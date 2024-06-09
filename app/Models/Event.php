@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Event extends Model
 {
     use HasFactory;
-    //data falta el lugar
-    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description', 'image', 'status'];
+    //data falta el lugar y costo
+    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description', 'image','status','price'];
 
     //relations with users,place,payments
 

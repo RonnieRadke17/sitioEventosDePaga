@@ -23,6 +23,8 @@ return new class extends Migration
             //$table->foreign('place_id')->references('id')->on('places')->onDelete('cascade')->onUpdate('cascade');
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
             //falta algo que ponga su status, de si esta activo el evento o ya no
+            //precio
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
     }

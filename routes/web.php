@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PaypalController;
+use App\Http\Controllers\UserEventController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,8 +17,9 @@ Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
 
 
-Route::view('/home', 'home')->middleware('auth')->name('home');//ruta que muestra la pagina principal
-
+Route::get('/home', [UserEventController::class, 'index'])->name('home');//ruta que muestra la pagina principal
+Route::get('/events/{id}', [UserEventController::class, 'show'])->name('events.show');
+Route::get('/purchase-event/{id}', [UserEventController::class, 'purchase'])->name('events.purchase');
 
 Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
 Route::view('/register', 'auth/register')->name('register');//ruta que muestra la vista del register ya no se ocupa

@@ -8,6 +8,9 @@ use App\Models\Payment;
 
 class PaypalController extends Controller
 {
+
+    //agregar que si el pago fue exitoso se haga la incersion en userEvent el id del usuario y del evento
+
     public function paypal(Request $request)
     {
         $provider = new PayPalClient;

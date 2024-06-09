@@ -26,4 +26,5 @@
             <option value="Activo">Activo</option>
             
         </select>
+        <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required value="{{ $event->price ?? '' }}">
         <input type="submit" value="{{$mode}}">
