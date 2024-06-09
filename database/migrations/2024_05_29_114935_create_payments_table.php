@@ -16,6 +16,8 @@ return new class extends Migration
             //falta id  de evento y de usuario que hizo el pago
             //como las fechas del pago si se puede
             $table->string('payment_id');
+            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('event_id')->constrained('events')->onUpdate('cascade')->onDelete('cascade');
             $table->string('product_name');
             $table->string('quantity');
             $table->string('amount');

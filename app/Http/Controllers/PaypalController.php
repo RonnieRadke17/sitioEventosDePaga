@@ -38,6 +38,7 @@ class PaypalController extends Controller
                 if($link['rel'] === 'approve') {
                     session()->put('product_name', $request->product_name);
                     session()->put('quantity', $request->quantity);
+                    session()->put('event_id', $request->event);//send id event 
                     return redirect()->away($link['href']);
                 }
             }
@@ -57,6 +58,9 @@ class PaypalController extends Controller
             // Insert data into database
             $payment = new Payment;
             $payment->payment_id = $response['id'];
+            //id of event and user
+            $payment->user_id = auth()->id();;
+            $payment->event_id = session()->get('event_id');
             $payment->product_name = session()->get('product_name');
             $payment->quantity = session()->get('quantity');
             $payment->amount = $response['purchase_units'][0]['payments']['captures'][0]['amount']['value'];
@@ -66,6 +70,9 @@ class PaypalController extends Controller
             $payment->payment_status = $response['status'];
             $payment->payment_method = "PayPal";
             $payment->save();
+
+            //insert into userEvent
+
 
             //aqui va la ruta de regreso a la pagina de eventos la cual tiene que mandar un mensaje de pago con exito de sweetalert
             return "Siuuuu";
@@ -80,6 +87,7 @@ class PaypalController extends Controller
     }
     public function cancel()//aqui va la ruta de home con un mensaje 
     {
-        return "Pago cancelado unu.";
+        //return "Pago cancelado unu.";
+        return view('home');//aqui para regresar a home tienes que mandar todos los eventos otra vez
     }
 }

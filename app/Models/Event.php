@@ -25,6 +25,6 @@ class Event extends Model
 
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->belongsToMany(User::class, 'payments')->withTimestamps();
     }
 }

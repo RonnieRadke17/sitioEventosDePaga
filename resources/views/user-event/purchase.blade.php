@@ -21,6 +21,7 @@
         @csrf
         <input type="hidden" name="price" value="{{ $event->price }}">
         <input type="hidden" name="product_name" value="{{ $event->name }}">
+        <input type="hidden" name="event" value="{{ $event->id }}">
         <input type="hidden" name="quantity" value="1">
         <button type="submit">Pay with payPal</button>
     </form>
