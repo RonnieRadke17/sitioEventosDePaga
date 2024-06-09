@@ -71,7 +71,7 @@ class PaypalController extends Controller
             $payment->payment_method = "PayPal";
             $payment->save();
 
-            //insert into userEvent
+            //insert into userEvent donde va el idUser y idEvent como a su vez los id de las actividades
 
 
             //aqui va la ruta de regreso a la pagina de eventos la cual tiene que mandar un mensaje de pago con exito de sweetalert
