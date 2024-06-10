@@ -8,8 +8,8 @@
 </head>
 <body>
 
-    <h2>Product: Laptop</h2>
-    <h3>Price: $5</h3>
+    <h2>Producto: Laptop</h2>
+    <h3>Precio: $5</h3>
 
     <form action="{{ route('paypal') }}" method="post">
         @csrf

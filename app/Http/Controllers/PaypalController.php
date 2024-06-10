@@ -59,7 +59,7 @@ class PaypalController extends Controller
             $payment = new Payment;
             $payment->payment_id = $response['id'];
             //id of event and user
-            $payment->user_id = auth()->id();;
+            $payment->user_id = auth()->id();
             $payment->event_id = session()->get('event_id');
             $payment->product_name = session()->get('product_name');
             $payment->quantity = session()->get('quantity');

@@ -5,13 +5,25 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\UserEventController;
+
+
+use App\Http\Controllers\PaypalController;
+use App\Http\Controllers\MercadoPagoController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
+//mercadopago
+Route::get('/mp', [MercadoPagoController::class, 'index']);
+
+Route::get('/create-preference', [MercadoPagoController::class, 'generatePreferenceId']);
+
+
+
+//paypal
 Route::post('paypal', [PaypalController::class, 'paypal'])->name('paypal');
 Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
