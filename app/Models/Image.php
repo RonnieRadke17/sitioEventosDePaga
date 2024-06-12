@@ -5,17 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Activity extends Model
+class Image extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-     'name'
+        'image',
     ];
 
-    //relation with event
-    public function eventActivities()
+
+    //relation with events 1-n-1
+    public function imgEvents()
     {
         return $this->belongsToMany(Event::class)->withTimestamps();
     }
-
 }

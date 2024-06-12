@@ -9,7 +9,7 @@ class Event extends Model
 {
     use HasFactory;
     //data falta el lugar y costo
-    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description', 'image','status','price'];
+    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description','status','price'];
 
     //relations with users,place,payments
 
@@ -27,4 +27,19 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'payments')->withTimestamps();
     }
+
+
+    //relation with activity 
+    public function eventActivities()
+    {
+        return $this->belongsToMany(Activity::class)->withTimestamps();
+    }
+
+
+    //relation with images 1-n-1
+    public function imgEvents()
+    {
+        return $this->belongsToMany(Image::class)->withTimestamps();
+    }
+    
 }

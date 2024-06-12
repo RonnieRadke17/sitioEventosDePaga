@@ -18,12 +18,13 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->text('description');
-            $table->string('image')->nullable();
-            //desmarcar el lugar
+            //$table->string('image')->nullable(); ya esta una relacion en la tabla
+            //falta poner lugar de entrga de kits y lugar del evento
             //$table->foreign('place_id')->references('id')->on('places')->onDelete('cascade')->onUpdate('cascade');
+            //$table->foreign('place_id')->references('id')->on('places')->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('capacity');
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
             //falta algo que ponga su status, de si esta activo el evento o ya no
-            //precio
             $table->decimal('price', 10, 2);
             $table->timestamps();
         });

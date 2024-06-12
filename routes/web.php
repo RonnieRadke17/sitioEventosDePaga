@@ -6,6 +6,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SubController;
 
 
 use App\Http\Controllers\PaypalController;
@@ -15,6 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::resource('sub', SubController::class);
+
+Route::resource('activity', ActivityController::class);
 
 //mercadopago
 Route::get('/mp', [MercadoPagoController::class, 'index']);

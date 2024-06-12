@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Activity;
+use App\Models\Sub;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -21,7 +23,16 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('event.create');
+        //hacer un carrusel de imgs en el sistema y que las pueda elegir o subir una nueva las que quiera en si 
+        //insert into event, event_activities, img,img_events incluso en dado caso si quiero registrar una nueva actividad
+        //se tiene que hacer una insercion en actividad antes que en evento(se haria antes que todas las demas inserciones)
+
+        //aqui vamos a tener que mandar la lista de actividades para que las seleccione
+        //show the activities registered
+        $activities = Activity::all(); // Esto te da una colección de todos los modelos Activity
+        //show the subs registered
+        $subs = Sub::all(); // Esto te da una colección de todos las subs
+        return view('event.create', compact('activities','subs'));        
     }
 
     /**
@@ -35,7 +46,12 @@ class EventController extends Controller
             $datosEvento['image'] = $request->file('image')->store('uploads', 'public');
         }
 
-        Event::create($datosEvento);
+        //registras primero el evento y luego a que actividades estan registradas en el evento
+        $event = Event::create($datosEvento);
+        
+        $id = $event->id;
+        //aqui sigue guardar las actividades a realizar
+
 
         return redirect('event')->with('mensaje', 'Evento agregado con éxito');
     }
