@@ -8,7 +8,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "mercadopago/dx-php": "^3.0",
+        "mercadopago/dx-php": "*",
         "srmklive/paypal": "^3.0"
     },
     "require-dev": {
