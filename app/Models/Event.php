@@ -9,7 +9,7 @@ class Event extends Model
 {
     use HasFactory;
     //data falta el lugar y costo
-    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description','status','price'];
+    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description','capacity','status','price'];
 
     //relations with users,place,payments
 

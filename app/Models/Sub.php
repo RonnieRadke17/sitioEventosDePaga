@@ -13,6 +13,6 @@ class Sub extends Model
 
     public function subs()
     {
-        return $this->hasMany(EventActivity::class);
+        return $this->hasMany(ActivityEvent::class);
     }
 }

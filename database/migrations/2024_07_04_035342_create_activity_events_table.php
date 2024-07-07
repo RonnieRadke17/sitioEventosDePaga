@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('event_activities', function (Blueprint $table) {
+        Schema::create('activity_events', function (Blueprint $table) {
             $table->id();
             //si se amplia el negocio poner tabla de deportes
             $table->foreignId('event_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('event_activities');
+        Schema::dropIfExists('activity_events');
     }
 };
