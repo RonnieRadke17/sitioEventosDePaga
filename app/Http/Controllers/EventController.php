@@ -214,11 +214,11 @@ class EventController extends Controller
 /**
  * Display the specified resource.
  */
-public function show($id)
-{
-    $evento = Event::findOrFail($id);
-    return view('event.show', compact('event'));
-}
+    public function show($id)
+    {
+        $event = Event::with('images')->findOrFail($id);
+        return view('event.show', compact('event'));
+    }
 
 
     /**

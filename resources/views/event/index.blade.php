@@ -38,6 +38,7 @@
                 <td>{{$event->name}}</td>
                 <td>{{$event->date}}</td>
                 <td><img class="img-thumbnail img-fluid" src="{{asset('storage').'/'.$event->image}}" height="100px" width="100px" alt=""></td>
+                <td><a href="{{route('event.show', $event->id)}}" class="btn btn-warning">Ver</a> </td>
                 <td>
                     <a href="{{route('event.edit', $event->id)}}" class="btn btn-warning">Editar</a> 
                     |
