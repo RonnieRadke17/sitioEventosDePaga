@@ -216,6 +216,7 @@ class EventController extends Controller
  */
     public function show($id)
     {
+        //tenemos que buscar en la tabla intermedia las imagenes
         $event = Event::with('images')->findOrFail($id);
         return view('event.show', compact('event'));
     }
