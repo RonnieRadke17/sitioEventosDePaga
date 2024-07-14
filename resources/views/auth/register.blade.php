@@ -75,6 +75,4 @@
 
     <button type="submit">Registrar</button>
 </form>
-
-falta agregar reCaptcha aqui y luego mandar el codigo de verificacion
 @endsection

@@ -20,6 +20,7 @@
         <input type="checkbox" name="remember">
         <label for="remember">Mantener sesion</label>
 
+        <p><a href="{{route('register')}}">¿Olvidaste tu contraseña?</a></p>
         <p>No tienes cuenta? <a href="{{route('register')}}">Registrate</a></p>
         <button type="submit">Acceder</button>
             

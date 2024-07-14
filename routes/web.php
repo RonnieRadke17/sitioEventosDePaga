@@ -25,7 +25,8 @@ Route::get('/email-verification',[RegisterController::class,'emailVerification']
 
 Route::post('/check-email-verification',[RegisterController::class,'checkEmailVerification'])->name('check-email-verification');
 
-//Route::get('/email-verification',[RegisterController::class,'emailVerification'])->name('email-verification');;
+Route::post('/send-verification-code',[RegisterController::class,'sendVerificationCode'])->name('send-verification-code');
+
 
 
 

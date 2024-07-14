@@ -37,8 +37,8 @@ class RegisterController extends Controller
                 ->withInput();
         }
 
-        $contrladoremail = app(EmailController::class);
-        $contrladoremail->sendCodeViaEmail($request->email,"verification");
+        $controladoremail = app(EmailController::class);
+        $controladoremail->sendCodeViaEmail($request->email,"verification");
 
             //falta hacer la insersion del token en la DB
         $user = [
@@ -53,6 +53,13 @@ class RegisterController extends Controller
         // Almacenar los datos del usuario en la sesión
         session(['user' => $user]);
         return redirect()->route('email-verification');
+    }
+
+    public function sendVerificationCode(){
+        $user = session('user');
+        $controladoremail = app(EmailController::class);
+        $controladoremail->sendCodeViaEmail($user['email'],"verification");
+        return redirect()->back();
     }
 
 
