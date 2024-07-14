@@ -17,6 +17,36 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');//ruta que muestra la vista del register ya no se ocupa
+
+Route::post('/process-register', [RegisterController::class, 'processRegister'])->name('process-register');
+
+Route::get('/email-verification',[RegisterController::class,'emailVerification'])->name('email-verification');
+
+Route::post('/check-email-verification',[RegisterController::class,'checkEmailVerification'])->name('check-email-verification');
+
+//Route::get('/email-verification',[RegisterController::class,'emailVerification'])->name('email-verification');;
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::post('/signup',[RegisterController::class,'register'] )->name('signup');//ruta que registra al usr
+
+
+
+
+Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
+Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta que inicia sesion al usr 
+
 Route::resource('sub', SubController::class);
 
 Route::resource('activity', ActivityController::class);
@@ -38,12 +68,7 @@ Route::get('/home', [UserEventController::class, 'index'])->name('home');//ruta 
 Route::get('/events/{id}', [UserEventController::class, 'show'])->name('events.show');
 Route::get('/purchase-event/{id}', [UserEventController::class, 'purchase'])->name('events.purchase');
 
-Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
-Route::view('/register', 'auth/register')->name('register');//ruta que muestra la vista del register ya no se ocupa
 
-
-Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta que inicia sesion al usr 
-Route::post('/signup',[RegisterController::class,'register'] )->name('signup');//ruta que registra al usr
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
 

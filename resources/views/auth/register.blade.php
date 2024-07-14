@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('title','Registro')
 @section('content')
 @if ($errors->any())
     <div class="alert alert-danger">
@@ -11,7 +11,7 @@
     </div>
 @endif
 
-<form method="POST" action="{{ route('signup') }}">
+<form method="POST" action="{{ route('process-register') }}">
     @csrf
     <!-- Nombre -->
     <div>
@@ -40,11 +40,11 @@
         @enderror
     </div>
 
-    <!-- Edad -->
+    <!-- Fecha de nacimiento -->
     <div>
-        <label for="age">Edad</label>
-        <input id="age" type="number" name="age" value="{{ old('age') }}" required>
-        @error('age')
+        <label for="birthdate">Fecha de nacimiento</label>
+        <input id="birthdate" type="date" name="birthdate" value="{{ old('birthdate') }}" required>
+        @error('birthdate')
             <span class="text-danger">{{ $message }}</span>
         @enderror
     </div>
@@ -76,5 +76,5 @@
     <button type="submit">Registrar</button>
 </form>
 
-
+falta agregar reCaptcha aqui y luego mandar el codigo de verificacion
 @endsection
