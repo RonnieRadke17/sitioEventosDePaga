@@ -8,8 +8,8 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\SubController;
-
-
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\MercadoPagoController;
 
@@ -17,7 +17,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');//ruta que muestra la vista del register ya no se ocupa
+// web.php
+Route::get('/password/reset/{token}',[ResetPasswordController::class,'showResetForm'])->name('password.reset');//la ruta esta bien
+Route::get('/forgot-password',[ResetPasswordController::class,'showFormSendCode'])->name('forgot-password');
+Route::post('/send-passwod-code',[ResetPasswordController::class,'sendPasswordCode'])->name('send-passwod-code');
+
+
+Route::get('/error',[ErrorsController::class,'showWindowError'])->name('window.error');
+
+Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');
 
 Route::post('/process-register', [RegisterController::class, 'processRegister'])->name('process-register');
 
@@ -26,16 +34,6 @@ Route::get('/email-verification',[RegisterController::class,'emailVerification']
 Route::post('/check-email-verification',[RegisterController::class,'checkEmailVerification'])->name('check-email-verification');
 
 Route::post('/send-verification-code',[RegisterController::class,'sendVerificationCode'])->name('send-verification-code');
-
-
-
-
-
-
-
-
-
-
 
 
 

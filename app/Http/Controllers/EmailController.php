@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
 use App\Models\EmailVerification;
+use App\Models\PasswordResetToken;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class EmailController extends Controller
@@ -43,22 +45,14 @@ class EmailController extends Controller
                     'token' => $code,
                     'expiration' => Carbon::now()->addMinutes(5)
                 ]);
+
+                // Send the email
+                Mail::send('emails.verification', $data, function ($message) use ($email,$subject) {
+                    $message->to($email)
+                    ->subject($subject);
+                });
                 break;
-
-            case "resetPassword":
-                $data = [
-                    'mailSubject' => 'Código de Recuperación',
-                    'mailMessage' => 'tu codigo de Recuperación es:',
-                    'code' => $code
-                ];
-            break;
-
         }        
-        // Send the email
-        Mail::send('emails.verification', $data, function ($message) use ($email,$subject) {
-            $message->to($email)
-            ->subject($subject);
-        });
 
     }
 
