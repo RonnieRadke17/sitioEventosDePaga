@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
 use App\Models\EmailVerification;
 use App\Models\PasswordResetToken;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
 use Carbon\Carbon;
 
 class EmailController extends Controller
@@ -42,7 +42,8 @@ class EmailController extends Controller
         
                 EmailVerification::create([
                     'email' => $email,
-                    'token' => $code,
+                    'token' => $code,//se manda encriptado a la DB
+                    //'token' => Crypt::encryptString($code),//se manda encriptado a la DB
                     'expiration' => Carbon::now()->addMinutes(5)
                 ]);
 
@@ -60,7 +61,10 @@ class EmailController extends Controller
         
         switch($affair){
             case "verifyCodeRegister":
-                // 1. Buscar el registro de verificación
+                /* 
+                    Buscamos el registro de verificación y encriptamos el codigo para buscarlo en la DB
+                */
+                //$code = Crypt::encryptString($code);
                 $verification = EmailVerification::where('email', $email)->where('token', $code)->first();
 
                 // 2. Verificar si se encontró el registro
@@ -80,7 +84,7 @@ class EmailController extends Controller
 
                 // Si todas las verificaciones pasan, proceder con la verificación
                 // Aquí puedes marcar el token como utilizado, etc.
-                $verification->status = true; // O como lo manejes
+                $verification->status = true;
                 $verification->save();
 
                 return 'Correo verificado con éxito.';

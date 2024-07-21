@@ -1,17 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Restablecer Contraseña</title>
-</head>
-<body>
-    
+@extends('layouts.app')
+@section('title','Restablecer contraseña')
+@section('content')
+@if (session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
+    </div>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <form method="POST" action="{{ route('password.update') }}">
     @csrf
     <input type="hidden" name="token" value="{{ $token }}">
-
     <div>
         <label for="password">Nueva contraseña</label>
         <input type="password" name="password" required>
@@ -27,5 +35,6 @@
     </div>
 </form>
 
-</body>
-</html>
+@endsection
+
+

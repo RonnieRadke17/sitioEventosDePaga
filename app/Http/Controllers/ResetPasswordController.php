@@ -9,10 +9,11 @@ use Illuminate\Mail\Message;
 use App\Models\EmailVerification;
 use App\Models\User;
 use App\Models\PasswordResetToken;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
+use Illuminate\Support\Str;//se usa para generar texto aleatorio
+use Carbon\Carbon;//se usa para la fecha
 use App\Http\Controllers\ErrorsController;
+use Illuminate\Support\Facades\Validator;//se usa para validar informacion
 
 class ResetPasswordController extends Controller
 {
@@ -39,9 +40,7 @@ class ResetPasswordController extends Controller
                 $existingVerification->status = true;
                 $existingVerification->save();
             }
-
-            // Crear un nuevo token de restablecimiento de contraseña
-            $tokenEncrypted = Hash::make(Str::random(60)); // Generar y encriptar el token
+            $tokenEncrypted = Crypt::encryptString(Str::random(10));// generamos el token y lo encriptamos
 
             PasswordResetToken::create([
                 'email' => $email,
@@ -69,16 +68,14 @@ class ResetPasswordController extends Controller
 
     public function showResetForm($token)
     {
-        
         $passwordReset = PasswordResetToken::where('token', $token)->first();
         
-        //si el codigo no fue encontrado o si paso su tiempo de expiracion
-        if (!$passwordReset || $passwordReset->expiration <= Carbon::now()) {
+        if (!$passwordReset || $passwordReset->expiration <= Carbon::now()) {//si el codigo no fue encontrado o si paso su tiempo de expiracion
+            
             //redireccionamos a la ruta del controlador que contiene las vistas con error debido a que en este caso no se puede volver a intentar cargar la pagina
             return redirect()->route('window.error', ['message' => 'código expirado']);
         
-        //si el codigo ya ha expirado    
-        }else if($passwordReset->status == 1){
+        }else if($passwordReset->status == 1){//si el codigo ya fue usado    
 
             return redirect()->route('window.error', ['message' => 'código ya usado']);
         }
@@ -86,37 +83,52 @@ class ResetPasswordController extends Controller
         return view('auth.passwords.reset', ['token' => $token]);
     }
 
+    
+    //revisar el token del url y revisar el token del form verificando que sean veridicos
     public function reset(Request $request)//falta validar la informacion
     {
-        $request->validate([
-            'token' => 'required',
-            'password' => 'required|confirmed|min:8',
+        /* 
+            Aqui validamos la contrasena, que sea igual, que sea de min 8 caracteres y max de 40
+        */
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:8|max:40|confirmed',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        /* 
+            si la contrasena es valida entonces buscamos el token en la DB para actualizar la contrasena 
+            del correo el cual esta con el token e inhabilitamos el token y logueamos al usuario
+        */
         $passwordReset = PasswordResetToken::where('token', $request->token)->first();
 
         if (!$passwordReset || $passwordReset->expiration < Carbon::now()) {
             return back()->withErrors(['token' => 'El token es inválido o ha expirado.']);
         }
 
+        //aqui buscamos el usuario con ese correo
         $user = User::where('email', $passwordReset->email)->first();
+
         if (!$user) {
             return back()->withErrors(['email' => 'No se ha encontrado ningún usuario con este correo.']);
         }
-
-        $user->password = Hash::make($request->password);
+        /* 
+            Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel
+        */
+        $user->password = Crypt::encryptString($request->password);
         $user->setRememberToken(Str::random(60));
         $user->save();
 
-        // Eliminar el token utilizado
-        //$passwordReset->delete();
-
         // Inhabilitar el token utilizado
-        $passwordReset->status = false; // O cualquier otro valor que indique que el token ya no es válido
+        $passwordReset->status = true; 
         $passwordReset->save();
 
         auth()->login($user);
 
-        return redirect('/home');
+        return redirect()->route('home');// redijirimos a la ruta principal
+
     }
 }

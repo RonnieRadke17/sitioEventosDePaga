@@ -1,30 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login</title>
-</head>
-<body>
-    <main class="container aling-center p-5">
-        <form method="Post" action="{{route('signin')}}">
-        @csrf
-        
-        <label for="email">Email address</label>
-        <input type="email" name="email" required autocomplete="disable">
-        
-        <label for="password">Password</label>
-        <input type="password" name="password" required autocomplete="disable">
-        
-        <input type="checkbox" name="remember">
-        <label for="remember">Mantener sesion</label>
+@extends('layouts.app')
+@section('title','Login')
+@section('content')
 
-        <p><a href="{{route('forgot-password')}}">¿Olvidaste tu contraseña?</a></p>
-        <p>No tienes cuenta? <a href="{{route('register')}}">Registrate</a></p>
-        <button type="submit">Acceder</button>
-            
-        </form>
-    </main>
-</body>
-</html>
+<form method="POST" action="{{ route('signin') }}" class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+    @csrf
+    
+    <div class="mb-4">
+        <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email address</label>
+        <input type="email" name="email" id="email" required autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+    
+    <div class="mb-4">
+        <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+        <input type="password" name="password" id="password" required autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+    
+    <div class="flex items-center mb-4">
+        <input type="checkbox" name="remember" id="remember" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+        <label for="remember" class="ml-2 block text-gray-700 text-sm font-medium">Mantener sesión</label>
+    </div>
+    
+    <div class="mb-4 text-sm text-gray-600">
+        <p><a href="{{ route('forgot-password') }}" class="text-indigo-600 hover:text-indigo-700">¿Olvidaste tu contraseña?</a></p>
+        <p>No tienes cuenta? <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-700">Regístrate</a></p>
+    </div>
+    
+    <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Acceder</button>
+</form>
+
+@endsection

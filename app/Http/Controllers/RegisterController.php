@@ -26,7 +26,12 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'paternal' => 'required|string|max:255',
             'maternal' => 'required|string|max:255',
-            'birthdate' => 'required|date|before_or_equal:today|date_format:Y-m-d',
+            'birthdate' => [
+                'required',
+                'date',
+                'before_or_equal:' . now()->subYears(10)->format('Y-m-d'),
+                'date_format:Y-m-d',
+            ],
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -55,11 +60,11 @@ class RegisterController extends Controller
         return redirect()->route('email-verification');
     }
 
-    public function sendVerificationCode(){
+    public function sendVerificationCode(){//aqui me falta mandar el mensaje de codigo renviado
         $user = session('user');
         $controladoremail = app(EmailController::class);
         $controladoremail->sendCodeViaEmail($user['email'],"verification");
-        return redirect()->back();
+        return redirect()->back()->with('message','Código reenviado');
     }
 
 
