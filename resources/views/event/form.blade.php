@@ -1,122 +1,94 @@
-<style>
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
+            <!-- Paso 1: Event Details -->
+            <div id="step-1">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700">Event Name</label>
+                    <input type="text" name="name" id="name" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-gray-700">Description</label>
+                    <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                </div>
+                <div class="flex mb-4">
+                    <div class="w-1/2 pr-2">
+                        <label for="event_date" class="block text-gray-700">Event Date</label>
+                        <input type="text" name="event_date" id="event_date" class="w-full px-4 py-2 border rounded-lg" placeholder="YYYY-MM-DD HH:MM">
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="registration_deadline" class="block text-gray-700">Registration Deadline</label>
+                        <input type="text" name="registration_deadline" id="registration_deadline" class="w-full px-4 py-2 border rounded-lg" placeholder="YYYY-MM-DD HH:MM">
+                    </div>
+                </div>
 
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-    }
+                <div class="flex mb-4">
+                    <div class="w-1/2 pr-2">
+                        <label for="kit_delivery" class="block text-gray-700">Kit Delivery Date (Optional)</label>
+                        <input type="text" name="kit_delivery" id="kit_delivery" class="w-full px-4 py-2 border rounded-lg" placeholder="YYYY-MM-DD HH:MM">
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="is_limited_capacity" class="block text-gray-700">Limited Capacity</label>
+                        <select name="is_limited_capacity" id="is_limited_capacity" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
 
-    .dropdown-content label {
-        display: block;
-        padding: 8px;
-        position: relative; /* Needed to correctly position sub-dropdown */
-    }
+                <div class="mb-4 hidden" id="capacity-field">
+                    <label for="capacity" class="block text-gray-700">Capacity</label>
+                    <input type="number" name="capacity" id="capacity" class="w-full px-4 py-2 border rounded-lg" min="1">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="price" class="block text-gray-700">Price</label>
+                    <input type="number" name="price" id="price" class="w-full px-4 py-2 border rounded-lg" step="0.01" min="0">
+                </div>
+                @if ($mode == 'Editar')
+                <div class="mb-4">
+                    <label for="status" class="block text-gray-700">Status</label>
+                    <select name="status" id="status" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="Activo">Active</option>
+                        <option value="Inactivo">Inactive</option>
+                        <option value="Cancelado">Cancelled</option>
+                    </select>
+                </div>
+                @endif
 
-    .dropdown-content label:hover {
-        background-color: #f1f1f1;
-    }
+                <div class="flex justify-center mt-4">
+                    <button type="button" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2" id="to-step-2">Next</button>
+                </div>
+                
+            </div>
 
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    .dropdown:hover .dropbtn {
-        background-color: #3e8e41;
-    }
-
-    .sub-dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 140px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        left: 160px; /* Adjust to align with parent dropdown */
-        top: 0px;   /* Align with the parent label */
-    }
-
-    .dropdown-content label:hover .sub-dropdown-content {
-        display: block;
-    }
-</style>
-
-<h1>{{$mode}} evento</h1>
-
-@if(count($errors)>0)
-    <div class="alert alert-danger" role="alert">
-        <ul>
-            @foreach($errors->all() as $error)
-                <li>{{$error}}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-<input type="text" name="name" id="" value="{{ $event->name ?? '' }}" placeholder="Nombre del evento">
-<br>
-<input type="date" name="date" id="" value="{{ $event->date ?? '' }}">
-<br>
-<label for="start_time">Fecha del evento</label>
-<input type="time" name="start_time" id="" value="{{ $event->start_time ?? '' }}">
-<br>
-<label for="end_time">cierre de inscripciones</label>
-<input type="time" name="end_time" id="" value="{{ $event->end_time ?? '' }}">
-<br>
-<input type="text" name="description" id="" value="{{ $event->description ?? '' }}" placeholder="Descripción del evento">
-<br>
-<input type="number" name="capacity" id="" value="{{ $event->capacity ?? '' }}" placeholder="Capacidad del evento">
-<br>
-<input type="number" class="form-control" id="price" name="price" step="0.01" min="0"  value="{{ $event->price ?? '' }}" placeholder="Precio del evento">      
-<br>
-
-<label for="image">Imagen</label>
-@if(isset($event->image))
-    <img class="img-thumbnail img-fluid" src="{{asset('storage').'/'.$event->image}}" width="100" alt="">
-@endif
-<input type="file" class="form-control" name="images[]" value="" id="imagen" multiple>
-<br>       
-@if($mode == 'Editar')
-<select class="form-control" name="status">
-    <option value="Activo" {{ $event->status == 'Activo' ? 'selected' : '' }}>Activo</option>
-    <option value="Inactivo" {{ $event->status == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
-</select>
-<br>
-@endif
-
-<!-- Tabla de actividades -->
-<table class="table table-light">
-    <thead class="thead-light">
-        <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Genero y Subs</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($activities as $activity)
-        <tr>
-            <td><input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}></td>
-            <td>{{ $activity->name }}</td>
-            <td>
-                <div class="dropdown">
-                    <input type="button" class="dropbtn" value="Seleccionar Genero y Subs"></input>
-                    <div class="dropdown-content">
-                        @foreach(['M', 'F', 'Mix'] as $gender)
-                            <label>
-                                <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}" 
-                                @if(isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->contains('gender', $gender))
-                                    checked
-                                @endif> {{ $gender }}
-                                <div class="sub-dropdown-content">
-                                    @foreach ($subs as $sub)
-                                        <label>
+            <!-- Paso 2: Activities -->
+            <div id="step-2" class="hidden">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="py-2 px-4 text-left">Nombre</th>
+                            <th class="py-2 px-4 text-left">Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($activities as $activity)
+                        <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
+                            <td class="py-2 px-4">{{ $activity->name }}</td>
+                            <td class="py-2 px-4 text-center">
+                                <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}>
+                            </td>
+                        </tr>
+                        <tr class="hidden activity-details" id="activity-{{ $activity->id }}-details">
+                            <td colspan="2" class="py-2 px-4">
+                                @foreach(['M', 'F', 'Mix'] as $gender)
+                                <div class="mb-2">
+                                    <label class="block font-semibold">
+                                        <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
+                                        @if(isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->contains('gender', $gender))
+                                            checked
+                                        @endif> {{ $gender }}
+                                    </label>
+                                    <div class="pl-4 hidden gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
+                                        @foreach ($subs as $sub)
+                                        <label class="block">
                                             <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
                                             @if(isset($eventActivities[$activity->id]))
                                                 @foreach($eventActivities[$activity->id] as $eventActivity)
@@ -124,19 +96,22 @@
                                                         checked
                                                     @endif
                                                 @endforeach
-                                            @endif> {{ $sub->name }} ({{ $gender }})
+                                            @endif> {{ $sub->name }}
                                         </label>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </label>
+                                @endforeach
+                            </td>
+                        </tr>
                         @endforeach
-                    </div>
+                    </tbody>
+                </table>
+                <div class="flex justify-between mt-4">
+                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
+                    <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
                 </div>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+            </div>
 
 <!-------aqui van dos mapas el cual uno es para entrega de kits y otro es para lugar del evento--------->
-<input type="submit" value="{{$mode}}">
+

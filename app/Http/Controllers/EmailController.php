@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
 use App\Models\EmailVerification;
 use App\Models\PasswordResetToken;
-use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
 use Carbon\Carbon;
 
 class EmailController extends Controller
@@ -42,8 +41,7 @@ class EmailController extends Controller
         
                 EmailVerification::create([
                     'email' => $email,
-                    'token' => $code,//se manda encriptado a la DB
-                    //'token' => Crypt::encryptString($code),//se manda encriptado a la DB
+                    'token' => base64_encode($code),
                     'expiration' => Carbon::now()->addMinutes(5)
                 ]);
 
@@ -63,8 +61,11 @@ class EmailController extends Controller
             case "verifyCodeRegister":
                 /* 
                     Buscamos el registro de verificación y encriptamos el codigo para buscarlo en la DB
+                    aqui va encriptar el codigo dado por el usuario
                 */
-                //$code = Crypt::encryptString($code);
+                
+                $code = base64_encode($code);
+                
                 $verification = EmailVerification::where('email', $email)->where('token', $code)->first();
 
                 // 2. Verificar si se encontró el registro
@@ -78,7 +79,7 @@ class EmailController extends Controller
                 }
 
                 // 4. Verificar si el token ha expirado
-                if ($verification->expiration < Carbon::now('UTC')) {
+                if ($verification->expiration < Carbon::now('America/Mexico_City')) {
                 return 'El token ha expirado.';
                 }
 

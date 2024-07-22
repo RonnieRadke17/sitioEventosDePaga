@@ -9,7 +9,17 @@ class Event extends Model
 {
     use HasFactory;
     //data falta el lugar y costo
-    protected $fillable = ['name', 'date', 'start_time', 'end_time', 'description','capacity','status','price'];
+    protected $fillable = [
+        'name',
+        'description',
+        'event_date',
+        'kit_delivery',
+        'registration_deadline', 
+        'is_limited_capacity',
+        'capacity',
+        'status',
+        'price'
+    ];
 
     //relations with users,place,payments
 

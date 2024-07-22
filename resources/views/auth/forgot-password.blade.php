@@ -12,7 +12,7 @@
 @endif
 
 olvido su contrasena?
-<form action="{{'send-passwod-code'}}" method="post">
+<form action="{{ route('password.send-password-code') }}" method="post">
     @csrf
     <input type="email" name="email" placeholder="ingrese su correo">
     <button type="submit">enviar codigo</button>

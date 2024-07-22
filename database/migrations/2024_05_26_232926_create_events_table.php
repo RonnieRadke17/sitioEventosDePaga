@@ -14,17 +14,17 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time');
             $table->text('description');
-            //$table->string('image')->nullable(); ya esta una relacion en la tabla
-            //falta poner lugar de entrga de kits y lugar del evento
-            //$table->foreign('place_id')->references('id')->on('places')->onDelete('cascade')->onUpdate('cascade');
-            //$table->foreign('place_id')->references('id')->on('places')->onDelete('cascade')->onUpdate('cascade');
-            $table->integer('capacity');
+            $table->datetime('event_date');//datetime sobre la fecha del evento
+            $table->datetime('kit_delivery')->nullable();//fecha de entrega de kits puede que se den o no
+            $table->datetime('registration_deadline');//datetime del ultimo dia para inscribirse y la hora
+            /* 
+                aqui definimos que si la capacidad es limitada si se ocupa el campo capacidad 
+                si no es limitada no se ocupa ese campo 
+            */
+            $table->boolean('is_limited_capacity')->default(true);
+            $table->integer('capacity')->nullable();
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
-            //falta algo que ponga su status, de si esta activo el evento o ya no
             $table->decimal('price', 10, 2);
             $table->timestamps();
         });
