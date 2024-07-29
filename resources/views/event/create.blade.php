@@ -1,6 +1,9 @@
 @extends('layouts.app')
 @section('head')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+{{-- <script src="{{ asset('js/calendar.js') }}"></script>
+<link rel="stylesheet" href="/css/calendar.css"> --}}
 <style>
     /**
      * @license
@@ -100,12 +103,26 @@
 
         if (place.viewport) {
           map.innerMap.fitBounds(place.viewport);
+          
+          
         } else {
           map.center = place.location;
+          
           map.zoom = 17;
         }
 
         marker.position = place.location;
+        const textLat = document.getElementById("place-lat");
+        const textLng = document.getElementById("place-lng");
+        const textName = document.getElementById("place-name-input");
+        const textAdress = document.getElementById("place-address-input");
+
+        //valores del 1er mapa
+        textLat.value = place.location.lat();
+        textLng.value = place.location.lng();
+        textName.value = place.displayName;
+        textAdress.value = place.formattedAddress;
+        
         infowindowContent.children["place-name"].textContent = place.displayName;
         infowindowContent.children["place-address"].textContent = place.formattedAddress;
         infowindow.open(map.innerMap, marker);

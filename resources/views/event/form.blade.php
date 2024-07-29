@@ -1,4 +1,4 @@
-            <!-- Paso 1: Event Details -->
+        <!-- Paso 1: Event Details -->
         <div id="step-1">
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700">Event Name</label>
@@ -131,64 +131,65 @@
         </div>
 
 
-<!-- Paso 3: Maps -->
-<div id="step-3" class="hidden">
-    <h2 class="text-lg font-semibold mb-4">Lugar del Evento</h2>
-    <select name="place_id" id="place_id" class="form-select mb-4">
-        @foreach($places as $place)
-            <option value="{{ $place->id }}">{{ $place->name }}</option>
-        @endforeach
-        <option value="nose">nose...</option>
-        <option value="Otro">Otro...</option>
-    </select>
-    <p class="mb-4">Listado de lugares y opción de otro. Si selecciona "Otro", se muestra el mapa.</p>
+        <!-- Paso 3: Maps -->
+        <div id="step-3" class="hidden">
+            <h2 class="text-lg font-semibold mb-4">Lugar del Evento</h2>
+            <select name="place_id" id="place_id" class="form-select mb-4">
+                @foreach($places as $place)
+                    <option value="{{ $place->id }}">{{ $place->name }}</option>
+                @endforeach
+                <option value="nose">nose...</option>
+                <option value="Otro">Otro...</option>
+            </select>
+            <p class="mb-4">Listado de lugares y opción de otro. Si selecciona "Otro", se muestra el mapa.</p>
 
-    <div id="map-container" class="hidden">
-        <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">
-        </gmpx-api-loader>
-        <gmp-map id="map" center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
-            <div slot="control-block-start-inline-start" class="pac-card" id="pac-card">
-                <div>
-                    <div id="title">Autocomplete search</div>
-                    <div id="type-selector" class="pac-controls">
-                        <input type="radio" name="type" id="changetype-all" checked="checked" />
-                        <label for="changetype-all">All</label>
-                        <input type="radio" name="type" id="changetype-establishment" />
-                        <label for="changetype-establishment">Establishment</label>
-                        <input type="radio" name="type" id="changetype-address" />
-                        <label for="changetype-address">Address</label>
-                        <input type="radio" name="type" id="changetype-geocode" />
-                        <label for="changetype-geocode">Geocode</label>
-                        <input type="radio" name="type" id="changetype-cities" />
-                        <label for="changetype-cities">(Cities)</label>
-                        <input type="radio" name="type" id="changetype-regions" />
-                        <label for="changetype-regions">(Regions)</label>
+            <div id="map-container" class="hidden">
+                <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">
+                </gmpx-api-loader>
+                <gmp-map id="map" center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
+                    <div slot="control-block-start-inline-start" class="pac-card" id="pac-card">
+                        <div>
+                            <div id="title">Autocomplete search</div>
+                            <div id="type-selector" class="pac-controls">
+                                <input type="radio" name="type" id="changetype-all" checked="checked" />
+                                <label for="changetype-all">All</label>
+                                <input type="radio" name="type" id="changetype-establishment" />
+                                <label for="changetype-establishment">Establishment</label>
+                                <input type="radio" name="type" id="changetype-address" />
+                                <label for="changetype-address">Address</label>
+                                <input type="radio" name="type" id="changetype-geocode" />
+                                <label for="changetype-geocode">Geocode</label>
+                                <input type="radio" name="type" id="changetype-cities" />
+                                <label for="changetype-cities">(Cities)</label>
+                                <input type="radio" name="type" id="changetype-regions" />
+                                <label for="changetype-regions">(Regions)</label>
+                            </div>
+                            <br />
+                            <div id="strict-bounds-selector" class="pac-controls">
+                                <input type="checkbox" id="use-strict-bounds" value="" />
+                                <label for="use-strict-bounds">Restrict to map viewport</label>
+                            </div>
+                        </div>
+                        <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
                     </div>
-                    <br />
-                    <div id="strict-bounds-selector" class="pac-controls">
-                        <input type="checkbox" id="use-strict-bounds" value="" />
-                        <label for="use-strict-bounds">Restrict to map viewport</label>
-                    </div>
+                    <gmp-advanced-marker id="marker"></gmp-advanced-marker>
+                </gmp-map>
+                <div id="infowindow-content">
+                    <span id="place-name" class="title" style="font-weight: bold;"></span><br />
+                    <span id="place-address"></span>
                 </div>
-                <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
             </div>
-            <gmp-advanced-marker id="marker"></gmp-advanced-marker>
-        </gmp-map>
-        <div id="infowindow-content">
-            <span id="place-name" class="title" style="font-weight: bold;"></span><br />
-            <span id="place-address"></span>
+
+            <input type="text" id="place-lat" name="lat">
+            <input type="text" id="place-lng" name="lng">
+            <input type="text" id="place-name-input" name="place">
+            <input type="text" id="place-address-input" name="address">
+
+            <div class="flex justify-between mt-4">
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step2">Regresar</button>
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-4">siguiente</button>
+            </div>
         </div>
-    </div>
-
-    <input type="text" id="place-lat" name="lat">
-    <input type="text" id="place-lon" name="lon">
-    <input type="text" id="place-address-input" name="address">
-
-    <div class="flex justify-between mt-4">
-        <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step2">Regresar</button>
-        <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-4">siguiente</button>
-    </div>
-</div>
       
         
 
