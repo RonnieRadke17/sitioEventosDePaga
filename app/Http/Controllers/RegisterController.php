@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User; // Importa tu modelo User
 use Illuminate\Support\Facades\Auth; // Importa Auth para el login
-
+use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
 
@@ -33,7 +33,7 @@ class RegisterController extends Controller
                 'date_format:Y-m-d',
             ],
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',//poner validacion de minusculas y mayusculas y numeros
         ]);
 
         if ($validator->fails()) {
@@ -52,11 +52,14 @@ class RegisterController extends Controller
             'maternal'=> $request->maternal,
             'birthdate'=> $request->birthdate,
             'email'=> $request->email,
-            'password' => Hash::make($request->password), // Encriptar la contraseña
+            //encriptar en base 64
+            'password' =>base64_encode($request->password),
+            //'password' => Crypt::encryptString($request->password), // Encriptar la contraseña
         ];    
-        
+        //dd($user);
         // Almacenar los datos del usuario en la sesión
         session(['user' => $user]);
+        
         return redirect()->route('email-verification');
     }
 

@@ -118,7 +118,8 @@ class ResetPasswordController extends Controller
         /* 
             Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel
         */
-        $user->password = Crypt::encryptString($request->password);
+        $user->password = base64_encode($request->password);
+        //$user->password = Crypt::encryptString($request->password);
         $user->setRememberToken(Str::random(60));
         $user->save();
 

@@ -2,17 +2,25 @@
 @section('title','Login')
 @section('content')
 
+
+
 <form method="POST" action="{{ route('signin') }}" class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
     @csrf
     
     <div class="mb-4">
         <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email address</label>
         <input type="email" name="email" id="email" required autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        @error('email')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
     </div>
     
     <div class="mb-4">
         <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
         <input type="password" name="password" id="password" required autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        @error('password')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
     </div>
     
     <div class="flex items-center mb-4">

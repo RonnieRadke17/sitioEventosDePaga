@@ -6,7 +6,9 @@ use App\Models\Event;
 use App\Models\Image;
 use App\Models\Activity;
 use App\Models\Sub;
+use App\Models\Place;
 use App\Models\ActivityEvent;
+use App\Models\ActivityCategory;
 use Illuminate\Http\Request;
 
 
@@ -26,16 +28,23 @@ class EventController extends Controller
      */
     public function create()
     {
-        //hacer un carrusel de imgs en el sistema y que las pueda elegir o subir una nueva las que quiera en si 
-        //insert into event, event_activities, img,img_events incluso en dado caso si quiero registrar una nueva actividad
-        //se tiene que hacer una insercion en actividad antes que en evento(se haria antes que todas las demas inserciones)
+        /* 
+            //hacer un carrusel de imgs en el sistema y que las pueda elegir o subir una nueva las que quiera en si 
+            //insert into event, event_activities, img,img_events incluso en dado caso si quiero registrar una nueva actividad
+            //se tiene que hacer una insercion en actividad antes que en evento(se haria antes que todas las demas inserciones)
 
-        //aqui vamos a tener que mandar la lista de actividades para que las seleccione
-        //show the activities registered
-        $activities = Activity::all(); // Esto te da una colección de todos los modelos Activity
-        //show the subs registered
+            //aqui vamos a tener que mandar la lista de actividades para que las seleccione
+            //show the activities registered
+            //$activities = Activity::all(); // Esto te da una colección de todos los modelos Activity
+            //show the subs registered
+            //return view('event.create', compact('activities','subs'));         
+        */
         $subs = Sub::all(); // Esto te da una colección de todos las subs
-        return view('event.create', compact('activities','subs'));        
+        //obtenemos todas las categorias con las actividades
+        $places = Place::all();
+        $activityCategories = ActivityCategory::with('activities')->get();
+
+        return view('event.create', compact('activityCategories','subs','places'));
     }
 
     /**
@@ -43,7 +52,10 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-    
+
+        dd($request);
+
+        //falta validar la informacion
         $eventData = [
             'name' => $request->name,
             'date' => $request->date,
