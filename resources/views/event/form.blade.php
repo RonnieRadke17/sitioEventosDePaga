@@ -180,6 +180,7 @@
                 </div>
             </div>
 
+            {{-- informacion del 1er mapa --}}
             <input type="text" id="place-lat" name="lat">
             <input type="text" id="place-lng" name="lng">
             <input type="text" id="place-name-input" name="place">
@@ -190,9 +191,7 @@
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-4">siguiente</button>
             </div>
         </div>
-      
         
-
           <!-- Paso 4: Imgs -->
          <div id="step-4" class="hidden">
             imgs del sitio 
