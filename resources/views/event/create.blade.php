@@ -1,21 +1,21 @@
 @extends('layouts.app')
 @section('head')
-{{-- script del calendario --}}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="{{ asset('js/calendar.js') }}"></script>
-{{-- style del mapa --}}
-<link rel="stylesheet" href="/css/mapStyle.css"> 
-{{-- script del mapa --}}
-<script src="{{ asset('js/map.js') }}"></script>
-<script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
+    {{-- script del calendario --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="{{ asset('js/calendar.js') }}"></script>
+    {{-- style del mapa --}}
+    <link rel="stylesheet" href="/css/mapStyle.css"> 
+    {{-- script del mapa --}}
+    <script src="{{ asset('js/map.js') }}"></script>
+    <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
 
-{{-- estilos de los checkbox --}}
-<link rel="stylesheet" href="/css/checkboxStyle.css">
+    {{-- estilos de los checkbox --}}
+    <link rel="stylesheet" href="/css/checkboxStyle.css">
 
-{{-- script que muestra el contenido el en form y el mapa del evento --}}
-<script src="{{ asset('js/formContent.js') }}"></script>
-
+    {{-- script que muestra el contenido el en form y el mapa del evento --}}
+    <script src="{{ asset('js/formContent.js') }}"></script>
 @endsection
+
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full md:w-2/3 lg:w-1/2">

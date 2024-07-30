@@ -44,8 +44,9 @@ class EventController extends Controller
         //obtenemos todas las categorias con las actividades
         $places = Place::all();
         $activityCategories = ActivityCategory::with('activities')->get();
-
-        return view('event.create', compact('activityCategories','subs','places'));
+        $activities = Activity::all();
+        //return view('event.create', compact('activityCategories','subs','places'));
+        return view('event.create', compact('activities','subs','places'));         
     }
 
     /**

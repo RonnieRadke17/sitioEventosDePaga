@@ -87,7 +87,9 @@
                 <button type="button" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2" id="to-step-2">Next</button>
             </div>
         </div>
-                    <!-- Paso 2: Activities -->
+
+        
+        <!-- Paso 2: Activities -->
         <div id="step-2" class="hidden">
             {{-- aqui se muestra el boton que muestra las actividades --}}
             <div class="mb-4">
@@ -120,33 +122,7 @@
                                     </label>
                                 </td>
                             </tr>
-                            <tr class="hidden activity-details" id="activity-{{ $activity->id }}-details">
-                                <td colspan="3" class="py-2 px-4">
-                                    <div class="flex justify-between mb-2">
-                                        <label class="gender-container" data-activity-id="{{ $activity->id }}" data-gender="M">
-                                            <input type="checkbox" name="genders[{{ $activity->id }}][M]" value="M" class="hidden">
-                                            <span class="gender-checkmark"></span> Male
-                                        </label>
-                                        <label class="gender-container" data-activity-id="{{ $activity->id }}" data-gender="F">
-                                            <input type="checkbox" name="genders[{{ $activity->id }}][F]" value="F" class="hidden">
-                                            <span class="gender-checkmark"></span> Female
-                                        </label>
-                                        <label class="gender-container" data-activity-id="{{ $activity->id }}" data-gender="Mix">
-                                            <input type="checkbox" name="genders[{{ $activity->id }}][Mix]" value="Mix" class="hidden">
-                                            <span class="gender-checkmark"></span> Mix
-                                        </label>
-                                    </div>
-                                    @foreach(['M', 'F', 'Mix'] as $gender)
-                                        <div class="pl-4 hidden gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
-                                            @foreach ($subs as $sub)
-                                                <label class="block">
-                                                    <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"> {{ $sub->name }}
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                    @endforeach
-                                </td>
-                            </tr>
+                            
                         @endforeach
                     @endforeach
                 </tbody>
