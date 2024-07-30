@@ -10,6 +10,7 @@ use App\Models\Place;
 use App\Models\ActivityEvent;
 use App\Models\ActivityCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 
 class EventController extends Controller
@@ -52,84 +53,113 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request);
+        $selectedActivities = $request->input('selected_activities');
+        //falta el valor de is_with_activities
+        dd($selectedActivities);
+        //informacion de evento//ya
+        //actividades del evento//en proceso
+        //mapa del evento//
+        //imagenes del evento
 
-        dd($request);
+        //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
+        $eventData = Validator::make($request->all(), [
+            'name' => 'required|string|max:60',
+            'description' => 'required|string|max:200',
+            'event_date' => 'required|date|after:today',
+            //la entrega de kits y restration sea after:today es decir se entregan despues de hoy
+            'kit_delivery' => 'required|date|after:today|before:event_date',
+            'registration_deadline' => 'required|date|after:today|before:event_date',
+            'is_limited_capacity' => 'required|boolean',
+            'capacity' => [
+                'nullable',
+                'integer',
+                'min:5',
+                'max:15000',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_limited_capacity') == 1 && ($value === null || $value <= 0)) {
+                        $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
+                    }
+                },
+            ],
+            'price' => 'required|numeric|min:10|max:10000',
+        ]);
 
-        //falta validar la informacion
-        $eventData = [
-            'name' => $request->name,
-            'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'description' => $request->description,
-            'capacity' => $request->capacity,
-            'price' => $request->price,
-        ];
-
-        //registras primero el evento y luego a que actividades estan registradas en el evento
-        $event = Event::create($eventData);
-
-        //luego guardamos el id del evento para registrar las imgs del evento
-        $eventId = $event->id;
-
-        #luego hacemos la insercion de las imagenes
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                //insercion de manera local de la img y en la DB
-                $path = $image->store('uploads', 'public');
-                $imageModel = Image::create([
-                    'image' => $path
-                ]);
-                // vinculamos el id de la imagen con el id del evento 
-                $event = Event::find($eventId);
-                // Utilizando el método attach para asociar la imagen al evento
-                $event->imgEvents()->attach($imageModel->id);
-            }
+        //aqui retornamos los errores de los datos del evento
+        if ($eventData->fails()) {
+            return redirect()->back()
+                ->withErrors($eventData)
+                ->withInput();
         }
 
-        
-        try {
-            // Iniciar una transacción para asegurar la integridad de los datos
-            \DB::beginTransaction();
 
-            // Obtener todas las actividades seleccionadas
-            $selectedActivities = $request->input('selected_activities');
 
-            foreach ($selectedActivities as $activityId) {
-                // Obtener los géneros seleccionados para esta actividad
-                $genders = $request->input("genders.$activityId", []);
+        //registras primero el evento y luego a que actividades estan registradas en el evento
+        //tenemos que validar todo y cuando este validado ya hacemos las incersiones
+        $event = Event::create($eventData);
+        /* 
+            //luego guardamos el id del evento para registrar las imgs del evento
+            $eventId = $event->id;
 
-                // Obtener las subactividades seleccionadas para esta actividad
-                $subs = $request->input("subs.$activityId", []);
-
-                // Iterar sobre los géneros seleccionados
-                foreach ($genders as $gender => $value) {
-                    // Iterar sobre las subactividades seleccionadas para este género
-                    foreach ($subs[$gender] as $subId) {
-                        // Crear un nuevo ActivityEvent
-                        ActivityEvent::create([
-                            'event_id' => $eventId,
-                            'activity_id' => $activityId,
-                            'gender' => $gender,
-                            'sub_id' => $subId,
-                        ]);
-                    }
+            #luego hacemos la insercion de las imagenes
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    //insercion de manera local de la img y en la DB
+                    $path = $image->store('uploads', 'public');
+                    $imageModel = Image::create([
+                        'image' => $path
+                    ]);
+                    // vinculamos el id de la imagen con el id del evento 
+                    $event = Event::find($eventId);
+                    // Utilizando el método attach para asociar la imagen al evento
+                    $event->imgEvents()->attach($imageModel->id);
                 }
             }
 
-            // Commit de la transacción si todo está correcto
-            \DB::commit();
+        */
+        //aqui estamos haciendo la insersion de las actividades
+        /*     try {
+                // Iniciar una transacción para asegurar la integridad de los datos
+                \DB::beginTransaction();
 
-            // Redireccionar o retornar una respuesta de éxito según tu flujo de aplicación
-            return redirect()->route('event.index')->with('success', 'Actividades registradas correctamente.');
-        } catch (\Exception $e) {
-            // En caso de error, hacer rollback de la transacción y manejar el error
-            \DB::rollback();
-            // Imprimir la excepción para depuración
-            dd($e);
-            return back()->withInput()->withErrors(['error' => "Error"]);
-        }
+                // Obtener todas las actividades seleccionadas
+                $selectedActivities = $request->input('selected_activities');
 
+                foreach ($selectedActivities as $activityId) {
+                    // Obtener los géneros seleccionados para esta actividad
+                    $genders = $request->input("genders.$activityId", []);
+
+                    // Obtener las subactividades seleccionadas para esta actividad
+                    $subs = $request->input("subs.$activityId", []);
+
+                    // Iterar sobre los géneros seleccionados
+                    foreach ($genders as $gender => $value) {
+                        // Iterar sobre las subactividades seleccionadas para este género
+                        foreach ($subs[$gender] as $subId) {
+                            // Crear un nuevo ActivityEvent
+                            ActivityEvent::create([
+                                'event_id' => $eventId,
+                                'activity_id' => $activityId,
+                                'gender' => $gender,
+                                'sub_id' => $subId,
+                            ]);
+                        }
+                    }
+                }
+
+                // Commit de la transacción si todo está correcto
+                \DB::commit();
+
+                // Redireccionar o retornar una respuesta de éxito según tu flujo de aplicación
+                return redirect()->route('event.index')->with('success', 'Actividades registradas correctamente.');
+            } catch (\Exception $e) {
+                // En caso de error, hacer rollback de la transacción y manejar el error
+                \DB::rollback();
+                // Imprimir la excepción para depuración
+                dd($e);
+                return back()->withInput()->withErrors(['error' => "Error"]);
+            }
+         */
     }
 
     // Resto de los métodos del controlador...

@@ -30,7 +30,7 @@
                 <span class="text-gray-700 text-sm">Activities</span>
             </div>
         </div>
-
+        
         <!-- Formulario -->
         <form action="{{ route('event.store') }}" method="post" id="multi-step-form">
             @csrf

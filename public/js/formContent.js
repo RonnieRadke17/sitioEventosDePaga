@@ -3,10 +3,33 @@
             //muestra el campo de capacidad y lo pone al lado de price
             document.getElementById('is_limited_capacity').addEventListener('change', function() {
                 const capacityField = document.getElementById('capacity-field');
-                if (this.value == '1') {
-                    capacityField.classList.remove('hidden');
+                const priceContent = document.getElementById('price-content');
+                const divContent = document.getElementById('div-content');
+                if
+                 (this.value == '1') {
+                    /* 
+                        si se muestra capacidad entonces  debe ser w-1/2 pr-2 ya 
+                        capacidad debe quitarle el mb-4 hidden 
+                        y a price-content quitarle el mb-4 y ponerle el w-1/2 pl-2 ya 
+                        como a su vez al divContent se le debe poner flex mb-4 ya  
+                    */
+
+                    divContent.classList.add('flex','mb-4');
+
+                    capacityField.classList.remove('mb-4','hidden');
+                    capacityField.classList.add('w-1/2', 'pr-2');
+
+                    priceContent.classList.remove('mb-4');
+                    priceContent.classList.add('w-1/2','pl-2');
                 } else {
-                    capacityField.classList.add('hidden');
+                    //no se muestra
+                    divContent.classList.remove('flex','mb-4');
+
+                    capacityField.classList.remove('w-1/2', 'pr-2');
+                    capacityField.classList.add('mb-4','hidden');
+
+                    priceContent.classList.remove('w-1/2','pl-2');
+                    priceContent.classList.add('mb-4');
                 }
             });
         
