@@ -101,9 +101,6 @@
                 </select>
             </div>
             {{-- tabla anterior --}}
-            
-                
-            
                 <div class="flex justify-between mt-4">
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
@@ -174,6 +171,9 @@
           <!-- Paso 4: Imgs -->
          <div id="step-4" class="hidden">
             imgs del sitio 
+
+            aqui mostramos las images que halla del evento y de la ui
+            para que pueda seleccionar las que quiera pero tambien pueda subir las que quiera
             
             <div class="flex justify-between mt-4">
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>

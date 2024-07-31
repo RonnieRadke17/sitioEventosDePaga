@@ -80,9 +80,7 @@ class EventController extends Controller
             'price' => 'required|numeric|min:10|max:10000',
             
             //aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
-
             //aqui se valida si se selecciono algun lugar ya registrado para validarlo
-
             'place_id' => [
             'required',
             'string',
@@ -107,6 +105,15 @@ class EventController extends Controller
             ],
 
             //aqui validamos la informacion de las imagenes    
+            'images.*' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ]
+
+
+            //aqui validamos la informacion de las actividades
         ]);
 
         
@@ -181,6 +188,8 @@ class EventController extends Controller
             }
 
         */
+        
+        
         //aqui estamos haciendo la insersion de las actividades
         /*     try {
                 // Iniciar una transacción para asegurar la integridad de los datos
