@@ -88,8 +88,9 @@
             </div>
         </div>
 
-        
+
         <!-- Paso 2: Activities -->
+        <!-- revisar la tabla todo lo relacionado con mostrar info-->
         <div id="step-2" class="hidden">
             {{-- aqui se muestra el boton que muestra las actividades --}}
             <div class="mb-4">
@@ -99,34 +100,9 @@
                     <option value="1">Yes</option>
                 </select>
             </div>
+            {{-- tabla anterior --}}
             
-            <table class="min-w-full bg-white border border-gray-200 hidden" id="activity_table">
-                <thead>
-                    <tr class="bg-gray-100 border-b">
-                        <th class="py-2 px-4 text-left">Categoría</th>
-                        <th class="py-2 px-4 text-left">Seleccionar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($activityCategories as $category)
-                        <tr class="bg-gray-200">
-                            <td class="py-2 px-4 font-bold" colspan="3">{{ $category->name }}</td>
-                        </tr>
-                        @foreach($category->activities as $activity)
-                            <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
-                                <td class="py-2 px-4">{{ $activity->name }}</td>
-                                <td class="py-2 px-4 text-center">
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}>
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                            
-                        @endforeach
-                    @endforeach
-                </tbody>
-            </table>
+                
             
                 <div class="flex justify-between mt-4">
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
@@ -142,8 +118,7 @@
                 @foreach($places as $place)
                     <option value="{{ $place->id }}">{{ $place->name }}</option>
                 @endforeach
-                <option value="nose">nose...</option>
-                <option value="Otro">Otro...</option>
+                <option value="Otro">Agregar uno nuevo</option>
             </select>
             <p class="mb-4">Listado de lugares y opción de otro. Si selecciona "Otro", se muestra el mapa.</p>
 

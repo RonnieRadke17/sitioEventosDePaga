@@ -83,34 +83,7 @@
             document.getElementById('step-4').classList.remove('hidden');
         });
 
-            // Mostrar/ocultar detalles de la actividad
-            document.querySelectorAll('.activity-row').forEach(row => {
-                row.addEventListener('click', function() {
-                    const activityId = this.dataset.activityId;
-                    const detailsRow = document.getElementById(`activity-${activityId}-details`);
-                    detailsRow.classList.toggle('hidden');
-                });
-            });
-        
-            // Manejar clic en el checkbox de género cambiar por el span o otra
-            document.querySelectorAll('.gender-container input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const activityId = this.name.match(/genders\[(\d+)\]/)[1];
-                    const gender = this.value;
-                    const subsDivs = document.querySelectorAll(`#activity-${activityId}-gender-M-subs, #activity-${activityId}-gender-F-subs, #activity-${activityId}-gender-Mix-subs`);
-        
-                    // Ocultar todas las sub-actividades de género
-                    subsDivs.forEach(subsDiv => {
-                        subsDiv.classList.add('hidden');
-                    });
-        
-                    // Mostrar solo las sub-actividades del género seleccionado
-                    if (this.checked) {
-                        document.querySelector(`#activity-${activityId}-gender-${gender}-subs`).classList.remove('hidden');
-                    }
-                });
-            });
-
+            
             //muestra el mapa del lugar del evento
             const placeSelect = document.getElementById('place_id');
             const mapContainer = document.getElementById('map-container');

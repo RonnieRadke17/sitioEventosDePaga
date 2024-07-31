@@ -12,6 +12,9 @@ use App\Models\ActivityCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+//aqui definimos el controlador del mapa para el evento
+use App\Http\Controllers\MapEventController;
+
 
 class EventController extends Controller
 {
@@ -54,15 +57,6 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request);
-        $selectedActivities = $request->input('selected_activities');
-        //falta el valor de is_with_activities
-        dd($selectedActivities);
-        //informacion de evento//ya
-        //actividades del evento//en proceso
-        //mapa del evento//
-        //imagenes del evento
-
         //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
         $eventData = Validator::make($request->all(), [
             'name' => 'required|string|max:60',
@@ -84,20 +78,89 @@ class EventController extends Controller
                 },
             ],
             'price' => 'required|numeric|min:10|max:10000',
+            
+            //aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
+
+            //aqui se valida si se selecciono algun lugar ya registrado para validarlo
+
+            'place_id' => [
+            'required',
+            'string',
+            'max:60',
+            //aqui validamos la informacion del mapa 
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === 'Otro') {
+                        if (empty($request->input('place'))) {
+                            $fail('The place field is required when place_id is Otro.');
+                        }
+                        if (empty($request->input('address'))) {
+                            $fail('The address field is required when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,2}\.\d+$/', $request->input('lat'))) {
+                            $fail('The lat field must be a valid decimal when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,3}\.\d+$/', $request->input('lng'))) {
+                            $fail('The lng field must be a valid decimal when place_id is Otro.');
+                        }
+                    }
+                },
+            ],
+
+            //aqui validamos la informacion de las imagenes    
         ]);
 
+        
         //aqui retornamos los errores de los datos del evento
+        //si eventData->fails() es true nos retorna los errores pero si es false entonces hacemos las incersiones
         if ($eventData->fails()) {
             return redirect()->back()
                 ->withErrors($eventData)
                 ->withInput();
+        }else{
+        
+        
+            //registras primero el evento
+        $event = Event::create([
+            'name' => $request->name,
+            'description'=> $request->description,
+            'event_date' => $request->event_date,
+            'kit_delivery' => $request->kit_delivery,
+            'registration_deadline' => $request->registration_deadline, 
+            'is_limited_capacity'=> $request->is_limited_capacity,
+            'capacity' => $request->capacity,
+            //'status', estatus no se registra porque por default es activo
+            'price'=> $request->price
+        ]);
+       
+        //hacemos la incersion del lugar y lo vinculamos con el evento
+        if ($request->place_id == 'Otro') {
+            //aqui hacemos la incersion del lugar
+            $place = Place::create([
+                'name' => $request->place,
+                'address' => $request->address,
+                'lat' => $request->lat,
+                'lng' => $request->lng,
+            ]);
+            //aqui hacemos la vinculacion del lugar con el evento
+            $event->places()->attach($place->id);
+
+        }else{//aqui validamos la informacion del id del lugar para hacer la vinculacion con el evento
+            //en la tabla intermedia de event_places
+            $event->places()->attach($request->place_id);
+        }
+        
+
+        //aqui hacemos la incersion de las imagenes y vinculamos las imagenes con el evento en la tabla event_images
+
+
+        //aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
         }
 
+      
+      
+       
 
-
-        //registras primero el evento y luego a que actividades estan registradas en el evento
-        //tenemos que validar todo y cuando este validado ya hacemos las incersiones
-        $event = Event::create($eventData);
+       //aqui esta el codigo de las imagenes
         /* 
             //luego guardamos el id del evento para registrar las imgs del evento
             $eventId = $event->id;

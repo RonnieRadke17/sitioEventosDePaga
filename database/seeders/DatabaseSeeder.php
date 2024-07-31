@@ -92,7 +92,7 @@ class DatabaseSeeder extends Seeder
             Activity::create($data);
         }
 
-            // Definir un arreglo con las categorías de edad
+        // Definir un arreglo con las categorías de edad
         $SubData = [
             ['name' => 'U12'],
             ['name' => 'U13'],

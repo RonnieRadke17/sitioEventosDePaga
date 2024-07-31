@@ -9,10 +9,7 @@
     <script src="{{ asset('js/map.js') }}"></script>
     <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
 
-    {{-- estilos de los checkbox --}}
-    <link rel="stylesheet" href="/css/checkboxStyle.css">
-
-    {{-- script que muestra el contenido el en form y el mapa del evento --}}
+    {{-- script que muestra el contenido el en form y el mapa del evento revisar los items de las subs--}}
     <script src="{{ asset('js/formContent.js') }}"></script>
 @endsection
 
@@ -42,6 +39,5 @@
 
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 
 @endsection

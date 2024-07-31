@@ -23,15 +23,23 @@ class Event extends Model
 
     //relations with users,place,payments
 
+    //relation with place m-m
+    public function places()
+    {
+        return $this->belongsToMany(Place::class);
+    }
+
+
+
     public function user()//ya
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    public function place()
+    /* public function place()
     {
         return $this->belongsTo(Place::class);
-    }
+    } */
 
     public function payments()
     {
