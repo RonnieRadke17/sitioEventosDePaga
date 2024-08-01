@@ -5,8 +5,7 @@
                 const capacityField = document.getElementById('capacity-field');
                 const priceContent = document.getElementById('price-content');
                 const divContent = document.getElementById('div-content');
-                if
-                 (this.value == '1') {
+                if(this.value == '1') {
                     /* 
                         si se muestra capacidad entonces  debe ser w-1/2 pr-2 ya 
                         capacidad debe quitarle el mb-4 hidden 
@@ -100,4 +99,41 @@
                     mapContainer.classList.add('hidden');
                 }
             });
+
+
+            //mostramos las actividades
+                    // Toggle activity details visibility
+            document.querySelectorAll('.activity-row').forEach(row => {
+                row.addEventListener('click', function() {
+                    const activityId = this.dataset.activityId;
+                    const detailsRow = document.getElementById(`activity-${activityId}-details`);
+                    detailsRow.classList.toggle('hidden');
+                });
+            });
+
+            // Toggle gender subs visibility
+            document.querySelectorAll('.activity-details input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const activityId = this.name.match(/genders\[(\d+)\]/)[1];
+                    const gender = this.value;
+                    const subsDiv = document.getElementById(`activity-${activityId}-gender-${gender}-subs`);
+                    if (this.checked) {
+                        subsDiv.classList.remove('hidden');
+                    } else {
+                        subsDiv.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Initialize gender subs visibility
+            document.querySelectorAll('.activity-details input[type="checkbox"]').forEach(checkbox => {
+                const activityId = checkbox.name.match(/genders\[(\d+)\]/)[1];
+                const gender = checkbox.value;
+                const subsDiv = document.getElementById(`activity-${activityId}-gender-${gender}-subs`);
+                if (checkbox.checked) {
+                    subsDiv.classList.remove('hidden');
+                }
+            });
+
+
     });

@@ -11,6 +11,13 @@
 
     {{-- script que muestra el contenido el en form y el mapa del evento revisar los items de las subs--}}
     <script src="{{ asset('js/formContent.js') }}"></script>
+    {{-- stilo de las imgs del sistema --}}
+    <style>
+        .scroll-container {
+            max-height: 60vh; /* Ajusta esto según sea necesario */
+            overflow-y: auto;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -29,10 +36,9 @@
         </div>
         
         <!-- Formulario -->
-        <form action="{{ route('event.store') }}" method="post" id="multi-step-form">
+        <form action="{{ route('event.store') }}" method="post" id="multi-step-form" enctype="multipart/form-data">
             @csrf
             @include('event.form',['mode'=>'Registrar'])
-        
         </form>
     </div>
 </div>
@@ -40,4 +46,12 @@
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+<script>
+    function actionOnImage(imageId) {
+        // Aquí puedes hacer una llamada AJAX o redirigir a otra ruta
+        console.log('Acción sobre la imagen con ID:', imageId);
+        // Por ejemplo, podrías redirigir a una ruta
+        // window.location.href = `/route/${imageId}`;
+    }
+</script>
 @endsection

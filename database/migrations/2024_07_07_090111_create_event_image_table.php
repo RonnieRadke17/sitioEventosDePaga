@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        //falta un campo el cual tenga el orden de las imgs para mostrarlas
         Schema::create('event_image', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');

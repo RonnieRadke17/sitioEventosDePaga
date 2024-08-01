@@ -1,3 +1,4 @@
+        <!-- formulario funcional -->
         <!-- Paso 1: Event Details -->
         <div id="step-1">
             <div class="mb-4">
@@ -92,7 +93,7 @@
         <!-- Paso 2: Activities -->
         <!-- revisar la tabla todo lo relacionado con mostrar info-->
         <div id="step-2" class="hidden">
-            {{-- aqui se muestra el boton que muestra las actividades --}}
+            <!--aqui se muestra el boton que muestra las actividades -->
             <div class="mb-4">
                 <label for="is_with_activities" class="block text-gray-700">Actividades</label>
                 <select name="is_with_activities" id="is_with_activities" class="w-full px-4 py-2 border rounded-lg">
@@ -100,24 +101,74 @@
                     <option value="1">Yes</option>
                 </select>
             </div>
-            {{-- tabla anterior --}}
+            
+            <table class="min-w-full bg-white border border-gray-200 hidden" id="activity_table">
+                <thead>
+                    <tr class="bg-gray-100 border-b">
+                        <th class="py-2 px-4 text-left">Nombre</th>
+                        <th class="py-2 px-4 text-left">Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($activities as $activity)
+                    <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
+                        <td class="py-2 px-4">{{ $activity->name }}</td>
+                        <td class="py-2 px-4 text-center">
+                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}>
+                        </td>
+                    </tr>
+                    <tr class="hidden activity-details" id="activity-{{ $activity->id }}-details">
+                        <td colspan="2" class="py-2 px-4">
+                            @foreach(['M', 'F', 'Mix'] as $gender)
+                            <div class="mb-2">
+                                <label class="block font-semibold">
+                                    <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
+                                    @if(isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->contains('gender', $gender))
+                                        checked
+                                    @endif> {{ $gender }}
+                                </label>
+                                <div class="pl-4 hidden gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
+                                    @foreach ($subs as $sub)
+                                    <label class="block">
+                                        <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
+                                        @if(isset($eventActivities[$activity->id]))
+                                            @foreach($eventActivities[$activity->id] as $eventActivity)
+                                                @if($eventActivity->gender == $gender && $eventActivity->sub_id == $sub->id)
+                                                    checked
+                                                @endif
+                                            @endforeach
+                                        @endif> {{ $sub->name }}
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endforeach
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
                 <div class="flex justify-between mt-4">
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
+                    {{-- <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button> --}}
                 </div>
         </div>
-
+       
 
         <!-- Paso 3: Maps -->
         <div id="step-3" class="hidden">
             <h2 class="text-lg font-semibold mb-4">Lugar del Evento</h2>
-            <select name="place_id" id="place_id" class="form-select mb-4">
-                @foreach($places as $place)
-                    <option value="{{ $place->id }}">{{ $place->name }}</option>
-                @endforeach
-                <option value="Otro">Agregar uno nuevo</option>
-            </select>
-            <p class="mb-4">Listado de lugares y opción de otro. Si selecciona "Otro", se muestra el mapa.</p>
+
+            <div class="mb-4">
+                <label for="place_id" class="block text-gray-700">Lugares</label>
+                <select name="place_id" id="place_id" class="w-full px-4 py-2 border rounded-lg">
+                    @foreach($places as $place)
+                        <option value="{{ $place->id }}">{{ $place->name }}</option>
+                    @endforeach
+                    <option value="Otro">Agregar uno nuevo</option>
+                </select>
+            </div>
 
             <div id="map-container" class="hidden">
                 <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">
@@ -156,7 +207,7 @@
                 </div>
             </div>
 
-            {{-- informacion del 1er mapa --}}
+            <!-- Informacion del primer mapa -->
             <input type="text" id="place-lat" name="lat">
             <input type="text" id="place-lng" name="lng">
             <input type="text" id="place-name-input" name="place">
@@ -169,18 +220,48 @@
         </div>
 
           <!-- Paso 4: Imgs -->
-         <div id="step-4" class="hidden">
-            imgs del sitio 
+        <div id="step-4" class="hidden">
+            <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
+            <div class="mb-4">
+                <select name="imgsSelected" id="imgsSelected" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="invalid">Selecciona una opcion</option>
+                    <option value="before">Eventos anteriores</option>
+                    <option value="new">Agregar nuevas</option>
+                    <option value="combined">Combinadas</option>
+                </select>
+            </div>
 
-            aqui mostramos las images que halla del evento y de la ui
-            para que pueda seleccionar las que quiera pero tambien pueda subir las que quiera
-            
+            <div class="container mx-auto mt-4 hidden">
+                <div class="scroll-container h-64">
+                    @foreach($images->chunk(3) as $chunk)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                            @foreach($chunk as $image)
+                                <div class="bg-white rounded-lg shadow-md relative">
+                                    <img src="{{ asset('storage/' . $image->image) }}" class="w-full h-36 object-cover rounded-t-lg" alt="Imagen">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="mb-4 hidden">
+                <label for="images">Subir imágenes:</label>
+                <input type="file" id="images" name="images[]" multiple>
+            </div>
+
+            <div class="mb-4">
+                @if ($errors->has('images.*'))
+                @foreach ($errors->get('images.*') as $messages)
+                    @foreach ($messages as $message)
+                        <span class="text-danger">{{ $message }}</span>
+                    @endforeach
+                @endforeach
+                @endif
+            </div>
             <div class="flex justify-between mt-4">
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
                 
                 <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
             </div>
         </div> 
-
-<!-------aqui van dos mapas el cual uno es para entrega de kits y otro es para lugar del evento--------->
-
