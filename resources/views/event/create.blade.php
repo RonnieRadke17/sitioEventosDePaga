@@ -47,11 +47,31 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    function actionOnImage(imageId) {
-        // Aquí puedes hacer una llamada AJAX o redirigir a otra ruta
-        console.log('Acción sobre la imagen con ID:', imageId);
-        // Por ejemplo, podrías redirigir a una ruta
-        // window.location.href = `/route/${imageId}`;
-    }
+    //mostramos las imagenes
+    document.getElementById('imgsSelected').addEventListener('change', function() {
+            const imgsBefore = document.getElementById('imgsBefore');
+            const uploadImgs = document.getElementById('uploadImgs');
+
+            if (this.value == 'invalid') {
+                console.log(this.value);
+                imgsBefore.classList.add('hidden');
+                uploadImgs.classList.add('hidden');
+
+            } else if(this.value == 'before'){
+                console.log(this.value);
+                imgsBefore.classList.remove('hidden');
+                uploadImgs.classList.add('hidden');
+                
+            } else if(this.value == 'new'){
+                console.log(this.value);
+                imgsBefore.classList.add('hidden');
+                uploadImgs.classList.remove('hidden');
+
+            }else if(this.value == 'combined'){
+                console.log(this.value);
+                imgsBefore.classList.remove('hidden');
+                uploadImgs.classList.remove('hidden');
+            }
+        });
 </script>
 @endsection

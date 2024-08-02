@@ -64,7 +64,8 @@ class EventController extends Controller
             'description' => 'required|string|max:200',
             'event_date' => 'required|date|after:today',
             //la entrega de kits y restration sea after:today es decir se entregan despues de hoy
-            'kit_delivery' => 'required|date|after:today|before:event_date',
+            //kit_delivery puede ser nulo pero sino es nulo se valida
+            'kit_delivery' => 'nullable|date|after:today|before:event_date',
             'registration_deadline' => 'required|date|after:today|before:event_date',
             'is_limited_capacity' => 'required|boolean',
             'capacity' => [
@@ -80,9 +81,11 @@ class EventController extends Controller
             ],
             'price' => 'required|numeric|min:10|max:10000',
             
-            //aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
-            //aqui se valida si se selecciono algun lugar ya registrado para validarlo
-            //validar si hay algun lugar seleccionado
+            /* 
+                aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
+                aqui se valida si se selecciono algun lugar ya registrado para validarlo
+                validar si hay algun lugar seleccionado 
+            */
             'place_id' => [
             'required',
             'string',
@@ -116,18 +119,34 @@ class EventController extends Controller
 
 
             //aqui validamos la informacion de las actividades
+            'is_with_activities' =>[
+                'required',
+                'boolean',
+                'in:0,1',
+                //aqui validamos la informacion del mapa 
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === 1) {//validamos si las actividades estan bien
+                        
+                    }
+                },
+            ],
+
+
+
+
         ]);
 
-        
-        //aqui retornamos los errores de los datos del evento
-        //si eventData->fails() es true nos retorna los errores pero si es false entonces hacemos las incersiones
+        /* 
+            aqui retornamos los errores de los datos del evento
+            si eventData->fails() es true nos retorna los errores pero si es false entonces hacemos las incersiones
+        */
         if ($eventData->fails()) {
             return redirect()->back()
                 ->withErrors($eventData)
                 ->withInput();
         }else{
         
-            //registras primero el evento
+            //registra primero el evento
             $event = Event::create([
                 'name' => $request->name,
                 'description'=> $request->description,
@@ -142,7 +161,7 @@ class EventController extends Controller
         
             //hacemos la incersion del lugar y lo vinculamos con el evento
             if ($request->place_id == 'Otro') {
-                //aqui hacemos la incersion del lugar
+                
                 $place = Place::create([
                     'name' => $request->place,
                     'address' => $request->address,
@@ -160,40 +179,41 @@ class EventController extends Controller
             //aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
             // Obtener todas las actividades seleccionadas
             //aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
-            $selectedActivities = $request->input('selected_activities');
+            if($request->is_with_activities === 1){
+                $selectedActivities = $request->input('selected_activities');
 
-            foreach ($selectedActivities as $activityId) {
-                // Obtener los géneros seleccionados para esta actividad
-                $genders = $request->input("genders.$activityId", []);
-
-                // Obtener las subactividades seleccionadas para esta actividad
-                $subs = $request->input("subs.$activityId", []);
-
-                // Iterar sobre los géneros seleccionados
-                foreach ($genders as $gender => $value) {
-                    // Iterar sobre las subactividades seleccionadas para este género
-                    foreach ($subs[$gender] as $subId) {
-                        // Crear un nuevo ActivityEvent
-                        ActivityEvent::create([
-                            'event_id' => $event->id,//id del evento no uso atach porque se mandan mas campos
-                            'activity_id' => $activityId,
-                            'gender' => $gender,
-                            'sub_id' => $subId,
-                        ]);
+                foreach ($selectedActivities as $activityId) {
+                    // Obtener los géneros seleccionados para esta actividad
+                    $genders = $request->input("genders.$activityId", []);
+    
+                    // Obtener las subactividades seleccionadas para esta actividad
+                    $subs = $request->input("subs.$activityId", []);
+    
+                    // Iterar sobre los géneros seleccionados
+                    foreach ($genders as $gender => $value) {
+                        // Iterar sobre las subactividades seleccionadas para este género
+                        foreach ($subs[$gender] as $subId) {
+                            // Crear un nuevo ActivityEvent
+                            ActivityEvent::create([
+                                'event_id' => $event->id,//id del evento no uso atach porque se mandan mas campos
+                                'activity_id' => $activityId,
+                                'gender' => $gender,
+                                'sub_id' => $subId,
+                            ]);
+                        }
                     }
                 }
             }
-        
-            //aqui hacemos la incersion de las imagenes y vinculamos las imagenes con el evento en la tabla event_images
-            
-       //aqui esta el codigo de las imagenes
-         
-            //luego guardamos el id del evento para registrar las imgs del evento
-            $eventId = $event->id;
 
-            #falta poner el orden de las imagenes eso se pondria poniendo un campo en la DB el cual tenga el
-            #orden de las imagenes y se le asignaria un valor a cada imagen
-            #luego hacemos la insercion de las imagenes
+            //luego guardamos el id del evento para registrar las imgs del evento
+            //$eventId = $event->id;
+
+            /*
+                falta poner el orden de las imagenes eso se pondria poniendo un campo en la DB el cual tenga el
+                orden de las imagenes y se le asignaria un valor a cada imagen
+                luego hacemos la insercion de las imagenes 
+            */
+
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     //insercion de manera local de la img y en la DB
@@ -202,7 +222,7 @@ class EventController extends Controller
                         'image' => $path
                     ]);
                     // vinculamos el id de la imagen con el id del evento 
-                    $event = Event::find($eventId);
+                    //$event = Event::find($eventId);
                     // Utilizando el método attach para asociar la imagen al evento
                     $event->imgEvents()->attach($imageModel->id);
                 }

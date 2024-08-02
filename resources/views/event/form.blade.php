@@ -168,42 +168,42 @@
                     @endforeach
                     <option value="Otro">Agregar uno nuevo</option>
                 </select>
-            </div>
 
-            <div id="map-container" class="hidden">
-                <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">
-                </gmpx-api-loader>
-                <gmp-map id="map" center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
-                    <div slot="control-block-start-inline-start" class="pac-card" id="pac-card">
-                        <div>
-                            <div id="title">Autocomplete search</div>
-                            <div id="type-selector" class="pac-controls">
-                                <input type="radio" name="type" id="changetype-all" checked="checked" />
-                                <label for="changetype-all">All</label>
-                                <input type="radio" name="type" id="changetype-establishment" />
-                                <label for="changetype-establishment">Establishment</label>
-                                <input type="radio" name="type" id="changetype-address" />
-                                <label for="changetype-address">Address</label>
-                                <input type="radio" name="type" id="changetype-geocode" />
-                                <label for="changetype-geocode">Geocode</label>
-                                <input type="radio" name="type" id="changetype-cities" />
-                                <label for="changetype-cities">(Cities)</label>
-                                <input type="radio" name="type" id="changetype-regions" />
-                                <label for="changetype-regions">(Regions)</label>
+                <div id="map-container" class="hidden">
+                    <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">
+                    </gmpx-api-loader>
+                    <gmp-map id="map" center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
+                        <div slot="control-block-start-inline-start" class="pac-card" id="pac-card">
+                            <div>
+                                <div id="title">Autocomplete search</div>
+                                <div id="type-selector" class="pac-controls">
+                                    <input type="radio" name="type" id="changetype-all" checked="checked" />
+                                    <label for="changetype-all">All</label>
+                                    <input type="radio" name="type" id="changetype-establishment" />
+                                    <label for="changetype-establishment">Establishment</label>
+                                    <input type="radio" name="type" id="changetype-address" />
+                                    <label for="changetype-address">Address</label>
+                                    <input type="radio" name="type" id="changetype-geocode" />
+                                    <label for="changetype-geocode">Geocode</label>
+                                    <input type="radio" name="type" id="changetype-cities" />
+                                    <label for="changetype-cities">(Cities)</label>
+                                    <input type="radio" name="type" id="changetype-regions" />
+                                    <label for="changetype-regions">(Regions)</label>
+                                </div>
+                                <br />
+                                <div id="strict-bounds-selector" class="pac-controls">
+                                    <input type="checkbox" id="use-strict-bounds" value="" />
+                                    <label for="use-strict-bounds">Restrict to map viewport</label>
+                                </div>
                             </div>
-                            <br />
-                            <div id="strict-bounds-selector" class="pac-controls">
-                                <input type="checkbox" id="use-strict-bounds" value="" />
-                                <label for="use-strict-bounds">Restrict to map viewport</label>
-                            </div>
+                            <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
                         </div>
-                        <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
+                        <gmp-advanced-marker id="marker"></gmp-advanced-marker>
+                    </gmp-map>
+                    <div id="infowindow-content">
+                        <span id="place-name" class="title" style="font-weight: bold;"></span><br />
+                        <span id="place-address"></span>
                     </div>
-                    <gmp-advanced-marker id="marker"></gmp-advanced-marker>
-                </gmp-map>
-                <div id="infowindow-content">
-                    <span id="place-name" class="title" style="font-weight: bold;"></span><br />
-                    <span id="place-address"></span>
                 </div>
             </div>
 
@@ -231,7 +231,7 @@
                 </select>
             </div>
 
-            <div class="container mx-auto mt-4 hidden">
+            <div class="container mx-auto mt-4 hidden" id="imgsBefore">
                 <div class="scroll-container h-64">
                     @foreach($images->chunk(3) as $chunk)
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
@@ -245,7 +245,7 @@
                 </div>
             </div>
 
-            <div class="mb-4 hidden">
+            <div class="mb-4 hidden" id="uploadImgs">
                 <label for="images">Subir imágenes:</label>
                 <input type="file" id="images" name="images[]" multiple>
             </div>
