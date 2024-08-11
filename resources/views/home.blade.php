@@ -2,46 +2,28 @@
 @section('title','Página principal')
 @section('content')
     <!-- estos deben ir en app en la navbar-->
-    @auth
-    <a href="{{route('logout')}}">Salir</a>   
-   @endauth
-    @guest
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Register</a>
-                    </li>
-    @endguest
+    
+    {{-- aqui dependiendo de la fecha de nacimiento se le muestran ciertos eventos --}}
 
-    <div class="container">
+    
+    <div class="container bg-gray-100 p-10">
         <h1 class="mb-4">Eventos</h1>
-
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
-        @foreach ($events as $event)
-            <div class="col">
-                <div class="card">
-                    @if ($event->image)
-                        <img src="{{ asset('storage/' . $event->image) }}" class="card-img-top" alt="image del event" style="height: 200px;">
-                    @else
-                        <!-- Puedes agregar una image por defecto o mensaje si no hay image -->
-                        <div class="card-img-top text-center py-5">Sin image</div>
-                    @endif
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $event->name }}</h5>
-                        <p class="card-text">
-                            <strong>Fecha:</strong> {{ $event->date }}<br>
-                            <strong>Descripción:</strong> {{ $event->description }}<br>
-                            @auth
-                            <a href="{{ route('events.show', $event->id) }}" class="btn btn-primary">Ver más</a>
-                            @endauth
-                        </p>
-                        <!-- Puedes agregar más detalles según sea necesario -->
+        <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            @foreach($events as $event)
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <img class="w-full h-48 object-cover" src="{{ asset('storage/'.$event->first_image) }}" alt="Event Image">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800">{{ $event->name }}</h2>
+                        <p class="text-gray-600 mt-2">{{ $event->event_date }}</p>
+                        <p class="text-gray-600 mt-2">{{ Str::limit($event->description, 100) }}</p>
+                        <div class="mt-4">
+                            <a href="{{ route('event.show', $event->id) }}" class="text-indigo-600 hover:text-indigo-800">Ver mas</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
-    </div>
+            @endforeach
+        </div>
+        
     </div>
     
 

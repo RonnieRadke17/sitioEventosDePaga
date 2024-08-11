@@ -54,10 +54,10 @@ class Event extends Model
     }
 
 
-    //relation with images 1-n-1
-    public function imgEvents()
+    //relation with images 1-m
+    public function images()
     {
-        return $this->belongsToMany(Image::class)->withTimestamps();
+        return $this->hasMany(Image::class);
     }
     
 }

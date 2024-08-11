@@ -13,18 +13,29 @@
         <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div class="relative flex items-center justify-between h-16">
                 <div class="flex-1 flex items-center justify-start">
-                    <div class="flex-shrink-0">
+                    <div class="flex-shrink-0">{{-- logo --}}
                         <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Workflow">
                     </div>
                     <div class="ml-6 flex space-x-4">
-                        <a href="#" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Deportes</a>
+                        <a href="{{ route('home') }}" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Deportes</a>
                     </div>
                 </div>
                 <div class="relative">
-                    <button type="button" class="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                        @auth
+                            {{-- <a href="{{route('logout')}}">Salir</a>    --}}
+                            <button type="button" class="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                         <span class="sr-only">Open user menu</span>
                         <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
                     </button>
+                        @endauth
+                        @guest
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('register') }}">Register</a>
+                                </li>
+                        @endguest
                 </div>
             </div>
         </div>
@@ -44,6 +55,7 @@
             <a href="#" class="block px-4 py-2 text-sm text-gray-700">Your Profile</a>
             <a href="#" class="block px-4 py-2 text-sm text-gray-700">Settings</a>
             <a href="#" class="block px-4 py-2 text-sm text-gray-700">Sign out</a>
+            <a href="{{route('logout')}}" class="block px-4 py-2 text-sm text-gray-700">Salir</a> 
             <div class="mt-4">
                 <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
                 <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>

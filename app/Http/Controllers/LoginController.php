@@ -28,7 +28,7 @@ class LoginController extends Controller
         $remember = ($request['remember'] ?? false);
 
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'required|string|email',
             'password' => 'required|string|min:8',//poner validacion de minusculas y mayusculas y numeros
         ]);
 

@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-<div class="container">
-    Muestra lista de events siuu
-    <br>
+@extends('layouts.app')
+
+@section('content')
+<div class="container bg-gray-100 p-10">
     @if(Session::has('mensaje'))
     <div class="alert alert-success alert-dismissible" role="alert">
         {{Session::get('mensaje')}}
@@ -20,8 +12,8 @@
     @endif
 
     <a href="{{url('event/create')}}" class="btn btn-success">Registrar</a>
-    <br>
-    <table class="table table-light">
+    
+    {{-- <table class="table table-light">
         <thead class="thead-light">
             <tr>
                 <th>#</th>
@@ -51,8 +43,23 @@
             </tr>
             @endforeach
         </tbody>
-    </table>
+    </table> --}}
+    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        @foreach($events as $event)
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img class="w-full h-48 object-cover" src="{{ asset('storage/'.$event->first_image) }}" alt="Event Image">
+                <div class="p-6">
+                    <h2 class="text-xl font-semibold text-gray-800">{{ $event->name }}</h2>
+                    <p class="text-gray-600 mt-2">{{ $event->event_date }}</p>
+                    <p class="text-gray-600 mt-2">{{ Str::limit($event->description, 100) }}</p>
+                    <div class="mt-4">
+                        <a href="{{ route('event.show', $event->id) }}" class="text-indigo-600 hover:text-indigo-800">Learn more</a>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    
     
 </div>
-</body>
-</html>
+@endSection

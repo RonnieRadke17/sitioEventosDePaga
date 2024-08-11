@@ -21,12 +21,19 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()//ya
-    {
-        $data['events'] = Event::paginate(10);
-        return view('event.index', $data);
-    }
+    // En tu controlador
+public function index()
+{
+    // Obtener los eventos con la primera imagen relacionada
+    $events = Event::with('images')->get()->map(function ($event) {
+        $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+        return $event;
+    });
 
+    return view('event.index', compact('events'));
+}
+
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -54,10 +61,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //aqui vemos que actividades fueron seleccionadas
-        //dd($request->input('selected_activities'), $request->input('genders'), $request->input('subs'));
-
-
+        //dd($request);
         //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
         $eventData = Validator::make($request->all(), [
             'name' => 'required|string|max:60',
@@ -86,6 +90,7 @@ class EventController extends Controller
                 aqui se valida si se selecciono algun lugar ya registrado para validarlo
                 validar si hay algun lugar seleccionado 
             */
+            
             'place_id' => [
             'required',
             'string',
@@ -109,15 +114,6 @@ class EventController extends Controller
                 },
             ],
 
-             //aqui validamos la informacion de las imagenes    
-            'images.*' => [
-                'required',
-                'image',
-                'mimes:jpeg,png,jpg,gif,svg',
-                'max:2048',
-            ],
-
-
             //aqui validamos la informacion de las actividades
             'is_with_activities' =>[
                 'required',
@@ -131,8 +127,17 @@ class EventController extends Controller
                 },
             ],
 
-
-
+            /*
+                aqui validamos la informacion de las imagenes 
+                es una relacion de 1-m por eso cada evento tiene sus imagenes
+            */
+             
+            'images.*' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
 
         ]);
 
@@ -154,7 +159,9 @@ class EventController extends Controller
                 'kit_delivery' => $request->kit_delivery,
                 'registration_deadline' => $request->registration_deadline, 
                 'is_limited_capacity'=> $request->is_limited_capacity,
-                'capacity' => $request->capacity,
+                //poner que si el valor es 1 si se necesita poner el valor de capacidad
+                $value = $request->is_limited_capacity,
+                'capacity' => $request->is_limited_capacity ? $request->capacity : null,
                 //'status', estatus no se registra porque por default es activo
                 'price'=> $request->price
             ]);
@@ -219,12 +226,14 @@ class EventController extends Controller
                     //insercion de manera local de la img y en la DB
                     $path = $image->store('uploads', 'public');
                     $imageModel = Image::create([
-                        'image' => $path
+                        'image' => $path,
+                        //aqui va el id del evento
+                        'event_id' => $event->id
                     ]);
                     // vinculamos el id de la imagen con el id del evento 
                     //$event = Event::find($eventId);
                     // Utilizando el método attach para asociar la imagen al evento
-                    $event->imgEvents()->attach($imageModel->id);
+                    //$event->imgEvents()->attach($imageModel->id);
                 }
             }
         }
@@ -328,8 +337,7 @@ class EventController extends Controller
     public function show($id)
     {
         //tenemos que buscar en la tabla intermedia las imagenes
-        $event = Event::with('images')->findOrFail($id);
-        return view('event.show', compact('event'));
+        return view('event.show');
     }
 
 

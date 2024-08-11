@@ -46,7 +46,7 @@
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<script>
+{{-- <script>
     //mostramos las imagenes
     document.getElementById('imgsSelected').addEventListener('change', function() {
             const imgsBefore = document.getElementById('imgsBefore');
@@ -73,5 +73,5 @@
                 uploadImgs.classList.remove('hidden');
             }
         });
-</script>
+</script> --}}
 @endsection

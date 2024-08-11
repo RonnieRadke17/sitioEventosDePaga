@@ -16,12 +16,13 @@ class Image extends Model
      */
     protected $fillable = [
         'image',
+        'event_id',
     ];
 
 
-    //relation with events 1-n-1
-    public function imgEvents()
+    //relation with events 1-m
+    public function event()
     {
-        return $this->belongsToMany(Event::class)->withTimestamps();
+        return $this->belongsTo(Event::class);
     }
 }

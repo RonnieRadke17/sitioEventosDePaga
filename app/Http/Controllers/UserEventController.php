@@ -9,8 +9,14 @@ class UserEventController extends Controller
 {
     public function index()//show all events
     {
-        $data['events'] = Event::paginate(10);
-        return view('home', $data);
+        // Obtener los eventos con la primera imagen relacionada
+    $events = Event::with('images')->get()->map(function ($event) {
+        $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+        return $event;
+    });
+        return view('home', compact('events'));
+        /* $data['events'] = Event::paginate(10);
+        return view('home', $data); */
     }
 
     public function show($id)//show specific event

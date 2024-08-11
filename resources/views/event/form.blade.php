@@ -93,15 +93,15 @@
         <!-- Paso 2: Activities -->
         <!-- revisar la tabla todo lo relacionado con mostrar info-->
         <div id="step-2" class="hidden">
-            <!--aqui se muestra el boton que muestra las actividades -->
+            <!-- Aquí se muestra el botón que muestra las actividades -->
             <div class="mb-4">
                 <label for="is_with_activities" class="block text-gray-700">Actividades</label>
                 <select name="is_with_activities" id="is_with_activities" class="w-full px-4 py-2 border rounded-lg">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
+                    <option value="0" {{ old('is_with_activities') == 0 ? 'selected' : '' }}>No</option>
+                    <option value="1" {{ old('is_with_activities') == 1 ? 'selected' : '' }}>Yes</option>
                 </select>
             </div>
-            
+        
             <table class="min-w-full bg-white border border-gray-200 hidden" id="activity_table">
                 <thead>
                     <tr class="bg-gray-100 border-b">
@@ -114,7 +114,8 @@
                     <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
                         <td class="py-2 px-4">{{ $activity->name }}</td>
                         <td class="py-2 px-4 text-center">
-                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}>
+                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" 
+                                {{ in_array($activity->id, old('selected_activities', [])) ? 'checked' : '' }}>
                         </td>
                     </tr>
                     <tr class="hidden activity-details" id="activity-{{ $activity->id }}-details">
@@ -123,21 +124,13 @@
                             <div class="mb-2">
                                 <label class="block font-semibold">
                                     <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
-                                    @if(isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->contains('gender', $gender))
-                                        checked
-                                    @endif> {{ $gender }}
+                                        {{ isset(old('genders')[$activity->id][$gender]) ? 'checked' : '' }}> {{ $gender }}
                                 </label>
                                 <div class="pl-4 hidden gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
                                     @foreach ($subs as $sub)
                                     <label class="block">
                                         <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
-                                        @if(isset($eventActivities[$activity->id]))
-                                            @foreach($eventActivities[$activity->id] as $eventActivity)
-                                                @if($eventActivity->gender == $gender && $eventActivity->sub_id == $sub->id)
-                                                    checked
-                                                @endif
-                                            @endforeach
-                                        @endif> {{ $sub->name }}
+                                            {{ isset(old('subs')[$activity->id][$gender]) && in_array($sub->id, old('subs')[$activity->id][$gender]) ? 'checked' : '' }}> {{ $sub->name }}
                                     </label>
                                     @endforeach
                                 </div>
@@ -148,11 +141,10 @@
                     @endforeach
                 </tbody>
             </table>
-                <div class="flex justify-between mt-4">
-                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
-                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
-                    {{-- <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button> --}}
-                </div>
+            <div class="flex justify-between mt-4">
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
+            </div>
         </div>
        
 
@@ -163,6 +155,7 @@
             <div class="mb-4">
                 <label for="place_id" class="block text-gray-700">Lugares</label>
                 <select name="place_id" id="place_id" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="select">Selecciona un lugar</option>
                     @foreach($places as $place)
                         <option value="{{ $place->id }}">{{ $place->name }}</option>
                     @endforeach
@@ -208,10 +201,10 @@
             </div>
 
             <!-- Informacion del primer mapa -->
-            <input type="text" id="place-lat" name="lat">
-            <input type="text" id="place-lng" name="lng">
-            <input type="text" id="place-name-input" name="place">
-            <input type="text" id="place-address-input" name="address">
+            <input type="hidden" id="place-lat" name="lat">
+            <input type="hidden" id="place-lng" name="lng">
+            <input type="hidden" id="place-name-input" name="place">
+            <input type="hidden" id="place-address-input" name="address">
 
             <div class="flex justify-between mt-4">
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step2">Regresar</button>
@@ -219,35 +212,17 @@
             </div>
         </div>
 
-          <!-- Paso 4: Imgs -->
+        <!-- Paso 4: Imgs -->
         <div id="step-4" class="hidden">
             <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
-            <div class="mb-4">
-                <select name="imgsSelected" id="imgsSelected" class="w-full px-4 py-2 border rounded-lg">
-                    <option value="invalid">Selecciona una opcion</option>
-                    <option value="before">Eventos anteriores</option>
-                    <option value="new">Agregar nuevas</option>
-                    <option value="combined">Combinadas</option>
-                </select>
-            </div>
-
-            <div class="container mx-auto mt-4 hidden" id="imgsBefore">
-                <div class="scroll-container h-64">
-                    @foreach($images->chunk(3) as $chunk)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                            @foreach($chunk as $image)
-                                <div class="bg-white rounded-lg shadow-md relative">
-                                    <img src="{{ asset('storage/' . $image->image) }}" class="w-full h-36 object-cover rounded-t-lg" alt="Imagen">
-                                </div>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="mb-4 hidden" id="uploadImgs">
+            
+            <div class="mb-4" id="uploadImgs">
                 <label for="images">Subir imágenes:</label>
-                <input type="file" id="images" name="images[]" multiple>
+                <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
+            </div>
+            
+            <div class="mb-4 max-h-72 overflow-y-auto">
+                <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
             </div>
 
             <div class="mb-4">
@@ -265,3 +240,24 @@
                 <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
             </div>
         </div> 
+
+        <script>
+            function previewImages(event) {
+                let previewContainer = document.getElementById('preview-container');
+                previewContainer.innerHTML = '';
+                let files = event.target.files;
+                
+                Array.from(files).forEach(file => {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        let div = document.createElement('div');
+                        div.className = 'relative';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-32 object-cover">
+                        `;
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            </script>

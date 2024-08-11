@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ $event->name }}</h1>
+    {{-- <h1>{{ $event->name }}</h1>
        
     <h2>Imágenes</h2>
     <div class="row">
@@ -11,6 +11,6 @@
                 <img src="{{ asset('storage/' . $image->path) }}" class="img-fluid" alt="{{ $image->alt_text }}">
             </div>
         @endforeach
-    </div>
+    </div> --}}
 </div>
 @endsection
