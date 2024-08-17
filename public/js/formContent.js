@@ -10,23 +10,24 @@ window.onload = function() {
     const divContent = document.getElementById('div-content');
     //mostrar el campo de el mapa o la opcion seleccionada del map
     //muestra el mapa del lugar del evento
-    const placeSelect = document.getElementById('place_id');
+    const placeId = document.getElementById('place_id');
     const mapContainer = document.getElementById('map-container');
-    const mapElement = document.getElementById('map');
-        
-    placeSelect.addEventListener('change', function() {
-            if (this.value === 'Otro') {
-                mapContainer.classList.remove('hidden');
-                // Inicializa el mapa si es necesario
-                if (!mapElement.dataset.initialized) {
-                    mapElement.dataset.initialized = true;
-                }
-            } else {
-                mapContainer.classList.add('hidden');
-            }
+    
+    // Mostrar/ocultar mapa basado en la selección del lugar
+    placeId.addEventListener('change', function() {
+        if (this.value === 'Otro') {
+            mapContainer.classList.remove('hidden');
+        } else {
+            mapContainer.classList.add('hidden');
+        }
     });
 
+    // Mostrar mapa si "Otro" está seleccionado al cargar la página
+    if (placeId.value === 'Otro') {
+        mapContainer.classList.remove('hidden');
+    }
 
+    
 
     // Función para actualizar la visibilidad de la tabla de actividades
     function updateActivityTableVisibility() {

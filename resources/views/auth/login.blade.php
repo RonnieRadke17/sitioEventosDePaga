@@ -2,8 +2,7 @@
 @section('title','Login')
 @section('content')
 
-
-
+<br>
 <form method="POST" action="{{ route('signin') }}" class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
     @csrf
     

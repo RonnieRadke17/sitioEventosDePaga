@@ -151,15 +151,19 @@
         <!-- Paso 3: Maps -->
         <div id="step-3" class="hidden">
             <h2 class="text-lg font-semibold mb-4">Lugar del Evento</h2>
-
+            <div class="mb-4">
+                @error('place')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>   
             <div class="mb-4">
                 <label for="place_id" class="block text-gray-700">Lugares</label>
                 <select name="place_id" id="place_id" class="w-full px-4 py-2 border rounded-lg">
                     <option value="select">Selecciona un lugar</option>
                     @foreach($places as $place)
-                        <option value="{{ $place->id }}">{{ $place->name }}</option>
+                        <option value="{{ $place->id }}" {{ old('place_id') == $place->id ? 'selected' : '' }}>{{ $place->name }}</option>
                     @endforeach
-                    <option value="Otro">Agregar uno nuevo</option>
+                    <option value="Otro" {{ old('place_id') == 'Otro' ? 'selected' : '' }}>Agregar uno nuevo</option>
                 </select>
 
                 <div id="map-container" class="hidden">
@@ -200,11 +204,12 @@
                 </div>
             </div>
 
-            <!-- Informacion del primer mapa -->
-            <input type="hidden" id="place-lat" name="lat">
-            <input type="hidden" id="place-lng" name="lng">
-            <input type="hidden" id="place-name-input" name="place">
+            <!-- Campos ocultos para latitud, longitud, nombre y dirección -->
+            <input type="hidden" id="place-lat" name="lat" >
+            <input type="hidden" id="place-lng" name="lng" >
+            <input type="hidden" id="place-name-input" name="place" >
             <input type="hidden" id="place-address-input" name="address">
+
 
             <div class="flex justify-between mt-4">
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step2">Regresar</button>

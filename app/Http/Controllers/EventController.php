@@ -165,6 +165,7 @@ public function index()
                 //'status', estatus no se registra porque por default es activo
                 'price'=> $request->price
             ]);
+            
         
             //hacemos la incersion del lugar y lo vinculamos con el evento
             if ($request->place_id == 'Otro') {
