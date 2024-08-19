@@ -72,7 +72,7 @@ public function index()
             'kit_delivery' => 'nullable|date|after:today|before:event_date',
             'registration_deadline' => 'required|date|after:today|before:event_date',
             'is_limited_capacity' => 'required|boolean',
-            'capacity' => [
+            /* 'capacity' => [
                 'nullable',
                 'integer',
                 'min:5',
@@ -82,7 +82,30 @@ public function index()
                         $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
                     }
                 },
+            ], */
+
+            'capacity' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_limited_capacity') == 1) { // = true
+                        if (is_null($request->input('capacity'))) {
+                            $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
+                        }
+                        if (!is_numeric($request->input('capacity')) || intval($request->input('capacity')) != $request->input('capacity')) {
+                            $fail('The capacity must be an integer.');
+                        }
+                        if ($request->input('capacity') < 5 || $request->input('capacity') > 15000) {
+                            $fail('The capacity is not valid.');
+                        }
+                    } else { // = false
+                        if (!is_null($request->input('capacity'))) {
+                            $fail('The capacity must be null when limited capacity is disabled.');
+                        }
+                    }
+                },
             ],
+
+
+
             'price' => 'required|numeric|min:10|max:10000',
             
             /* 

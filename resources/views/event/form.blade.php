@@ -55,7 +55,7 @@
             <div class="" id="div-content">
                 <div class="mb-4 hidden" id="capacity-field">
                     <label for="capacity" class="block text-gray-700">Capacity</label>
-                    <input type="number" name="capacity" id="capacity" class="w-full px-4 py-2 border rounded-lg" min="1" value="{{ old('capacity', $event->capacity ?? '') }}">
+                    <input type="number" name="capacity" id="capacity" class="w-full px-4 py-2 border rounded-lg" value="{{ old('capacity', $event->capacity ?? '') }}">
                     @error('capacity')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
