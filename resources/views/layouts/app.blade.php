@@ -7,6 +7,9 @@
     @vite('resources/css/app.css') 
     @yield('head')
     <title>@yield('title')</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body class="bg-gray-100">
     <nav class="bg-gray-800">
@@ -65,8 +68,6 @@
     </div>
 </div>
 <!--header y nav-->
-    <!--un nav tiene que tener icono nombre y icono de user-->
-    <!--un nav tiene que tener todas las acciones del profesor-->
    
     @yield('content')
 

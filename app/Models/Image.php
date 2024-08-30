@@ -17,6 +17,7 @@ class Image extends Model
     protected $fillable = [
         'image',
         'event_id',
+        'type',
     ];
 
 

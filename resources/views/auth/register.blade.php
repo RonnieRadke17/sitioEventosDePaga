@@ -49,6 +49,22 @@
         @enderror
     </div>
 
+        <!-- Género -->
+    <div class="mb-4">
+        <label class="block text-gray-700">Género</label>
+        <div class="flex items-center">
+            <input type="radio" name="gender" id="male" value="M" class="mr-2" {{ old('gender') == 'M' ? 'checked' : '' }}>
+            <label for="male" class="mr-4">Masculino</label>
+
+            <input type="radio" name="gender" id="female" value="F" class="mr-2" {{ old('gender') == 'F' ? 'checked' : '' }}>
+            <label for="female">Femenino</label>
+        </div>
+        @error('gender')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+
+
     <!-- Correo Electrónico -->
     <div>
         <label for="email">Correo Electrónico</label>

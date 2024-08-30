@@ -32,6 +32,7 @@ class RegisterController extends Controller
                 'before_or_equal:' . now()->subYears(10)->format('Y-m-d'),
                 'date_format:Y-m-d',
             ],
+            //falta validar el genero
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',//poner validacion de minusculas y mayusculas y numeros
         ]);
@@ -51,6 +52,7 @@ class RegisterController extends Controller
             'paternal' => $request->paternal,
             'maternal'=> $request->maternal,
             'birthdate'=> $request->birthdate,
+            'gender'=> $request->gender,
             'email'=> $request->email,
             //encriptar en base 64
             'password' =>base64_encode($request->password),

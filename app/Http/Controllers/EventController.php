@@ -11,17 +11,13 @@ use App\Models\ActivityEvent;
 use App\Models\ActivityCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
 //aqui definimos el controlador del mapa para el evento
 use App\Http\Controllers\MapEventController;
 
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // En tu controlador
+
 public function index()
 {
     // Obtener los eventos con la primera imagen relacionada
@@ -33,10 +29,6 @@ public function index()
     return view('event.index', compact('events'));
 }
 
-    
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         /* 
@@ -56,9 +48,6 @@ public function index()
         return view('event.create', compact('activities','subs','places','images'));         
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //dd($request);
@@ -67,23 +56,9 @@ public function index()
             'name' => 'required|string|max:60',
             'description' => 'required|string|max:200',
             'event_date' => 'required|date|after:today',
-            //la entrega de kits y restration sea after:today es decir se entregan despues de hoy
-            //kit_delivery puede ser nulo pero sino es nulo se valida
-            'kit_delivery' => 'nullable|date|after:today|before:event_date',
+            'kit_delivery' => 'nullable|date|after:today|before:event_date',//kit_delivery puede ser nulo pero sino es nulo se valida//la entrega de kits y restration sea after:today es decir se entregan despues de hoy
             'registration_deadline' => 'required|date|after:today|before:event_date',
             'is_limited_capacity' => 'required|boolean',
-            /* 'capacity' => [
-                'nullable',
-                'integer',
-                'min:5',
-                'max:15000',
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_limited_capacity') == 1 && ($value === null || $value <= 0)) {
-                        $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
-                    }
-                },
-            ], */
-
             'capacity' => [
                 function ($attribute, $value, $fail) use ($request) {
                     if ($request->input('is_limited_capacity') == 1) { // = true
@@ -103,17 +78,12 @@ public function index()
                     }
                 },
             ],
-
-
-
             'price' => 'required|numeric|min:10|max:10000',
-            
             /* 
                 aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
                 aqui se valida si se selecciono algun lugar ya registrado para validarlo
                 validar si hay algun lugar seleccionado 
             */
-            
             'place_id' => [
             'required',
             'string',
@@ -154,9 +124,20 @@ public function index()
                 aqui validamos la informacion de las imagenes 
                 es una relacion de 1-m por eso cada evento tiene sus imagenes
             */
-             
-            'images.*' => [
+            'cover' => [
                 'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
+            'kit' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
+            'images.*' => [//content
+                'nullable',
                 'image',
                 'mimes:jpeg,png,jpg,gif,svg',
                 'max:2048',
@@ -164,18 +145,14 @@ public function index()
 
         ]);
 
-        /* 
-            aqui retornamos los errores de los datos del evento
-            si eventData->fails() es true nos retorna los errores pero si es false entonces hacemos las incersiones
-        */
-        if ($eventData->fails()) {
+        if ($eventData->fails()) {//retornamos los errores de los datos del evento
             return redirect()->back()
                 ->withErrors($eventData)
                 ->withInput();
         }else{
         
-            //registra primero el evento
-            $event = Event::create([
+            //aqui falta un boolean de si es con actividades o no
+            $event = Event::create([//registra primero el evento
                 'name' => $request->name,
                 'description'=> $request->description,
                 'event_date' => $request->event_date,
@@ -236,28 +213,42 @@ public function index()
                 }
             }
 
-            //luego guardamos el id del evento para registrar las imgs del evento
-            //$eventId = $event->id;
+            if ($request->hasFile('cover')) {//first image
+                $image = $request->file('cover');  
+                $path = $image->store('uploads', 'public'); 
+                $imageModel = Image::create([
+                    'image' => $path,
+                    'event_id' => $event->id,
+                    'type' => 'cover'
+                ]);
+            }
 
-            /*
-                falta poner el orden de las imagenes eso se pondria poniendo un campo en la DB el cual tenga el
-                orden de las imagenes y se le asignaria un valor a cada imagen
-                luego hacemos la insercion de las imagenes 
-            */
+            if ($request->hasFile('kit')) {//kit
+                $image = $request->file('kit');  
+                $path = $image->store('uploads', 'public'); 
+                $imageModel = Image::create([
+                    'image' => $path,
+                    'event_id' => $event->id,
+                    'type' => 'kit'
+                ]);
+            }
 
-            if ($request->hasFile('images')) {
+            if ($request->hasFile('images')) {//content
                 foreach ($request->file('images') as $image) {
                     //insercion de manera local de la img y en la DB
                     $path = $image->store('uploads', 'public');
                     $imageModel = Image::create([
                         'image' => $path,
                         //aqui va el id del evento
-                        'event_id' => $event->id
+                        'event_id' => $event->id,
+                        'type' => 'content'
                     ]);
-                    // vinculamos el id de la imagen con el id del evento 
-                    //$event = Event::find($eventId);
-                    // Utilizando el método attach para asociar la imagen al evento
-                    //$event->imgEvents()->attach($imageModel->id);
+                    /* 
+                        vinculamos el id de la imagen con el id del evento 
+                        $event = Event::find($eventId);
+                        Utilizando el método attach para asociar la imagen al evento
+                        $event->imgEvents()->attach($imageModel->id); 
+                    */
                 }
             }
         }
@@ -277,11 +268,6 @@ public function index()
         return view('event.edit', compact('event', 'activities', 'subs', 'eventActivities'));
     }
     
-
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         // Validación de los datos
@@ -354,20 +340,12 @@ public function index()
         return redirect()->route('event.index')->with('success', 'Evento modificado correctamente.');
     }
 
-
-/**
- * Display the specified resource.
- */
     public function show($id)
     {
         //tenemos que buscar en la tabla intermedia las imagenes
         return view('event.show');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $evento = Event::findOrFail($id);

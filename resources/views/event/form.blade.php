@@ -222,7 +222,23 @@
             <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
             
             <div class="mb-4" id="uploadImgs">
-                <label for="images">Subir imágenes:</label>
+                <label for="cover">Imagen de portada:</label>
+                <input type="file" name="cover">
+                @error('cover')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="mb-4" id="uploadImgs">
+                <label for="kit">Imagen del kit(opcional):</label>
+                <input type="file" name="kit">
+                @error('kit')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+
+
+            <div class="mb-4" id="uploadImgs">
+                <label for="images">Imagenes de contenido(opcional):</label>
                 <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
             </div>
             

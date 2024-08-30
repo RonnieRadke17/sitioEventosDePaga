@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('image');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->enum('type',['cover','kit','content']);
             $table->timestamps();
         });
     }

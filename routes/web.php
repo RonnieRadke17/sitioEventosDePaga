@@ -15,10 +15,14 @@ use App\Http\Controllers\MercadoPagoController;
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
+ Route::get('payment', function () {//ventana que muestra paypal
+    return view('welcome');
+});
+
 //falta hacer uso de grupos de rutas
 Route::get('/', [UserEventController::class, 'index'])->name('home');//ruta que muestra la pagina principal
-Route::get('/events/{id}', [UserEventController::class, 'show'])->name('events.show');
-Route::get('/purchase-event/{id}', [UserEventController::class, 'purchase'])->name('events.purchase');
+Route::get('/events/{id}', [UserEventController::class, 'events'])->name('eventDetails.show');
+//Route::get('/purchase-event/{id}', [UserEventController::class, 'purchase'])->name('events.purchase');
 
 //restablecimiento de contrasena
 Route::controller(ResetPasswordController::class)->group(function () {
@@ -60,9 +64,7 @@ Route::post('paypal', [PaypalController::class, 'paypal'])->name('paypal');
 Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
 
-/* Route::get('/', function () {
-    return view('welcome');
-}); */
+
 
 /*
     Route::get('/password/reset/{token}',[ResetPasswordController::class,'showResetForm'])->name('password.reset');//la ruta esta bien

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'paternal',
         'maternal',
         'birthdate',
+        'gender',
         'email',
         'password',
     ];

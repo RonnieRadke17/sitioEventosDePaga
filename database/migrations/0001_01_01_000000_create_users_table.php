@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('paternal');
             $table->string('maternal');
             $table->date('birthdate');
+            $table->enum('gender',["M","F"]);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
