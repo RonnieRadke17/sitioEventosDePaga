@@ -17,6 +17,7 @@ class Event extends Model
         'registration_deadline', 
         'is_limited_capacity',
         'capacity',
+        'activities',
         'status',
         'price'
     ];

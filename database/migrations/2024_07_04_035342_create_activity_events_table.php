@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             //si se amplia el negocio poner tabla de deportes
             $table->foreignId('event_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->boolean('Activities')->default(true);//campo inecesario
             $table->foreignId('activity_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->enum('gender',['M','F','Mix']);
             $table->foreignId('sub_id')->constrained()->onUpdate('cascade')->onDelete('cascade');

@@ -2,15 +2,17 @@
 
 @section('content')
 <div class="container">
-    {{-- <h1>{{ $event->name }}</h1>
-       
-    <h2>Imágenes</h2>
-    <div class="row">
-        @foreach($event->images as $image)
-            <div class="col-md-4">
-                <img src="{{ asset('storage/' . $image->path) }}" class="img-fluid" alt="{{ $image->alt_text }}">
+    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img class="w-full h-48 object-cover" src="{{ asset('storage/'.$event->first_image) }}" alt="Event Image">
+                <div class="p-6">
+                    <h2 class="text-xl font-semibold text-gray-800">{{ $event->name }}</h2>
+                    <p class="text-gray-600 mt-2">{{ $event->event_date }}</p>
+                    <p class="text-gray-600 mt-2">{{ Str::limit($event->description, 100) }}</p>
+                </div>
             </div>
-        @endforeach
-    </div> --}}
+        
+    </div>
 </div>
 @endsection

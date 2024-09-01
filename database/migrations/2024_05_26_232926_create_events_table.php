@@ -24,6 +24,7 @@ return new class extends Migration
             */
             $table->boolean('is_limited_capacity')->default(true);
             $table->integer('capacity')->nullable();
+            $table->boolean('activities');//campo para ver si el evento va a tener actividades
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
             $table->decimal('price', 10, 2);
             $table->timestamps();

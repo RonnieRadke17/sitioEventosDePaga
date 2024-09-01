@@ -159,14 +159,11 @@ public function index()
                 'kit_delivery' => $request->kit_delivery,
                 'registration_deadline' => $request->registration_deadline, 
                 'is_limited_capacity'=> $request->is_limited_capacity,
-                //poner que si el valor es 1 si se necesita poner el valor de capacidad
-                $value = $request->is_limited_capacity,
                 'capacity' => $request->is_limited_capacity ? $request->capacity : null,
-                //'status', estatus no se registra porque por default es activo
+                'activities' => $request->is_with_activities,//este campo es de si es con actividades el evento o no
                 'price'=> $request->price
             ]);
             
-        
             //hacemos la incersion del lugar y lo vinculamos con el evento
             if ($request->place_id == 'Otro') {
                 
@@ -213,6 +210,7 @@ public function index()
                 }
             }
 
+            //imagenes del evento
             if ($request->hasFile('cover')) {//first image
                 $image = $request->file('cover');  
                 $path = $image->store('uploads', 'public'); 
@@ -251,6 +249,8 @@ public function index()
                     */
                 }
             }
+
+            return redirect()->route('event');
         }
         
     }
@@ -258,18 +258,21 @@ public function index()
     // Resto de los métodos del controlador...
     public function edit($id)
     {
-        $event = Event::findOrFail($id);
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+        $places = Place::all();
         $activities = Activity::all();
         $subs = Sub::all();
         
         // Obtener las actividades del evento
         $eventActivities = ActivityEvent::where('event_id', $id)->get()->groupBy('activity_id');
     
-        return view('event.edit', compact('event', 'activities', 'subs', 'eventActivities'));
+        return view('event.edit', compact('event', 'activities', 'subs', 'places','eventActivities'));
     }
     
     public function update(Request $request, $id)
     {
+        $id = decrypt($id);
         // Validación de los datos
         $request->validate([
             'name' => 'required|string|max:255',
@@ -343,13 +346,23 @@ public function index()
     public function show($id)
     {
         //tenemos que buscar en la tabla intermedia las imagenes
-        return view('event.show');
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+        return view('event.show', compact('event'));
+        //$images = Image::all();//mandamos todas las imagenes que se tienen
+        //$images = Image::all()->chunk(3);
+        //$subs = Sub::all(); // Esto te da una colección de todos las subs
+        //obtenemos todas las categorias con las actividades
+        //$places = Place::all();
+        //$activityCategories = ActivityCategory::with('activities')->get();
+        //$activities = Activity::all();
+        
+        //return view('event.create', compact('activities','subs','places','images'));  
     }
 
     public function destroy($id)
     {
-        $evento = Event::findOrFail($id);
-
+        $event = Event::findOrFail($id);
         // Elimina el evento sin borrar la imagen
         Event::destroy($id);
 
