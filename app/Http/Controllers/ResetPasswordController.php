@@ -23,7 +23,7 @@ class ResetPasswordController extends Controller
         return view('auth.forgot-password');
     }
     //falta poner algo que verifique que no se pueda mandar otro codigo de reguridad para no mandar muchos a la vez
-    public function sendPasswordCode(Request $request){
+    public function sendPasswordCode(Request $request){//revisar el Request $request para ver si se recibe todo o solo el correo, falla el restablecer
         $email = $request->email;
 
         //revisar que el correo si este en el sistema
@@ -116,8 +116,12 @@ class ResetPasswordController extends Controller
             return back()->withErrors(['email' => 'No se ha encontrado ningún usuario con este correo.']);
         }
         /* 
-            Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel
+            Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel y habilitamos la cuenta en dado caso de que este suspendida
         */
+        if($user->is_suspended){
+            $user->is_suspended = 0;//habilitamos la cuenta de nuevo
+        }
+        
         $user->password = base64_encode($request->password);
         //$user->password = Crypt::encryptString($request->password);
         $user->setRememberToken(Str::random(60));

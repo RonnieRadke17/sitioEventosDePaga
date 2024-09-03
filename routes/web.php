@@ -30,7 +30,13 @@ Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');//formulario para restablecer la contrasena
     Route::post('/password/send-passwod-code', 'sendPasswordCode')->name('password.send-password-code');//manda el correo
     Route::post('/password/reset-password', 'reset')->name('password.update');//restablece la contrasena
+    //ruta de ventana cuenta bloqueada
+
 });
+
+Route::view('acount/suspended', 'auth/passwords/message')->name('acount.suspended');
+
+
 //ventana que muestra los errores comunes
 Route::get('/error',[ErrorsController::class,'showWindowError'])->name('window.error');
 
@@ -63,12 +69,3 @@ Route::get('/create-preference', [MercadoPagoController::class, 'generatePrefere
 Route::post('paypal', [PaypalController::class, 'paypal'])->name('paypal');
 Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
-
-
-
-/*
-    Route::get('/password/reset/{token}',[ResetPasswordController::class,'showResetForm'])->name('password.reset');//la ruta esta bien
-    Route::get('/forgot-password',[ResetPasswordController::class,'showFormSendCode'])->name('forgot-password');
-    Route::post('/send-passwod-code',[ResetPasswordController::class,'sendPasswordCode'])->name('send-passwod-code');
-    Route::post('/reset-password',[ResetPasswordController::class,'reset'])->name('password.update'); 
-*/
