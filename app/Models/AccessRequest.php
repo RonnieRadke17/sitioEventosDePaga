@@ -13,5 +13,6 @@ class AccessRequest extends Model
         'attempts',
         'date',
         'ip_address',
+        'valid',
     ];
 }

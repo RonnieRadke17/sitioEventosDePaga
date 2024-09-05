@@ -34,7 +34,9 @@ class RegisterController extends Controller
             ],
             //falta validar el genero
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',//poner validacion de minusculas y mayusculas y numeros
+            'password' => 'required|string|min:8|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/', // Validación de mayúsculas, minúsculas y números
+            //'password' => 'required|string|min:8|confirmed',//poner validacion de minusculas y mayusculas y numeros
+            //falta poner el confirmed porque sino la contrasena no funciona
         ]);
 
         if ($validator->fails()) {

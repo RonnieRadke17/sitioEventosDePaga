@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('attempts')->default(0);
             $table->timestamp('date')->useCurrent();
             $table->string('ip_address')->nullable();
+            $table->boolean('valid')->default(true);
             $table->timestamps();
         });
     }

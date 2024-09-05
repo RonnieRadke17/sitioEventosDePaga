@@ -90,8 +90,8 @@ class ResetPasswordController extends Controller
         /* 
             Aqui validamos la contrasena, que sea igual, que sea de min 8 caracteres y max de 40
         */
-        $validator = Validator::make($request->all(), [
-            'password' => 'required|string|min:8|max:40|confirmed',
+        $validator = Validator::make($request->all(), [//'password' => 'required|string|min:8|max:40|confirmed',
+            'password' => 'required|string|min:8|max:40|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/', // Validación de mayúsculas, minúsculas y números
         ]);
 
         if ($validator->fails()) {

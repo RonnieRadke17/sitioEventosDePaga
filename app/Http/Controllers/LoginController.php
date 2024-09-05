@@ -22,6 +22,7 @@ class LoginController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'password' => 'required|string|min:8|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/', // Validación de mayúsculas, minúsculas y números
+            //'password' => 'required|string|min:8',//poner validacion de minusculas y mayusculas y numeros
         ]);
 
         if ($validator->fails()) {
@@ -52,9 +53,12 @@ class LoginController extends Controller
 
             } else {//aqui se verifica sino hay un registro de intentos fallidos hoy
                 
+                //el registro que se busque de hoy tiene que tener un status de si ya se llego al limite
+                //si ya se llego al limite de hoy busca el siguiente registro es decir el que no tenga el limite aun
                 $today = Carbon::today();
                 $accessRequest = AccessRequest::where('email', $request->email)
                     ->whereDate('date', $today)
+                    ->where('valid', 1) 
                     ->first();
 
                     if ($accessRequest) {// Si ya existe un registro de hoy, incrementar los intentos
@@ -62,12 +66,13 @@ class LoginController extends Controller
                         $accessRequest->save();
 
                         if ($accessRequest->attempts >= 3) {//aqui es donde suspendemos la cuenta, buscamos la cuenta y cambiamos el is_suspended = 1
-                            
+                            $accessRequest->valid = 0;//aqui ponemos que este registro de access ya no es valido
+                            $accessRequest->save();
                             $user = User::where('email', $request->email);
                             $user->update(['is_suspended' => 1]);
 
                             $resetPassword = app(ResetPasswordController::class);
-                            $resetPassword->sendPasswordCode($request->email);
+                            $resetPassword->sendPasswordCode($request);
                             return redirect()->route('acount.suspended', [
                                 'message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña',
                                 'status_code' => 403,
