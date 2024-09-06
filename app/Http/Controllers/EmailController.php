@@ -15,45 +15,64 @@ class EmailController extends Controller
     //pongo affairs porque es el asunto con el cual se manda el codigo y por lo cual aqui se hace la insersion en 
     //email verification resetPaswordtokens, o incluso para borrar la cuenta
     
-    public function sendCodeViaEmail($email,$affair){
-        $code = random_int(100000, 999999);
-        $data = ['mailSubject','mailMessage','code'];
-        $subject = null;
+    public function sendCodeViaEmail($email, $affair)
+{
+    $code = random_int(100000, 999999);
+    $data = ['mailSubject', 'mailMessage', 'code'];
+    $subject = null;
 
-        switch($affair){
-            case "verification":
-                //todos los anteriores y solo el ultimo estar habilitado
-                // Buscar si ya existe un código de verificación para este correo
-                $existingVerification = EmailVerification::where('email', $email)->first();
-        
-                if ($existingVerification) {
-                    // Invalidar el código anterior
-                    $existingVerification->status = true; // O marca como inválido de la forma que desees
-                    $existingVerification->save();
+    switch ($affair) {
+        case "verification":
+            // Buscar si ya existe un código de verificación para este correo
+            $existingVerification = EmailVerification::where('email', $email)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+
+            if ($existingVerification) {
+                // Verificar si el código anterior ha expirado
+                if (Carbon::now()->lt(Carbon::parse($existingVerification->expiration))) {
+                    // Si el código no ha expirado, retornar un error
+                    return [
+                        'status' => false,
+                        'message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado.'
+                    ];
                 }
-                $subject = 'Código de Verificación';
-                // Crear un nuevo código de verificación
-                $data = [
-                    'mailSubject' => 'Código de Verificación',
-                    'mailMessage' => 'Tu código de verificación es:',
-                    'code' => $code
-                ];
-        
-                EmailVerification::create([
-                    'email' => $email,
-                    'token' => base64_encode($code),
-                    'expiration' => Carbon::now()->addMinutes(5)
-                ]);
 
-                // Send the email
-                Mail::send('emails.verification', $data, function ($message) use ($email,$subject) {
-                    $message->to($email)
-                    ->subject($subject);
-                });
-                break;
-        }        
+                // Invalidar el código anterior si ha expirado
+                $existingVerification->status = true;
+                $existingVerification->save();
+            }
+            // Crear y enviar el nuevo código de verificación
+            $subject = 'Código de Verificación';
+            EmailVerification::create([
+                'email' => $email,
+                'token' => base64_encode($code),
+                'expiration' => Carbon::now()->addMinutes(5)
+            ]);
 
+            Mail::send('emails.verification', [
+                'mailSubject' => 'Código de Verificación',
+                'mailMessage' => 'Tu código de verificación es:',
+                'code' => $code
+                ], function ($message) use ($email, $subject) {
+                    $message->to($email)->subject($subject);
+            });
+
+            return [
+                'status' => true,
+                'message' => 'Código enviado correctamente.'
+            ];
+
+        break;  
+
+        default:
+            return [
+                'status' => false,
+                'message' => 'Tipo de asunto no reconocido.'
+            ];
     }
+}
 
     public function verifyCodeViaEmail($email,$code,$affair){
         

@@ -1,6 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 @section('title','Registro')
 @section('content')
+
+<!-- Mostrar errores de validación -->
 @if ($errors->any())
     <div class="alert alert-danger">
         <ul>
@@ -10,6 +12,9 @@
         </ul>
     </div>
 @endif
+
+<!-- Mostrar mensaje de error de sesión (como el error de código de verificación no expirado) -->
+{{ session()->get('error') }}
 
 <form method="POST" action="{{ route('process-register') }}">
     @csrf
@@ -49,7 +54,7 @@
         @enderror
     </div>
 
-        <!-- Género -->
+    <!-- Género -->
     <div class="mb-4">
         <label class="block text-gray-700">Género</label>
         <div class="flex items-center">
@@ -63,7 +68,6 @@
             <span class="text-danger">{{ $message }}</span>
         @enderror
     </div>
-
 
     <!-- Correo Electrónico -->
     <div>

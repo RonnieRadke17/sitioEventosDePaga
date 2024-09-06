@@ -32,11 +32,8 @@ class RegisterController extends Controller
                 'before_or_equal:' . now()->subYears(10)->format('Y-m-d'),
                 'date_format:Y-m-d',
             ],
-            //falta validar el genero
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/', // Validación de mayúsculas, minúsculas y números
-            //'password' => 'required|string|min:8|confirmed',//poner validacion de minusculas y mayusculas y numeros
-            //falta poner el confirmed porque sino la contrasena no funciona
+            'password' => 'required|string|min:8|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/',
         ]);
 
         if ($validator->fails()) {
@@ -45,34 +42,43 @@ class RegisterController extends Controller
                 ->withInput();
         }
 
+        // Llamar al controlador de correo para enviar el código de verificación
         $controladoremail = app(EmailController::class);
-        $controladoremail->sendCodeViaEmail($request->email,"verification");
+        $emailResponse = $controladoremail->sendCodeViaEmail($request->email, "verification");
 
-            //falta hacer la insersion del token en la DB
+            // Verificar si la respuesta es válida y manejar errores
+        if (!$emailResponse || $emailResponse['status'] == false) {
+            //session()->flash('error', $emailResponse['message']);
+            return redirect()->back()->with('error', $emailResponse['message']);
+            //session()->flash('error', $emailResponse['message'] ?? 'Error al enviar el código de verificación.');
+            return redirect()->back();
+        }
+
+        dd($emailResponse);
+        // Continuar con el proceso de registro si todo salió bien
         $user = [
             'name' => $request->name,
             'paternal' => $request->paternal,
-            'maternal'=> $request->maternal,
-            'birthdate'=> $request->birthdate,
-            'gender'=> $request->gender,
-            'email'=> $request->email,
-            //encriptar en base 64
-            'password' =>base64_encode($request->password),
-            //'password' => Crypt::encryptString($request->password), // Encriptar la contraseña
-        ];    
-        //dd($user);
+            'maternal' => $request->maternal,
+            'birthdate' => $request->birthdate,
+            'gender' => $request->gender,
+            'email' => $request->email,
+            'password' => base64_encode($request->password),
+        ];
+
         // Almacenar los datos del usuario en la sesión
         session(['user' => $user]);
-        
+
         return redirect()->route('email-verification');
     }
 
-    public function sendVerificationCode(){//aqui me falta mandar el mensaje de codigo renviado
+
+    /* public function sendVerificationCode(){//aqui me falta mandar el mensaje de codigo renviado
         $user = session('user');
         $controladoremail = app(EmailController::class);
         $controladoremail->sendCodeViaEmail($user['email'],"verification");
         return redirect()->back()->with('message','Código reenviado');
-    }
+    } */
 
 
     public function emailVerification(Request $request)//aqui solamente mostramos la vista de la verificacion del email
