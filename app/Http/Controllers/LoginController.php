@@ -49,6 +49,18 @@ class LoginController extends Controller
             if (Hash::check(base64_encode($request->password), $user->password)) {
                 Auth::login($user, $request->filled('remember'));
                 $request->session()->regenerate();
+
+                //consulta de intento anterior para inhabilitarlo codigo nuevo de lina 54,61
+                $today = Carbon::today();
+                $accessRequest = AccessRequest::where('email', $request->email)
+                    ->whereDate('date', $today)
+                    ->where('valid', 1) 
+                    ->first();
+                
+                $accessRequest->valid = 0;//aqui ponemos que este registro de access ya no es valido
+                $accessRequest->save();
+
+
                 return redirect()->route('home');
 
             } else {//aqui se verifica sino hay un registro de intentos fallidos hoy

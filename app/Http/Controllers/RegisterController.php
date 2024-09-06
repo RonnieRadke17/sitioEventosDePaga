@@ -23,9 +23,9 @@ class RegisterController extends Controller
     public function processRegister(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'paternal' => 'required|string|max:255',
-            'maternal' => 'required|string|max:255',
+            'name' => 'required|string|max:255|min:3|max:20',
+            'paternal' => 'required|string|max:255|min:4|max:20',
+            'maternal' => 'required|string|max:255|min:4|max:20',
             'birthdate' => [
                 'required',
                 'date',
