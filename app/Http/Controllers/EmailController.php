@@ -66,6 +66,64 @@ class EmailController extends Controller
 
         break;  
 
+
+        case "resetPassword":
+            //$email = $request->email;
+
+            //revisar que el correo si este en el sistema
+            $emailUser = User::where('email',$email)->exists();
+            
+            // El usuario con el correo electrónico existe
+            if ($emailUser) {
+                // Buscar si ya existe un código de verificación para este correo
+                $existingVerification = PasswordResetToken::where('email', $email)
+                ->orderBy('created_at', 'desc')
+                ->first();
+    
+                if ($existingVerification) {
+    
+                    // Invalidar el código anterior si ha expirado
+                    $existingVerification->status = true;
+                    $existingVerification->save();
+
+                    // Verificar si el código anterior ha expirado
+                    if (Carbon::now()->lt(Carbon::parse($existingVerification->expiration))) {
+                        // Si el código no ha expirado, retornar un error
+                        
+                        return redirect()->back()->withErrors(['message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado']);
+                    }
+
+                }
+    
+                $tokenEncrypted = Crypt::encryptString(Str::random(10));// generamos el token y lo encriptamos
+    
+                PasswordResetToken::create([
+                    'email' => $email,
+                    'token' => $tokenEncrypted,
+                    'expiration' => Carbon::now()->addMinutes(5)
+                ]);
+                // Enviar correo con el enlace de restablecimiento
+                $subject = 'Restablecimiento de Contraseña';
+                $data = [
+                    'url' => url('/password/reset', $tokenEncrypted)
+                ];
+    
+                Mail::send('emails.password_reset', $data, function ($message) use ($email, $subject) {
+                    $message->to($email)->subject($subject);
+                });
+                
+                return redirect()->back()->with('message','Link enviado a su correo');
+    
+            } else {
+                // No hay ningún usuario con ese correo electrónico
+                return redirect()->back()->withErrors(['message' => 'Correo no válido']);
+            }
+        
+        break;
+
+
+
+
         default:
             return [
                 'status' => false,

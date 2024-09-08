@@ -22,7 +22,7 @@ class ResetPasswordController extends Controller
     {
         return view('auth.forgot-password');
     }
-    //falta poner algo que verifique que no se pueda mandar otro codigo de reguridad para no mandar muchos a la vez
+    
     public function sendPasswordCode(Request $request){//revisar el Request $request para ver si se recibe todo o solo el correo, falla el restablecer
         $email = $request->email;
 
@@ -32,14 +32,33 @@ class ResetPasswordController extends Controller
         // El usuario con el correo electrónico existe
         if ($emailUser) {
             
+            /* // Buscar si ya existe un código de verificación para este correo
+                //$existingVerification = PasswordResetToken::where('email', $email)->first();
+                if ($existingVerification) {
+                    // Invalidar el código anterior
+                    $existingVerification->status = true;
+                    $existingVerification->save();
+                }
+            */
+
             // Buscar si ya existe un código de verificación para este correo
-            $existingVerification = PasswordResetToken::where('email', $email)->first();
+            $existingVerification = PasswordResetToken::where('email', $email)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
             if ($existingVerification) {
-                // Invalidar el código anterior
+                // Verificar si el código anterior ha expirado
+                if (Carbon::now()->lt(Carbon::parse($existingVerification->expiration))) {
+                    // Si el código no ha expirado, retornar un error
+                    
+                    return redirect()->back()->withErrors(['message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado']);
+                }
+
+                // Invalidar el código anterior si ha expirado
                 $existingVerification->status = true;
                 $existingVerification->save();
             }
+
             $tokenEncrypted = Crypt::encryptString(Str::random(10));// generamos el token y lo encriptamos
 
             PasswordResetToken::create([

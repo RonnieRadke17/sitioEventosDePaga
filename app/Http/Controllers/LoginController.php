@@ -37,11 +37,18 @@ class LoginController extends Controller
         if ($user) {
             // Verificar si la cuenta está suspendida// redireccionar mandando un codigo a el correo junto con la opcion de 
             if ($user->is_suspended) {
+                //falta validar aqui lo del envio de correos 
+
+
                 $resetPassword = app(ResetPasswordController::class)->sendPasswordCode($request);
+                return redirect()->route('acount.suspended')
+                ->withErrors(['message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña']);
+                
+                /* $resetPassword = app(ResetPasswordController::class)->sendPasswordCode($request);
                 return redirect()->route('acount.suspended', [
                     'message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña',
                     'status_code' => 403,
-                ]);
+                ]); */
                 //return redirect()->back()->withErrors(['email' => 'Tu cuenta está suspendida. Por favor, sigue el proceso de recuperación.']);
             }
 
@@ -83,6 +90,7 @@ class LoginController extends Controller
                             $user = User::where('email', $request->email);
                             $user->update(['is_suspended' => 1]);
 
+                            //falta validar aqui lo del envio de correos
                             $resetPassword = app(ResetPasswordController::class);
                             $resetPassword->sendPasswordCode($request);
                             return redirect()->route('acount.suspended', [
@@ -107,6 +115,5 @@ class LoginController extends Controller
             return redirect()->back()->withErrors(['email' => 'El correo electrónico no existe.']);
         }
     }
-
    
 }
