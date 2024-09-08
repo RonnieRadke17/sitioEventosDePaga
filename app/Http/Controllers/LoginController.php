@@ -38,8 +38,6 @@ class LoginController extends Controller
             // Verificar si la cuenta está suspendida// redireccionar mandando un codigo a el correo junto con la opcion de 
             if ($user->is_suspended) {
                 //falta validar aqui lo del envio de correos 
-
-
                 $resetPassword = app(ResetPasswordController::class)->sendPasswordCode($request);
                 return redirect()->route('acount.suspended')
                 ->withErrors(['message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña']);

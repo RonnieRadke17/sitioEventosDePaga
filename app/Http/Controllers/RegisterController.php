@@ -54,7 +54,7 @@ class RegisterController extends Controller
             return redirect()->back();
         }
 
-        dd($emailResponse);
+        //dd($emailResponse);
         // Continuar con el proceso de registro si todo salió bien
         $user = [
             'name' => $request->name,

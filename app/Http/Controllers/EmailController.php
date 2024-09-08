@@ -9,6 +9,9 @@ use Illuminate\Mail\Message;
 use App\Models\EmailVerification;
 use App\Models\PasswordResetToken;
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
+use Illuminate\Support\Str;//se usa para generar texto aleatorio
 
 class EmailController extends Controller
 {
@@ -27,7 +30,6 @@ class EmailController extends Controller
             $existingVerification = EmailVerification::where('email', $email)
             ->orderBy('created_at', 'desc')
             ->first();
-
 
             if ($existingVerification) {
                 // Verificar si el código anterior ha expirado
@@ -66,10 +68,8 @@ class EmailController extends Controller
 
         break;  
 
-
-        case "resetPassword":
-            //$email = $request->email;
-
+        case "resetPassword"://$email = $request->email;
+            
             //revisar que el correo si este en el sistema
             $emailUser = User::where('email',$email)->exists();
             
@@ -89,8 +89,11 @@ class EmailController extends Controller
                     // Verificar si el código anterior ha expirado
                     if (Carbon::now()->lt(Carbon::parse($existingVerification->expiration))) {
                         // Si el código no ha expirado, retornar un error
-                        
-                        return redirect()->back()->withErrors(['message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado']);
+                        return [
+                            'status' => 1,
+                            'message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado.'
+                        ];
+                        //return redirect()->back()->withErrors(['message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado']);
                     }
 
                 }
@@ -112,17 +115,22 @@ class EmailController extends Controller
                     $message->to($email)->subject($subject);
                 });
                 
-                return redirect()->back()->with('message','Link enviado a su correo');
+                return [
+                    'status' => 2,
+                    'message' => 'Link enviado a su correo'
+                ];
+                //return redirect()->back()->with('message','Link enviado a su correo');
     
             } else {
                 // No hay ningún usuario con ese correo electrónico
-                return redirect()->back()->withErrors(['message' => 'Correo no válido']);
+                return [
+                    'status' => 3,
+                    'message' => 'Correo no válido'
+                ];
+                //return redirect()->back()->withErrors(['message' => 'Correo no válido']);
             }
         
         break;
-
-
-
 
         default:
             return [
@@ -170,6 +178,54 @@ class EmailController extends Controller
             break;            
         }
 
+    }
+
+
+    //revisar el token del url y revisar el token del form verificando que sean veridicos
+    public function reset(Request $request)//falta validar la informacion
+    {
+        $passwordReset = PasswordResetToken::where('token', $request->token)->first();
+
+        if (!$passwordReset || $passwordReset->expiration < Carbon::now()) {
+            return [
+                'status' => 1,
+                'message' => 'El token es inválido o ha expirado.'
+            ];
+            //return back()->withErrors(['token' => 'El token es inválido o ha expirado.']);
+        }
+
+        //aqui buscamos el usuario con ese correo
+        $user = User::where('email', $passwordReset->email)->first();
+
+        if (!$user) {
+            return [
+                'status' => 2,
+                'message' => 'No se ha encontrado ningún usuario con este correo.'
+            ];
+            //return back()->withErrors(['email' => 'No se ha encontrado ningún usuario con este correo.']);
+        }
+        /* 
+            Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel y habilitamos la cuenta en dado caso de que este suspendida
+        */
+        if($user->is_suspended){
+            $user->is_suspended = 0;//habilitamos la cuenta de nuevo
+        }
+        
+        $user->password = base64_encode($request->password);
+        //$user->password = Crypt::encryptString($request->password);
+        $user->setRememberToken(Str::random(60));
+        $user->save();
+
+        // Inhabilitar el token utilizado
+        $passwordReset->status = true; 
+        $passwordReset->save();
+
+        auth()->login($user);
+
+        //return redirect()->route('home');// redijirimos a la ruta principal
+        return [
+            'status' => 3,
+        ];
     }
 
 }

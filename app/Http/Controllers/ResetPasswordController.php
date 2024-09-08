@@ -14,6 +14,7 @@ use Illuminate\Support\Str;//se usa para generar texto aleatorio
 use Carbon\Carbon;//se usa para la fecha
 use App\Http\Controllers\ErrorsController;
 use Illuminate\Support\Facades\Validator;//se usa para validar informacion
+use App\Http\Controllers\EmailController;
 
 class ResetPasswordController extends Controller
 {
@@ -22,67 +23,22 @@ class ResetPasswordController extends Controller
     {
         return view('auth.forgot-password');
     }
-    
+
     public function sendPasswordCode(Request $request){//revisar el Request $request para ver si se recibe todo o solo el correo, falla el restablecer
         $email = $request->email;
+        // Llamar al controlador de correo para enviar el código de verificación
+        $controladoremail = app(EmailController::class);
+        $emailResponse = $controladoremail->sendCodeViaEmail($request->email, "resetPassword");
 
-        //revisar que el correo si este en el sistema
-        $emailUser = User::where('email',$email)->exists();
+        if($emailResponse['status'] == 1){
+            return redirect()->back()->withErrors(['message' => $emailResponse['message']]);
         
-        // El usuario con el correo electrónico existe
-        if ($emailUser) {
-            
-            /* // Buscar si ya existe un código de verificación para este correo
-                //$existingVerification = PasswordResetToken::where('email', $email)->first();
-                if ($existingVerification) {
-                    // Invalidar el código anterior
-                    $existingVerification->status = true;
-                    $existingVerification->save();
-                }
-            */
-
-            // Buscar si ya existe un código de verificación para este correo
-            $existingVerification = PasswordResetToken::where('email', $email)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-            if ($existingVerification) {
-                // Verificar si el código anterior ha expirado
-                if (Carbon::now()->lt(Carbon::parse($existingVerification->expiration))) {
-                    // Si el código no ha expirado, retornar un error
-                    
-                    return redirect()->back()->withErrors(['message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado']);
-                }
-
-                // Invalidar el código anterior si ha expirado
-                $existingVerification->status = true;
-                $existingVerification->save();
-            }
-
-            $tokenEncrypted = Crypt::encryptString(Str::random(10));// generamos el token y lo encriptamos
-
-            PasswordResetToken::create([
-                'email' => $email,
-                'token' => $tokenEncrypted,
-                'expiration' => Carbon::now()->addMinutes(5)
-            ]);
-            // Enviar correo con el enlace de restablecimiento
-            $subject = 'Restablecimiento de Contraseña';
-            $data = [
-                'url' => url('/password/reset', $tokenEncrypted)
-            ];
-
-            Mail::send('emails.password_reset', $data, function ($message) use ($email, $subject) {
-                $message->to($email)->subject($subject);
-            });
-            
-            return redirect()->back()->with('message','Link enviado a su correo');
-
-        } else {
-            // No hay ningún usuario con ese correo electrónico
-            return redirect()->back()->withErrors(['message' => 'Correo no válido']);
+        }else if($emailResponse['status'] == 2){
+            return redirect()->back()->with('message',$emailResponse['message']);
+            //return redirect()->back()->withErrors(['message' => $emailResponse['message']]);
+        }else if($emailResponse['status'] == 3){
+            return redirect()->back()->withErrors(['message' => $emailResponse['message']]);
         }
-
     }
 
     public function showResetForm($token)
@@ -103,7 +59,7 @@ class ResetPasswordController extends Controller
     }
 
     
-    //revisar el token del url y revisar el token del form verificando que sean veridicos
+    
     public function reset(Request $request)//falta validar la informacion
     {
         /* 
@@ -122,37 +78,20 @@ class ResetPasswordController extends Controller
             si la contrasena es valida entonces buscamos el token en la DB para actualizar la contrasena 
             del correo el cual esta con el token e inhabilitamos el token y logueamos al usuario
         */
-        $passwordReset = PasswordResetToken::where('token', $request->token)->first();
+        //aqui mandamos a llamar el metodo ya con los datos validados
+        // Llamar al controlador de correo para enviar el código de verificación
+        $controladoremail = app(EmailController::class);
+        $emailResponse = $controladoremail->reset($request);
 
-        if (!$passwordReset || $passwordReset->expiration < Carbon::now()) {
-            return back()->withErrors(['token' => 'El token es inválido o ha expirado.']);
+            // Verificar si la respuesta es válida y manejar errores
+        if ($emailResponse['status'] == 1) {
+            return back()->withErrors(['token' => $emailResponse['message']]);
+
+        }else if ($emailResponse['status'] == 2) {
+            return back()->withErrors(['token' => $emailResponse['message']]);
+
+        }else if ($emailResponse['status'] == 3) {
+            return redirect()->route('home');
         }
-
-        //aqui buscamos el usuario con ese correo
-        $user = User::where('email', $passwordReset->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'No se ha encontrado ningún usuario con este correo.']);
-        }
-        /* 
-            Aqui encriptamos la contrasena del usuario por el metodo convencional de laravel y habilitamos la cuenta en dado caso de que este suspendida
-        */
-        if($user->is_suspended){
-            $user->is_suspended = 0;//habilitamos la cuenta de nuevo
-        }
-        
-        $user->password = base64_encode($request->password);
-        //$user->password = Crypt::encryptString($request->password);
-        $user->setRememberToken(Str::random(60));
-        $user->save();
-
-        // Inhabilitar el token utilizado
-        $passwordReset->status = true; 
-        $passwordReset->save();
-
-        auth()->login($user);
-
-        return redirect()->route('home');// redijirimos a la ruta principal
-
     }
 }
