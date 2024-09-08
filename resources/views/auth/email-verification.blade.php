@@ -50,7 +50,7 @@
             <input type="number" name="code" class="w-full px-3 py-2 border rounded-lg mb-4 no-arrows">
             <input type="submit" value="Verificar" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg cursor-pointer">
         </form>
-        <form action="{{ route('send-verification-code') }}" method="POST" id="resendForm" class="hidden">
+        <form action="{{ route('send-verification-code') }}" method="POST" id="resendForm">
             @csrf
             <button type="submit" class="w-full px-3 py-2 bg-yellow-500 text-white rounded-lg">Reenviar código</button>
         </form>

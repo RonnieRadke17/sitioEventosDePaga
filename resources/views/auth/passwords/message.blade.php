@@ -1,11 +1,16 @@
 @extends('layouts.app')
+
 @section('content')
-@if (request()->has('message'))
-    <div class="alert alert-warning">
-        {{ request('message') }}
+
+@if (session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
     </div>
 @endif
+{{-- cuenta regresiva de el tiempo restante --}}
 
-{{-- boton de volver a mandar codigo si ya no es valido el anterior, como un contador de cuanto tiempo queda--}}
+<form action="" method="post">
+    <input type="submit" value="Reenviar código">
+</form>
 @endsection
 

@@ -114,13 +114,12 @@ class EmailController extends Controller
                 Mail::send('emails.password_reset', $data, function ($message) use ($email, $subject) {
                     $message->to($email)->subject($subject);
                 });
-                
+                //aqui en el login se manda mensaje distinto debido a que es por cuenta bloqueada
                 return [
                     'status' => 2,
                     'message' => 'Link enviado a su correo'
                 ];
-                //return redirect()->back()->with('message','Link enviado a su correo');
-    
+                
             } else {
                 // No hay ningún usuario con ese correo electrónico
                 return [

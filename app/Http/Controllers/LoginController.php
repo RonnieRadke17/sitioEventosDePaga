@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Models\AccessRequest;
 
+use App\Http\Controllers\EmailController;
+
 use App\Http\Controllers\ResetPasswordController;
+
 
 class LoginController extends Controller
 {
@@ -37,17 +40,23 @@ class LoginController extends Controller
         if ($user) {
             // Verificar si la cuenta está suspendida// redireccionar mandando un codigo a el correo junto con la opcion de 
             if ($user->is_suspended) {
-                //falta validar aqui lo del envio de correos 
-                $resetPassword = app(ResetPasswordController::class)->sendPasswordCode($request);
-                return redirect()->route('acount.suspended')
-                ->withErrors(['message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña']);
-                
-                /* $resetPassword = app(ResetPasswordController::class)->sendPasswordCode($request);
-                return redirect()->route('acount.suspended', [
-                    'message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña',
-                    'status_code' => 403,
-                ]); */
-                //return redirect()->back()->withErrors(['email' => 'Tu cuenta está suspendida. Por favor, sigue el proceso de recuperación.']);
+
+                $controladoremail = app(EmailController::class);
+                $emailResponse = $controladoremail->sendCodeViaEmail($request->email,"resetPassword");
+
+                    // Verificar si la respuesta es válida y manejar errores
+                if ($emailResponse['status'] == 1) {
+                    //dd($emailResponse['message']);               
+                    $parameter = $emailResponse['message'];
+                    return redirect()->route('acount.suspended')
+                    ->with(['message' =>$emailResponse['message']]);
+                    //'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña'
+                    //revisar mensaje de si ya se mando el correo o de te mandamos el correo
+                }else if ($emailResponse['status'] == 2) {
+                    //dd($emailResponse['message']);               
+                    return redirect()->route('acount.suspended')
+                    ->with(['message' =>$emailResponse['message']]);
+                }
             }
 
             // Verificar la contraseña
@@ -88,13 +97,19 @@ class LoginController extends Controller
                             $user = User::where('email', $request->email);
                             $user->update(['is_suspended' => 1]);
 
-                            //falta validar aqui lo del envio de correos
-                            $resetPassword = app(ResetPasswordController::class);
-                            $resetPassword->sendPasswordCode($request);
-                            return redirect()->route('acount.suspended', [
-                                'message' => 'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña',
-                                'status_code' => 403,
-                            ]);
+                            $controladoremail = app(EmailController::class);
+                            $emailResponse = $controladoremail->sendCodeViaEmail($request->email,"resetPassword");
+                                // Verificar si la respuesta es válida y manejar errores
+                            if ($emailResponse['status'] == 1) {
+                                dd($emailResponse['message']);               
+                                return redirect()->route('acount.suspended')
+                                ->withErrors(['message' =>'Tu cuenta está suspendida, te hemos enviado un link de restablecimiento de contraseña']);
+                 
+                                //revisar mensaje de si ya se mando el correo o de te mandamos el correo
+                            }else if ($emailResponse['status'] == 2) {
+                                return redirect()->route('acount.suspended')
+                                ->withErrors(['message' =>'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña']);
+                            }
                         }
                 
                     } else {
