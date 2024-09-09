@@ -76,9 +76,9 @@ class RegisterController extends Controller
     public function sendVerificationCode(){//aqui me falta mandar el mensaje de codigo renviado
         $user = session('user');
         $controladoremail = app(EmailController::class);
-        $controladoremail->sendCodeViaEmail($user['email'],"verification");
+        $emailResponse = $controladoremail->sendCodeViaEmail($user['email'],"verification");
         //falta poner los mensajes de el envio
-        return redirect()->back()->with('message','Código reenviado');
+        return redirect()->back()->with(['message'=>$emailResponse['message']]);
     }
 
 
