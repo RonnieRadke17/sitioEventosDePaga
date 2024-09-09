@@ -18,6 +18,4 @@ olvido su contrasena?
     <button type="submit">enviar codigo</button>
 </form>
 
-
-
 @endsection

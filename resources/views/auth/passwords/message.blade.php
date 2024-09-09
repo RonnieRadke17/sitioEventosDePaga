@@ -9,8 +9,10 @@
 @endif
 {{-- cuenta regresiva de el tiempo restante --}}
 
-<form action="" method="post">
-    <input type="submit" value="Reenviar código">
+<form action="{{ route('password.send-password-code') }}" method="post">
+    @csrf
+    <input type="email" name="email" placeholder="ingrese su correo">
+    <button type="submit">reenviar codigo</button>
 </form>
 @endsection
 
