@@ -62,4 +62,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'payments')->withTimestamps();
     }
 
+    //relations with roles
+    public function roles()
+    {
+        return $this->belongsTo(Role::class)->withTimestamps();
+    }
 }

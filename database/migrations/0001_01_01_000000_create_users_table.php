@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_suspended')->default(false);
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
         });
