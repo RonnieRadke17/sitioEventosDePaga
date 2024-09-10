@@ -89,19 +89,18 @@
             </div>
         </div>
 
-
         <!-- Paso 2: Activities -->
         <!-- revisar la tabla todo lo relacionado con mostrar info-->
         <div id="step-2" class="hidden">
-            <!-- Aquí se muestra el botón que muestra las actividades -->
+            <!--aqui se muestra el boton que muestra las actividades -->
             <div class="mb-4">
                 <label for="is_with_activities" class="block text-gray-700">Actividades</label>
                 <select name="is_with_activities" id="is_with_activities" class="w-full px-4 py-2 border rounded-lg">
-                    <option value="0" {{ old('is_with_activities') == 0 ? 'selected' : '' }}>No</option>
-                    <option value="1" {{ old('is_with_activities') == 1 ? 'selected' : '' }}>Yes</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
                 </select>
             </div>
-        
+            
             <table class="min-w-full bg-white border border-gray-200 hidden" id="activity_table">
                 <thead>
                     <tr class="bg-gray-100 border-b">
@@ -114,8 +113,7 @@
                     <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
                         <td class="py-2 px-4">{{ $activity->name }}</td>
                         <td class="py-2 px-4 text-center">
-                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" 
-                                {{ in_array($activity->id, old('selected_activities', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" {{ isset($eventActivities[$activity->id]) ? 'checked' : '' }}>
                         </td>
                     </tr>
                     <tr class="hidden activity-details" id="activity-{{ $activity->id }}-details">
@@ -124,13 +122,21 @@
                             <div class="mb-2">
                                 <label class="block font-semibold">
                                     <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
-                                        {{ isset(old('genders')[$activity->id][$gender]) ? 'checked' : '' }}> {{ $gender }}
+                                    @if(isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->contains('gender', $gender))
+                                        checked
+                                    @endif> {{ $gender }}
                                 </label>
                                 <div class="pl-4 hidden gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
                                     @foreach ($subs as $sub)
                                     <label class="block">
                                         <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
-                                            {{ isset(old('subs')[$activity->id][$gender]) && in_array($sub->id, old('subs')[$activity->id][$gender]) ? 'checked' : '' }}> {{ $sub->name }}
+                                        @if(isset($eventActivities[$activity->id]))
+                                            @foreach($eventActivities[$activity->id] as $eventActivity)
+                                                @if($eventActivity->gender == $gender && $eventActivity->sub_id == $sub->id)
+                                                    checked
+                                                @endif
+                                            @endforeach
+                                        @endif> {{ $sub->name }}
                                     </label>
                                     @endforeach
                                 </div>
@@ -141,12 +147,12 @@
                     @endforeach
                 </tbody>
             </table>
-            <div class="flex justify-between mt-4">
-                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
-                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
-            </div>
+                <div class="flex justify-between mt-4">
+                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
+                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
+                    
+                </div>
         </div>
-       
 
         <!-- Paso 3: Maps -->
         <div id="step-3" class="hidden">
@@ -161,10 +167,15 @@
                 <select name="place_id" id="place_id" class="w-full px-4 py-2 border rounded-lg">
                     <option value="select">Selecciona un lugar</option>
                     @foreach($places as $place)
-                        <option value="{{ $place->id }}" {{ old('place_id') == $place->id ? 'selected' : '' }}>{{ $place->name }}</option>
+                        <option value="{{ $place->id }}" 
+                            {{ old('place_id', isset($eventPlaceId) ? $eventPlaceId : '') == $place->id ? 'selected' : '' }}>
+                            {{ $place->name }}
+                        </option>
                     @endforeach
                     <option value="Otro" {{ old('place_id') == 'Otro' ? 'selected' : '' }}>Agregar uno nuevo</option>
                 </select>
+
+
 
                 <div id="map-container" class="hidden">
                     <gmpx-api-loader key="AIzaSyCiOsILiCTNFPbln2vBZpEtKXdx2JuceyU" solution-channel="GMP_CCS_autocomplete_v4">

@@ -181,33 +181,42 @@ public function index()
                 $event->places()->attach($request->place_id);
             }
         
-            //aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
-            // Obtener todas las actividades seleccionadas
-            //aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
-            if($request->is_with_activities === 1){
-                $selectedActivities = $request->input('selected_activities');
+            /* aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
+                Obtener todas las actividades seleccionadas
+                aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
+                //aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
+                // Obtener todas las actividades seleccionadas
+                //aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
+             */
+            if($request->is_with_activities == 1){//comparamos  que el valor dentro sea int,string
+                try {
+                    $selectedActivities = $request->input('selected_activities');
 
-                foreach ($selectedActivities as $activityId) {
-                    // Obtener los géneros seleccionados para esta actividad
-                    $genders = $request->input("genders.$activityId", []);
-    
-                    // Obtener las subactividades seleccionadas para esta actividad
-                    $subs = $request->input("subs.$activityId", []);
-    
-                    // Iterar sobre los géneros seleccionados
-                    foreach ($genders as $gender => $value) {
-                        // Iterar sobre las subactividades seleccionadas para este género
-                        foreach ($subs[$gender] as $subId) {
-                            // Crear un nuevo ActivityEvent
-                            ActivityEvent::create([
-                                'event_id' => $event->id,//id del evento no uso atach porque se mandan mas campos
-                                'activity_id' => $activityId,
-                                'gender' => $gender,
-                                'sub_id' => $subId,
-                            ]);
+                    foreach ($selectedActivities as $activityId) {
+                        // Obtener los géneros seleccionados para esta actividad
+                        $genders = $request->input("genders.$activityId", []);
+        
+                        // Obtener las subactividades seleccionadas para esta actividad
+                        $subs = $request->input("subs.$activityId", []);
+        
+                        // Iterar sobre los géneros seleccionados
+                        foreach ($genders as $gender => $value) {
+                            // Iterar sobre las subactividades seleccionadas para este género
+                            foreach ($subs[$gender] as $subId) {
+                                // Crear un nuevo ActivityEvent
+                                ActivityEvent::create([
+                                    'event_id' => $event->id,//id del evento no uso atach porque se mandan mas campos
+                                    'activity_id' => $activityId,
+                                    'gender' => $gender,
+                                    'sub_id' => $subId,
+                                ]);
+                            }
                         }
                     }
+                } catch (\Exception $e) {
+                    \Log::error('Error inserting activity event: ' . $e->getMessage());
                 }
+                
             }
 
             //imagenes del evento
@@ -241,16 +250,10 @@ public function index()
                         'event_id' => $event->id,
                         'type' => 'content'
                     ]);
-                    /* 
-                        vinculamos el id de la imagen con el id del evento 
-                        $event = Event::find($eventId);
-                        Utilizando el método attach para asociar la imagen al evento
-                        $event->imgEvents()->attach($imageModel->id); 
-                    */
                 }
             }
 
-            return redirect()->route('event');
+            return redirect()->route('event.index');
         }
         
     }
@@ -261,13 +264,17 @@ public function index()
         $decryptedId = decrypt($id);
         $event = Event::findOrFail($decryptedId);
         $places = Place::all();
+        
+        // Obtener el primer lugar asociado al evento
+        $eventPlaceId = $event->places()->pluck('place_id')->first(); // Obtener el ID del lugar asociado al evento
+    
         $activities = Activity::all();
         $subs = Sub::all();
         
         // Obtener las actividades del evento
         $eventActivities = ActivityEvent::where('event_id', $id)->get()->groupBy('activity_id');
     
-        return view('event.edit', compact('event', 'activities', 'subs', 'places','eventActivities'));
+        return view('event.edit', compact('event','eventPlaceId', 'activities', 'subs', 'places','eventActivities'));
     }
     
     public function update(Request $request, $id)
