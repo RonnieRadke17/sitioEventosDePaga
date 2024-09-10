@@ -36,7 +36,7 @@
         </div>
         
         <!-- Formulario -->
-        <form action="{{route('event.update', $event->id)}}" method="POST" id="multi-step-form" enctype="multipart/form-data">
+        <form action="{{route('event.update',encrypt($event->id))}}" method="POST" id="multi-step-form" enctype="multipart/form-data">
             @csrf
             @method('PATCH')
            @include('event.form',['mode'=>'Editar'])
