@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Auth; // Importa Auth para el login
 use Illuminate\Support\Facades\Crypt;//se usa para la encriptacion
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
-
+use Carbon\Carbon;
 use App\Http\Controllers\EmailController;
+use App\Models\EmailVerification;
 
 class RegisterController extends Controller
 {
@@ -82,18 +83,43 @@ class RegisterController extends Controller
     }
 
 
-    public function emailVerification(Request $request)//aqui solamente mostramos la vista de la verificacion del email
-    {
-        // Obtener los datos del usuario desde la sesión
-        $user = session('user');
+    public function emailVerification(Request $request)
+{
+    // Obtener los datos del usuario desde la sesión
+    $user = session('user');
     
-        // Verificar si los datos del usuario están presentes en la sesión
-        if (!$user) {
-            return redirect()->route('register')->withErrors(['error' => 'Datos de usuario no encontrados.']);
-        }
-        // Renderizar la vista de verificación de correo con los datos del usuario
-        return view('auth.email-verification', compact('user'));
+    if (!$user) {
+        return redirect()->route('register')->withErrors(['error' => 'Datos de usuario no encontrados.']);
     }
+
+        // Obtener la última verificación del correo electrónico
+        $existingVerification = EmailVerification::where('email', $user['email'])
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+    // Convertir el campo 'expiration' a un objeto Carbon y asegurarse de que esté en la zona horaria correcta
+    $expirationTime = Carbon::parse($existingVerification->expiration)->setTimezone('America/Mexico_City');
+    $now = Carbon::now('America/Mexico_City');
+
+    // Calcular el tiempo restante en segundos
+    $remainingSeconds = $now->diffInSeconds($expirationTime);
+
+    // Verificar si $remainingSeconds es negativo, y ajustarlo a 0 si lo es
+    if ($remainingSeconds < 0) {
+        $remainingSeconds = 0;
+    }
+
+    // Convertir los segundos restantes a minutos y segundos
+    $remainingMinutes = floor($remainingSeconds / 60);
+    $remainingSeconds = $remainingSeconds % 60;
+
+    // Formatear el tiempo restante en "minutos:segundos"
+    $remainingTimeFormatted = sprintf('%02d:%02d', $remainingMinutes, $remainingSeconds);
+
+    // Renderizar la vista de verificación de correo con los datos del usuario y el tiempo restante
+    return view('auth.email-verification', compact('user', 'remainingTimeFormatted'));
+}
+
 
     public function checkEmailVerification(Request $request){//aqui verificamos el correo y registramos al usuario si esta bien el codigo
         $user = session('user');

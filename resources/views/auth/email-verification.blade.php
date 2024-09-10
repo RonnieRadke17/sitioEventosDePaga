@@ -28,7 +28,10 @@
                 </span>
             </div>
         @endif
-
+        @if(isset($remainingTimeFormatted))
+        <p>Tu código de verificación expira en {{ $remainingTimeFormatted }}.</p>
+    @endif
+    
         
         <p class="mb-2">Hola: <span class="font-bold">{{ $user['name'] }}</span></p>
         <p>Te hemos mandado un código de verificación al correo:</p>
