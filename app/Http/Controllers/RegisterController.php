@@ -136,7 +136,8 @@ class RegisterController extends Controller
                 'maternal' => $user['maternal'],
                 'birthdate' => $user['birthdate'],
                 'email' => $user['email'],
-                'password' => $user['password']
+                'password' => $user['password'],
+                'role_id' => 1
             ]);
 
             //aqui va loguear al usuario y redireccionar a el home

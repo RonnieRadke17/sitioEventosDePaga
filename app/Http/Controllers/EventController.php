@@ -42,7 +42,7 @@ public function index()
         $subs = Sub::all(); // Esto te da una colección de todos las subs
         //obtenemos todas las categorias con las actividades
         $places = Place::all();
-        $activityCategories = ActivityCategory::with('activities')->get();
+        //$activityCategories = ActivityCategory::with('activities')->get();
         $activities = Activity::all();
         //return view('event.create', compact('activityCategories','subs','places'));
         return view('event.create', compact('activities','subs','places','images'));         
