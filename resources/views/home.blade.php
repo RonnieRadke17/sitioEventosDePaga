@@ -18,7 +18,7 @@
                     <p class="text-gray-600 mt-2">{{ $event->event_date }}</p>
                     <p class="text-gray-600 mt-2">{{ Str::limit($event->description, 100) }}</p>
                     <div class="mt-4">
-                        <a href="{{ route('eventDetails.show', $event->id) }}" class="text-indigo-600 hover:text-indigo-800">Ver mas</a>
+                        <a href="{{ route('eventDetails.show',encrypt($event->id)) }}" class="text-indigo-600 hover:text-indigo-800">Ver mas</a>
                     </div>
                 </div>
             </div>

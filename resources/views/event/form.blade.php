@@ -458,7 +458,7 @@
         <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
         
         <!-- Mostrar imagen de portada existente -->
-        @if ($coverImage)
+        @if (isset($coverImage))
             <p>Imagen portada actual:</p>
             <img src="{{ asset('storage/' . $coverImage->image) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" />
         @endif
@@ -476,7 +476,7 @@
         <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
         
         <!-- Mostrar imagen del kit existente -->
-        @if ($kitImage)
+        @if (isset($kitImage))
             <p>Imagen kit actual:</p>
             <img src="{{ asset('storage/' . $kitImage->image) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" />
         @endif
@@ -495,9 +495,11 @@
         
         <!-- Mostrar imágenes de contenido existentes -->
         <div class="mt-2">
+            @if(isset($contentImages))
             @foreach ($contentImages as $image)
                 <img src="{{ asset('storage/' . $image->image) }}" alt="Imagen contenido previa" class="mt-2" style="max-width: 100px;" />
             @endforeach
+            @endif
         </div>
     </div>
 

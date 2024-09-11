@@ -68,7 +68,7 @@ public function index()
                     }
                 },
             ],
-            'price' => 'required|numeric|min:10|max:10000',
+            'price' => 'nullable|numeric|min:10|max:10000',
             /* 
                 aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
                 aqui se valida si se selecciono algun lugar ya registrado para validarlo
@@ -309,7 +309,7 @@ public function index()
                     }
                 },
             ],
-            'price' => 'required|numeric|min:10|max:10000',
+            'price' => 'nullable|numeric|min:10|max:10000',
             'place_id' => [
                 'required',
                 'string',

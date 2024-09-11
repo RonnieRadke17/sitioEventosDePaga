@@ -81,4 +81,11 @@
       </div>
     
 </div>
+
+
+@foreach($event->images as $image)
+    <img src="{{ asset('images/' . $image->image) }}" alt="{{ $image->type }}">
+@endforeach
+
+
 @endsection

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('capacity')->nullable();
             $table->boolean('activities');//campo para ver si el evento va a tener actividades
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10, 2)->nullable();//se pone el precio nulo por si es un evento gratuito
             $table->timestamps();
         });
     }

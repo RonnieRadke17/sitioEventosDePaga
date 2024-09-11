@@ -76,9 +76,18 @@ class UserEventController extends Controller
 
     public function events($id)//show specific event cambiar nombre a show
     {
-        //mandar las actividades del evento que sean compatibles con el usuario, revisar el caso de que no este
-        //logueado
-        $event = Event::findOrFail($id);
+        //si el usuario no esta logueado mostrar todas las acts del evento
+        //si esta logueado solo mostrar en las que esta logueado
+        //mostrar ubicacion, acts y imgs
+        $decryptedId = decrypt($id);
+        //$event = Event::findOrFail($decryptedId);
+        
+
+        $event = Event::with(['images' => function ($query) {
+            $query->orderByRaw("FIELD(type, 'cover', 'kit', 'content')");
+        }])->find($decryptedId);
+        
+
         return view('user-event.show', compact('event'));
     }
 

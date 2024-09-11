@@ -7,12 +7,8 @@
         {{ session('message') }}
     </div>
 @endif
-{{-- cuenta regresiva de el tiempo restante --}}
+{{-- cuenta regresiva de el tiempo restante y boton de reenviar correo--}}
 
-<form action="{{ route('password.send-password-code') }}" method="post">
-    @csrf
-    <input type="email" name="email" placeholder="ingrese su correo">
-    <button type="submit">reenviar codigo</button>
-</form>
+<h2>tu cuenta esta suspendida</h2>
 @endsection
 
