@@ -4,8 +4,8 @@
     
     {{-- aqui dependiendo de la fecha de nacimiento y genero se le muestran ciertos eventos --}}    
 
-{{-- <p>{{$age}}{{$gender}}</p>
- --}}
+<p>{{$ageThisYear}}{{$gender}}{{$results}}</p>
+
 
 <div class="container bg-gray-100 p-10">
     <h1 class="mb-4">Eventos</h1>

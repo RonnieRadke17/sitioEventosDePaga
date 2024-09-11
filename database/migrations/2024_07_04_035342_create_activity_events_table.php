@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('activity_events', function (Blueprint $table) {
             $table->id();
-            //si se amplia el negocio poner tabla de deportes
             $table->foreignId('event_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('activity_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->enum('gender',['M','F','Mix']);

@@ -10,7 +10,6 @@ class Activity extends Model
     use HasFactory;
     protected $fillable = [
      'name',
-     'activity_category_id'
     ];
 
     //relation with event
@@ -18,6 +17,8 @@ class Activity extends Model
     {
         return $this->belongsToMany(Event::class)->withTimestamps();
     }
+
+    
 
     /* //one to many relationship
     public function activityCategory()

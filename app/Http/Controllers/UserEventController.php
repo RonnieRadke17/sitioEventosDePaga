@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\ActivityEvent;
+use Carbon\Carbon;
+//tabla intermedia de ActivityEvent
 
 class UserEventController extends Controller
 {
@@ -16,28 +19,66 @@ class UserEventController extends Controller
                 como a su vez que no aparescan los eventos si ya paso la fecha de registro
             */
             $user = auth()->user(); 
-            $age = $user->birthdate;
-            $gender = $user->gender;
+            $age = $user->birthdate;//fecha de cumpleanos
+            $gender = $user->gender;//genero
+            $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
+            $currentYear = Carbon::now()->year; // Obtén el año actual
 
-            $events = Event::with('images')->get()->map(function ($event) {
-                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+            // Obtener el año de nacimiento
+            $birthYear = Carbon::parse($birthdate)->year;
+
+            // Calcular la edad que el usuario va a tener o tiene en el año vigente
+            $ageThisYear = $currentYear - $birthYear;            
+
+            $subName = $ageThisYear; // Parte del nombre del sub que quieres comparar
+
+            $results = ActivityEvent::where('gender', $gender)
+                            ->whereHas('sub', function($query) use ($subName) {
+                                $query->where('name', 'LIKE', "%$subName%");
+                            })
+                            ->count();//get
+
+
+
+
+
+
+        $events = Event::with(['images' => function($query) {
+                $query->where('type', 'cover'); // Solo obtener imágenes de tipo 'cover'
+            }])
+            ->where('registration_deadline', '>', now()) // Filtrar eventos cuya fecha límite de registro no haya pasado
+            ->get()
+            ->map(function ($event) {
+                // Mostrar la imagen de tipo 'cover' si existe, si no, dejarlo en null
+                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : null;
                 return $event;
-            });
-        
-            return view('home', compact('events','age','gender'));
+        });
+    
+        return view('home', compact('events','ageThisYear','gender','results')); 
+
+
         
         } else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
-            //mandar los eventos con las imgs
-            $events = Event::with('images')->get()->map(function ($event) {
-                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+            
+            $events = Event::with(['images' => function($query) {
+                $query->where('type', 'cover'); // Solo obtener imágenes de tipo 'cover'
+            }])
+            ->where('registration_deadline', '>', now()) // Filtrar eventos cuya fecha límite de registro no haya pasado
+            ->get()
+            ->map(function ($event) {
+                // Mostrar la imagen de tipo 'cover' si existe, si no, dejarlo en null
+                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : null;
                 return $event;
             });
         
             return view('home', compact('events'));
         }
+
+
+        //retorna cuenta de eventos que si tiene los datos del user y mostrar esos eventos por id
     }
 
-    public function events($id)//show specific event
+    public function events($id)//show specific event cambiar nombre a show
     {
         $event = Event::findOrFail($id);
         return view('user-event.show', compact('event'));

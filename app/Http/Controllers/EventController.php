@@ -481,7 +481,9 @@ public function index()
             );
         }
 
-        //aqui falta borrar las anteriores y poner las nuevas
+        Image::where('event_id', $event->id)
+                    ->where('type','content')
+                    ->delete();
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('uploads', 'public');
