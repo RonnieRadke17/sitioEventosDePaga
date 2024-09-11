@@ -317,7 +317,7 @@
         </div>
 
         <!-- Paso 4: Imgs -->
-        <div id="step-4" class="hidden">
+        {{-- <div id="step-4" class="hidden">
             <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
             
             <div class="mb-4" id="uploadImgs">
@@ -380,4 +380,186 @@
                     reader.readAsDataURL(file);
                 });
             }
-            </script>
+        </script> --}}
+
+        <!-- Paso 4: Imgs -->
+    {{-- <div id="step-4" class="hidden">
+        <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
+        
+        <!-- Imagen de portada -->
+        <div class="mb-4" id="uploadImgs">
+            <label for="cover">Imagen de portada:</label>
+            <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
+            
+            <!-- Si existe una imagen previa -->
+            @if ($errors->any() && old('cover'))
+                <p>Imagen subida previamente: <img src="{{ asset('storage/' . old('cover')) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" /></p>
+            @endif
+
+            <!-- Vista previa si hay una imagen seleccionada -->
+            <img id="cover-preview" class="mt-2" style="display: none; max-width: 100px;"/>
+            @error('cover')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <!-- Imagen del kit (opcional) -->
+        <div class="mb-4" id="uploadImgs">
+            <label for="kit">Imagen del kit (opcional):</label>
+            <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
+            
+            <!-- Si existe una imagen previa -->
+            @if ($errors->any() && old('kit'))
+                <p>Imagen subida previamente: <img src="{{ asset('storage/' . old('kit')) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" /></p>
+            @endif
+
+            <!-- Vista previa si hay una imagen seleccionada -->
+            <img id="kit-preview" class="mt-2" style="display: none; max-width: 100px;"/>
+            @error('kit')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <!-- Imágenes de contenido (opcional) -->
+        <div class="mb-4" id="uploadImgs">
+            <label for="images">Imágenes de contenido (opcional):</label>
+            <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
+        </div>
+        
+        <div class="mb-4 max-h-72 overflow-y-auto">
+            <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
+        </div>
+
+        <div class="mb-4">
+            @if ($errors->has('images.*'))
+            @foreach ($errors->get('images.*') as $messages)
+                @foreach ($messages as $message)
+                    <span class="text-danger">{{ $message }}</span>
+                @endforeach
+            @endforeach
+            @endif
+        </div>
+
+        <div class="flex justify-between mt-4">
+            <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
+            
+            <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
+        </div>
+    </div> --}}
+
+
+    <!-- Paso 4: Imgs -->
+<div id="step-4" class="hidden">
+    <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
+    
+    <!-- Imagen de portada -->
+    <div class="mb-4" id="uploadImgs">
+        <label for="cover">Imagen de portada:</label>
+        <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
+        
+        <!-- Mostrar imagen de portada existente -->
+        @if ($coverImage)
+            <p>Imagen portada actual:</p>
+            <img src="{{ asset('storage/' . $coverImage->image) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" />
+        @endif
+
+        <!-- Vista previa si hay una imagen seleccionada -->
+        <img id="cover-preview" class="mt-2" style="display: none; max-width: 100px;"/>
+        @error('cover')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <!-- Imagen del kit (opcional) -->
+    <div class="mb-4" id="uploadImgs">
+        <label for="kit">Imagen del kit (opcional):</label>
+        <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
+        
+        <!-- Mostrar imagen del kit existente -->
+        @if ($kitImage)
+            <p>Imagen kit actual:</p>
+            <img src="{{ asset('storage/' . $kitImage->image) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" />
+        @endif
+
+        <!-- Vista previa si hay una imagen seleccionada -->
+        <img id="kit-preview" class="mt-2" style="display: none; max-width: 100px;"/>
+        @error('kit')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <!-- Imágenes de contenido (opcional) -->
+    <div class="mb-4" id="uploadImgs">
+        <label for="images">Imágenes de contenido (opcional):</label>
+        <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
+        
+        <!-- Mostrar imágenes de contenido existentes -->
+        <div class="mt-2">
+            @foreach ($contentImages as $image)
+                <img src="{{ asset('storage/' . $image->image) }}" alt="Imagen contenido previa" class="mt-2" style="max-width: 100px;" />
+            @endforeach
+        </div>
+    </div>
+
+    <div class="mb-4 max-h-72 overflow-y-auto">
+        <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
+    </div>
+
+    <div class="mb-4">
+        @if ($errors->has('images.*'))
+        @foreach ($errors->get('images.*') as $messages)
+            @foreach ($messages as $message)
+                <span class="text-danger">{{ $message }}</span>
+            @endforeach
+        @endforeach
+        @endif
+    </div>
+
+    <div class="flex justify-between mt-4">
+        <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
+        
+        <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
+    </div>
+</div>
+
+
+<!-- JavaScript para la vista previa -->
+    <script>
+        // Función para previsualizar una sola imagen (portada y kit)
+        function previewSingleImage(event, previewId) {
+            const file = event.target.files[0];
+            const preview = document.getElementById(previewId);
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
+
+        // Función para previsualizar múltiples imágenes
+        function previewImages(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = ''; // Limpiar las imágenes previas
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100px';
+                    img.classList.add('mt-2');
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+

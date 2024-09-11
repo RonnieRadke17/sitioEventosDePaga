@@ -9,14 +9,32 @@ class UserEventController extends Controller
 {
     public function index()//show all events
     {
-        //mandar los eventos con las imgs
-        $events = Event::with('images')->get()->map(function ($event) {
-            $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
-            return $event;
-        });
-        return view('home', compact('events'));
-        /* $data['events'] = Event::paginate(10);
-        return view('home', $data); */
+         
+        if (auth()->check()) {// El usuario está autenticado
+            /* 
+                mostrar por sub y genero y que no este registrado ya
+                como a su vez que no aparescan los eventos si ya paso la fecha de registro
+            */
+            $user = auth()->user(); 
+            $age = $user->birthdate;
+            $gender = $user->gender;
+
+            $events = Event::with('images')->get()->map(function ($event) {
+                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+                return $event;
+            });
+        
+            return view('home', compact('events','age','gender'));
+        
+        } else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
+            //mandar los eventos con las imgs
+            $events = Event::with('images')->get()->map(function ($event) {
+                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+                return $event;
+            });
+        
+            return view('home', compact('events'));
+        }
     }
 
     public function events($id)//show specific event

@@ -71,10 +71,11 @@ class LoginController extends Controller
                     ->where('valid', 1) 
                     ->first();
                 
-                $accessRequest->valid = 0;//aqui ponemos que este registro de access ya no es valido
-                $accessRequest->save();
-
-
+                if($accessRequest){//existe un registro
+                    $accessRequest->valid = 0;//aqui ponemos que este registro de access ya no es valido
+                    $accessRequest->save();
+                }
+                
                 return redirect()->route('home');
 
             } else {//aqui se verifica sino hay un registro de intentos fallidos hoy
