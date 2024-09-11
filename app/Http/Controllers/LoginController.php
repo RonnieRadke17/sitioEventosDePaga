@@ -43,22 +43,22 @@ class LoginController extends Controller
 
                 $controladoremail = app(EmailController::class);
                 $emailResponse = $controladoremail->sendCodeViaEmail($request->email,"resetPassword");
+                //mandar el valor del correo a una session
+                session(['email' => $request->input('email')]);
 
                     // Verificar si la respuesta es válida y manejar errores
                 if ($emailResponse['status'] == 1) {
                     //dd($emailResponse['message']);               
                     $parameter = $emailResponse['message'];
                     return redirect()->route('acount.suspended')
-                    ->with(['message' =>$emailResponse['message']]);
-                    //'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña'
-                    //revisar mensaje de si ya se mando el correo o de te mandamos el correo
-                }else if ($emailResponse['status'] == 2) {
-                    //dd($emailResponse['message']);               
+                    ->withErrors(['error' =>$emailResponse['message']]);
+                    
+                }else if ($emailResponse['status'] == 2) {//este caso es de que si le mando el correo               
                     return redirect()->route('acount.suspended')
-                    ->with(['message' =>$emailResponse['message']]);
+                    ->with(['message' =>'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña']);
                 }
             }
-
+            //'Tu cuenta está suspendida, te hemos enviado un link de reestablecimiento de contraseña' //revisar mensaje de si ya se mando el correo o de te mandamos el correo
             // Verificar la contraseña
             if (Hash::check(base64_encode($request->password), $user->password)) {
                 Auth::login($user, $request->filled('remember'));

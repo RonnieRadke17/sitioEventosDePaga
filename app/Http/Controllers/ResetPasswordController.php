@@ -94,4 +94,33 @@ class ResetPasswordController extends Controller
             return redirect()->route('home');
         }
     }
+
+
+
+    public function reSendPasswordCode(){//revisar el Request $request para ver si se recibe todo o solo el correo, falla el restablecer
+        //el correo en este caso se obtiene de un session que se declara en login controller para redireccionar a
+        //este metodo
+        $email = session('email');
+        //$email = $request->email;
+        // Llamar al controlador de correo para enviar el código de verificación
+        //falta el caso de que si se halla mandado a correo
+        $controladoremail = app(EmailController::class);
+        $emailResponse = $controladoremail->sendCodeViaEmail($email, "resetPassword");
+
+        if($emailResponse['status'] == 1){
+            return redirect()->back()->withErrors(['error' => $emailResponse['message']]);
+        
+        }else if($emailResponse['status'] == 2){//correo enviado
+            return redirect()->back()->with('message',$emailResponse['message']);
+        }else if($emailResponse['status'] == 3){
+            return redirect()->back()->withErrors(['error' => $emailResponse['message']]);
+        }
+    }
+
+
+
+
+
+
 }
+

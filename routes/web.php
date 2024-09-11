@@ -21,7 +21,7 @@ use App\Http\Controllers\MercadoPagoController;
 
 //falta hacer uso de grupos de rutas
 Route::get('/', [UserEventController::class, 'index'])->name('home');//ruta que muestra la pagina principal
-Route::get('/events/{id}', [UserEventController::class, 'events'])->name('eventDetails.show');
+Route::get('/events/{id}', [UserEventController::class, 'show'])->name('eventDetails.show');
 //Route::get('/purchase-event/{id}', [UserEventController::class, 'purchase'])->name('events.purchase');
 
 //restablecimiento de contrasena
@@ -30,6 +30,8 @@ Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');//formulario para restablecer la contrasena
     Route::post('/password/send-passwod-code', 'sendPasswordCode')->name('password.send-password-code');//manda el correo
     Route::post('/password/reset-password', 'reset')->name('password.update');//restablece la contrasena
+
+    Route::post('/password/send-code-password', 'reSendPasswordCode')->name('password.send-code');//manda el correo
     //ruta de ventana cuenta bloqueada
 
 });

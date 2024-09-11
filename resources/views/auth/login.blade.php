@@ -8,7 +8,7 @@
     
     <div class="mb-4">
         <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email address</label>
-        <input type="email" name="email" id="email" autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        <input type="email" name="email" id="email" autocomplete="off" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="{{ old('email') }}">
         @error('email')
             <span class="text-danger">{{ $message }}</span>
         @enderror
