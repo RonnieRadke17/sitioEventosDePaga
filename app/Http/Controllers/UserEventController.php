@@ -14,48 +14,44 @@ class UserEventController extends Controller
     {
          
         if (auth()->check()) {// El usuario está autenticado
-            /* 
-                mostrar por sub y genero y que no este registrado ya
-                como a su vez que no aparescan los eventos si ya paso la fecha de registro
-            */
-            $user = auth()->user(); 
-            $age = $user->birthdate;//fecha de cumpleanos
-            $gender = $user->gender;//genero
-            $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
-            $currentYear = Carbon::now()->year; // Obtén el año actual
+        // Obtener el usuario autenticado
+        $user = auth()->user(); 
+        $age = $user->birthdate; // Fecha de cumpleaños
+        $gender = $user->gender; // Género
+        $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
+        $currentYear = Carbon::now()->year; // Obtén el año actual
 
-            // Obtener el año de nacimiento
-            $birthYear = Carbon::parse($birthdate)->year;
+        // Obtener el año de nacimiento
+        $birthYear = Carbon::parse($birthdate)->year;
 
-            // Calcular la edad que el usuario va a tener o tiene en el año vigente
-            $ageThisYear = $currentYear - $birthYear;            
+        // Calcular la edad que el usuario va a tener o tiene en el año vigente
+        $ageThisYear = $currentYear - $birthYear;            
 
-            $subName = $ageThisYear; // Parte del nombre del sub que quieres comparar
+        // Parte del nombre del sub que quieres comparar
+        $subName = $ageThisYear; 
 
-            $results = ActivityEvent::where('gender', $gender)
-                            ->whereHas('sub', function($query) use ($subName) {
-                                $query->where('name', 'LIKE', "%$subName%");
-                            })
-                            ->count();//get
+        // Filtrar los ActivityEvents donde el usuario puede participar
+        $activityEventIds = ActivityEvent::where('gender', $gender)
+        ->whereHas('sub', function($query) use ($subName) {
+        $query->where('name', 'LIKE', "%$subName%");
+        })
+        ->pluck('event_id'); // Obtener solo los IDs de los eventos
 
-
-
-
-
-
+        // Obtener los eventos correspondientes a esos ActivityEvents y aplicar otras condiciones
         $events = Event::with(['images' => function($query) {
-                $query->where('type', 'cover'); // Solo obtener imágenes de tipo 'cover'
-            }])
-            ->where('registration_deadline', '>', now()) // Filtrar eventos cuya fecha límite de registro no haya pasado
-            ->get()
-            ->map(function ($event) {
-                // Mostrar la imagen de tipo 'cover' si existe, si no, dejarlo en null
-                $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : null;
-                return $event;
-        });
-    
-        return view('home', compact('events','ageThisYear','gender','results')); 
+                        $query->where('type', 'cover'); // Solo obtener imágenes de tipo 'cover'
+                    }])
+                    ->where('registration_deadline', '>', now()) // Filtrar eventos cuya fecha límite de registro no haya pasado
+                    ->whereIn('id', $activityEventIds) // Filtrar solo los eventos en los que el usuario puede participar
+                    ->get()
+                    ->map(function ($event) {
+                        // Mostrar la imagen de tipo 'cover' si existe, si no, dejarlo en null
+                        $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : null;
+                        return $event;
+                    });
 
+        // Devolver la vista con los datos obtenidos
+        return view('home', compact('events','ageThisYear','gender','activityEventIds'));
 
         
         } else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
@@ -80,6 +76,8 @@ class UserEventController extends Controller
 
     public function events($id)//show specific event cambiar nombre a show
     {
+        //mandar las actividades del evento que sean compatibles con el usuario, revisar el caso de que no este
+        //logueado
         $event = Event::findOrFail($id);
         return view('user-event.show', compact('event'));
     }
