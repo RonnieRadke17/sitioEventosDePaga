@@ -80,7 +80,7 @@ class UserEventController extends Controller
         //retorna cuenta de eventos que si tiene los datos del user y mostrar esos eventos por id
     }
 
-    public function show($id)//show specific event cambiar nombre a show
+    /* public function show($id)//show specific event cambiar nombre a show
     {
         //si el usuario no esta logueado mostrar todas las acts del evento
         //si esta logueado solo mostrar en las que esta logueado
@@ -89,7 +89,37 @@ class UserEventController extends Controller
         $event = Event::findOrFail($decryptedId);
         
         return view('user-event.show', compact('event'));
+    } */
+
+
+    public function show($id)
+    {
+        // Desencriptar el ID del evento
+        $decryptedId = decrypt($id);
+        // Buscar el evento con sus actividades y sus relaciones en activity_events
+        $event = Event::findOrFail($decryptedId);
+
+        // Buscar el evento con sus relaciones (lugares en este caso)
+        $event1 = Event::with('places')->findOrFail($decryptedId)->first();
+        // Obtener los lugares relacionados al evento
+        $places = $event1->places;
+
+        // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+        $activities = ActivityEvent::where('event_id', $event->id)
+            ->with(['activity', 'sub']) // Cargar la actividad y la sub
+            ->get();
+        
+
+        // Devolver la vista con el evento y las actividades
+        return view('user-event.show', compact('event', 'activities','places'));
     }
+
+
+    
+
+
+
+
 
     public function purchase($id)//show specific event este no sirve horita para nada
     {

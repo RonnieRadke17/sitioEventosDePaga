@@ -54,6 +54,11 @@ class Event extends Model
         return $this->belongsToMany(Activity::class)->withTimestamps();
     }
 
+    public function activityEvents()
+    {
+        return $this->hasMany(ActivityEvent::class, 'event_id');
+    }
+
 
     //relation with images 1-m
     public function images()

@@ -81,11 +81,30 @@
       </div>
     
 </div>
+{{-- Mostrar las actividades disponibles --}}
+<h3>Actividades del Evento</h3>
+@if($activities->isNotEmpty())
+    <ul>
+        @foreach($activities as $activityEvent)
+            <li>
+                <strong>Actividad:</strong> {{ $activityEvent->activity->name }} <br>
+                <strong>Género:</strong> {{ $activityEvent->gender }} <br>
+                <strong>Subcategoría:</strong> {{ $activityEvent->sub->name }}
+            </li>
+        @endforeach
+    </ul>
+@else
+    <p>No hay actividades disponibles para este evento.</p>
+@endif
+<h2>Lugares Relacionados:</h2>
+<ul>
+    @foreach($places as $place)
+        <li>{{ $place->name }} - {{ $place->address }}</li>
+    @endforeach
+</ul>
 
 
 @foreach($event->images as $image)
     <img src="{{ asset('images/' . $image->image) }}" alt="{{ $image->type }}">
 @endforeach
-
-
 @endsection
