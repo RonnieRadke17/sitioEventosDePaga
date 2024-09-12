@@ -67,18 +67,7 @@ class UserEventController extends Controller
         //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
         //en dado caso de que el evento no tenga actividades para nadie todos pueden entrar
         if (auth()->check()) {// El usuario está autenticado
-            // El usuario está autenticado
-            $user = auth()->user(); 
-            // Obtener la fecha de nacimiento y género del usuario
-            $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
-            $gender = $user->gender; // Género del usuario
-            $currentYear = Carbon::now()->year; // Obtén el año actual
-            // Obtener el año de nacimiento
-            $birthYear = Carbon::parse($birthdate)->year;
-            // Calcular la edad que el usuario va a tener o tiene en el año vigente
-            $ageThisYear = $currentYear - $birthYear;
-            // Parte del nombre del sub que quieres comparar con la edad del usuario
-            $subName = $ageThisYear;
+            $subName = $this->getUserData('sub'); 
             // Desencriptar el ID del evento
             $decryptedId = decrypt($id);
             // Buscar el evento
@@ -86,7 +75,7 @@ class UserEventController extends Controller
             if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
                     // Filtrar las actividades del evento en las que el usuario puede participar
                 $activityEventIds = ActivityEvent::where('event_id', $event->id)
-                ->where('gender', $gender) // Filtrar por género
+                ->where('gender',$this->getUserData('gender')) // Filtrar por género
                 ->whereHas('sub', function($query) use ($subName) {
                     // Filtrar por subName, que se relaciona con la edad
                     $query->where('name', 'LIKE', "%$subName%");
@@ -97,6 +86,7 @@ class UserEventController extends Controller
                 if ($activityEventIds->isEmpty()) {//si no hay acts en las que pueda participar
                     // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
                     return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
+
                 }else{//else si si hay acts donde el pueda participar
                         // Desencriptar el ID del evento
                     $decryptedId = decrypt($id);
@@ -193,29 +183,39 @@ class UserEventController extends Controller
     }
 
 
-    public function inscriptionFree($id)//show specific event este no sirve horita para nada
+    public function inscriptionFree(Request $request,$id)//obtenemos el id del evento y las acts mandadas por el user
     {
-        
-        if (auth()->check()) {// El usuario está autenticado
-            //verificar que exista un registro de una actividad con el genero y sub del usuario ejemplo 100mts M 20
-            //select en activityEvents donde se ponga que si hay un registro con idEvent,idActivity,Gender,idSub(likes)
-            
+        /* 
+            El usuario está autenticado
+            verificar que exista un registro de una actividad con el genero y sub del usuario ejemplo 100mts M 20
+            select en activityEvents donde se ponga que si hay un registro con idEvent,idActivity,Gender,idSub(likes) 
+        */
+        if (auth()->check()) {
             //buscar si el evento existe o no si hay capacidad o no
             $decryptedId = decrypt($id);
             // Buscar el evento
             $event = Event::findOrFail($decryptedId);
-            if($event){//si el evento existe continua
-
+            //lo negamos aqui para tener todo el codigo abajo
+            if(!$event){//si el evento NO existe continua
+                return redirect()->back()->withErrors('error','valores incorrectos');      
+            
             }else{
-                redirect()->back()->withErrors('error','valores incorrectos');      
+                if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
+                    //buscamos las actividades del usuario son las del evento
+                    // Obtener las actividades seleccionadas (si hay alguna)
+                    $selectedActivities = $request->input('activities', []);
+                    if($selectedActivities == null){
+                        return redirect()->back()->withErrors('error','Necesitas seleccionar una actividad minimo'); 
+                    }
+                    //dd($selectedActivities);
+                    //buscar las act en la base de datos en la tabla intermedia
+
+                    
+
+                }
+            
+                redirect()->back()->with('message','hola');     
             }
-
-            if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
-
-            }
-        
-            redirect()->back()->with('message','hola');  
-
         }else{//redireccionamos para que se registre el user
             
             return view('auth/login');

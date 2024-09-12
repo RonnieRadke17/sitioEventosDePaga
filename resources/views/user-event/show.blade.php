@@ -65,8 +65,24 @@
           <p class="text-3xl tracking-tight text-gray-900">
             {{ $event->price ? '$' . $event->price : 'Gratis' }}
           </p>
-          @if($event->price)
-              <!-- Si el precio no es nulo, mostrar este formulario -->
+            @if($event->price)
+                <!-- Si el precio no es nulo, mostrar este formulario -->
+                @if($activities->isNotEmpty())
+                  <h3>Actividades del Evento</h3>
+                  <ul>
+                      @foreach($activities as $activityEvent)
+                          <li>
+                              <label>
+                                  <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
+                                  {{ $activityEvent->activity->name }}
+                              </label>
+                          </li>
+                      @endforeach
+                  </ul>
+              @else
+                  <p>No hay actividades disponibles para este evento.</p>
+              @endif
+
               <form class="mt-10">
                   <p class="text-base tracking-tight text-gray-900">Seleccione un metodo de pago</p>
                   <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to bag</button>
@@ -81,29 +97,29 @@
                   <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with PayPal</button>
               </form>
           @else
-          <form class="mt-10" method="POST" action="{{ route('events.inscriptionFree', encrypt($event->id)) }}">
-            @csrf         
-            @if($activities->isNotEmpty())
-                <h3>Actividades del Evento</h3>
-                <ul>
-                    @foreach($activities as $activityEvent)
-                        <li>
-                            <label>
-                                <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
-                                {{ $activityEvent->activity->name }}
-                            </label>
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <p>No hay actividades disponibles para este evento.</p>
-            @endif
-        
-            <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Inscribirme
-            </button>
-          </form>
-        
+            <form class="mt-10" method="POST" action="{{ route('events.inscriptionFree', encrypt($event->id)) }}">
+              @csrf         
+              @if($activities->isNotEmpty())
+                  <h3>Actividades del Evento</h3>
+                  <ul>
+                      @foreach($activities as $activityEvent)
+                          <li>
+                              <label>
+                                  <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
+                                  {{ $activityEvent->activity->name }}
+                              </label>
+                          </li>
+                      @endforeach
+                  </ul>
+              @else
+                  <p>No hay actividades disponibles para este evento.</p>
+              @endif
+          
+              <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Inscribirme
+              </button>
+            </form>
+
           @endif
 
       
