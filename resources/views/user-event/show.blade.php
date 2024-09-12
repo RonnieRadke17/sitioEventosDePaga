@@ -104,7 +104,17 @@
 </ul>
 
 
-@foreach($event->images as $image)
-    <img src="{{ asset('images/' . $image->image) }}" alt="{{ $image->type }}">
-@endforeach
+@if($orderedImages->isNotEmpty())
+<!-- Bucle para mostrar las imágenes en el orden 'cover', 'kit', 'content' -->
+<div >
+    @foreach($orderedImages as $image)
+        <img  src="{{ asset('storage/' . $image->image) }}" alt="Event Image">
+    @endforeach
+</div>
+@else
+<!-- Imagen por defecto si no tiene imágenes -->
+<img class="w-full h-48 object-cover" src="{{ asset('storage/default.jpg') }}" alt="Default Image">
+@endif
+
+
 @endsection

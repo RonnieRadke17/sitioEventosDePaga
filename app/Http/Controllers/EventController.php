@@ -367,6 +367,11 @@ public function index()
                 $updates['capacity'] = null;
             }
         }
+        //es el campo de actividades
+        if ($event->activities !== $request->is_with_activities) {
+            $updates['activities'] = $request->is_with_activities;
+        }
+
         if ($event->price !== $request->price) {
             $updates['price'] = $request->price;
         }
@@ -459,6 +464,13 @@ public function index()
                 ]);
             }
         }
+
+        if ($request->is_with_activities == 0){
+            //borramos las actividades ligadas a este evento
+            ActivityEvent::where('event_id', $event->id)->delete();
+        }
+
+
         
         //actualizacion de las imagenes
 

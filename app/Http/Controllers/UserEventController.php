@@ -80,49 +80,109 @@ class UserEventController extends Controller
         //retorna cuenta de eventos que si tiene los datos del user y mostrar esos eventos por id
     }
 
-    /* public function show($id)//show specific event cambiar nombre a show
-    {
-        //si el usuario no esta logueado mostrar todas las acts del evento
-        //si esta logueado solo mostrar en las que esta logueado
-        //mostrar ubicacion, acts y imgs
-        $decryptedId = decrypt($id);
-        $event = Event::findOrFail($decryptedId);
-        
-        return view('user-event.show', compact('event'));
-    } */
-
 
     public function show($id)
     {
-        // Desencriptar el ID del evento
-        $decryptedId = decrypt($id);
-        // Buscar el evento con sus actividades y sus relaciones en activity_events
-        $event = Event::findOrFail($decryptedId);
+        //falta poner si el user esta auth o no, si esta auth verificar que pueda entrar a ver el evento
+        if (auth()->check()) {// El usuario está autenticado
+                // El usuario está autenticado
+            $user = auth()->user(); 
+            // Obtener la fecha de nacimiento y género del usuario
+            $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
+            $gender = $user->gender; // Género del usuario
+            $currentYear = Carbon::now()->year; // Obtén el año actual
+            // Obtener el año de nacimiento
+            $birthYear = Carbon::parse($birthdate)->year;
+            // Calcular la edad que el usuario va a tener o tiene en el año vigente
+            $ageThisYear = $currentYear - $birthYear;
+            // Parte del nombre del sub que quieres comparar con la edad del usuario
+            $subName = $ageThisYear;
+            // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento
+            $event = Event::findOrFail($decryptedId);
+            // Filtrar las actividades del evento en las que el usuario puede participar
+            $activityEventIds = ActivityEvent::where('event_id', $event->id)
+                ->where('gender', $gender) // Filtrar por género
+                ->whereHas('sub', function($query) use ($subName) {
+                    // Filtrar por subName, que se relaciona con la edad
+                    $query->where('name', 'LIKE', "%$subName%");
+                })
+                ->pluck('id'); // Obtener solo los IDs de las actividades válidas
+                // Verificar si el usuario tiene permitido participar en alguna actividad
+            if ($activityEventIds->isEmpty()) {
+                // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
+                return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
+            }else{
+                     // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento con sus actividades y sus relaciones en activity_events
+            $event = Event::findOrFail($decryptedId);
+            // Buscar el evento con sus relaciones (lugares en este caso)
+            $event1 = Event::with('places')->findOrFail($decryptedId);
+            // Obtener los lugares relacionados al evento
+            $places = $event1->places;
+            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+            // Buscar el evento junto con sus imágenes
+            $eventIMG = Event::with('images')->findOrFail($decryptedId);
 
-        // Buscar el evento con sus relaciones (lugares en este caso)
-        $event1 = Event::with('places')->findOrFail($decryptedId)->first();
-        // Obtener los lugares relacionados al evento
-        $places = $event1->places;
+            // Ordenar las imágenes según el valor del campo 'type'
+            $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                switch ($image->type) {
+                    case 'cover':
+                        return 1;
+                    case 'kit':
+                        return 2;
+                    case 'content':
+                        return 3;
+                    default:
+                        return 4; // Si hubiera algún otro valor, lo ponemos al final
+                }
+            });
 
-        // Obtener todas las actividades del evento con sus géneros y subs correspondientes
-        $activities = ActivityEvent::where('event_id', $event->id)
-            ->with(['activity', 'sub']) // Cargar la actividad y la sub
-            ->get();
+            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+            }
         
+        }else{
+                // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento con sus actividades y sus relaciones en activity_events
+            $event = Event::findOrFail($decryptedId);
+            // Buscar el evento con sus relaciones (lugares en este caso)
+            $event1 = Event::with('places')->findOrFail($decryptedId);
+            // Obtener los lugares relacionados al evento
+            $places = $event1->places;
+            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+            // Buscar el evento junto con sus imágenes
+            $eventIMG = Event::with('images')->findOrFail($decryptedId);
 
-        // Devolver la vista con el evento y las actividades
-        return view('user-event.show', compact('event', 'activities','places'));
+            // Ordenar las imágenes según el valor del campo 'type'
+            $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                switch ($image->type) {
+                    case 'cover':
+                        return 1;
+                    case 'kit':
+                        return 2;
+                    case 'content':
+                        return 3;
+                    default:
+                        return 4; // Si hubiera algún otro valor, lo ponemos al final
+                }
+            });
+
+            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+        }  
     }
 
 
     
 
-
-
-
-
     public function purchase($id)//show specific event este no sirve horita para nada
     {
+        //verificar que exista un registro de una actividad con el genero y sub del usuario ejemplo 100mts M 20
+        //select en activityEvents donde se ponga que si hay un registro con idEvent,idActivity,Gender,idSub(likes)
         $event = Event::findOrFail($id);
         return view('user-event.purchase', compact('event'));
     }
