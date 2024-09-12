@@ -101,8 +101,9 @@ class UserEventController extends Controller
             $decryptedId = decrypt($id);
             // Buscar el evento
             $event = Event::findOrFail($decryptedId);
-            // Filtrar las actividades del evento en las que el usuario puede participar
-            $activityEventIds = ActivityEvent::where('event_id', $event->id)
+            if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
+                    // Filtrar las actividades del evento en las que el usuario puede participar
+                $activityEventIds = ActivityEvent::where('event_id', $event->id)
                 ->where('gender', $gender) // Filtrar por género
                 ->whereHas('sub', function($query) use ($subName) {
                     // Filtrar por subName, que se relaciona con la edad
@@ -110,11 +111,44 @@ class UserEventController extends Controller
                 })
                 ->pluck('id'); // Obtener solo los IDs de las actividades válidas
                 // Verificar si el usuario tiene permitido participar en alguna actividad
-            if ($activityEventIds->isEmpty()) {
-                // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
-                return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
-            }else{
-                     // Desencriptar el ID del evento
+
+                if ($activityEventIds->isEmpty()) {//si no hay acts en las que pueda participar
+                    // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
+                    return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
+                
+                }else{//else si si hay acts donde el pueda participar
+                        // Desencriptar el ID del evento
+                    $decryptedId = decrypt($id);
+                    // Buscar el evento con sus actividades y sus relaciones en activity_events
+                    $event = Event::findOrFail($decryptedId);
+                    // Buscar el evento con sus relaciones (lugares en este caso)
+                    $event1 = Event::with('places')->findOrFail($decryptedId);
+                    // Obtener los lugares relacionados al evento
+                    $places = $event1->places;
+                    // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+                    $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+                    // Buscar el evento junto con sus imágenes
+                    $eventIMG = Event::with('images')->findOrFail($decryptedId);
+
+                    // Ordenar las imágenes según el valor del campo 'type'
+                    $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                        switch ($image->type) {
+                            case 'cover':
+                                return 1;
+                            case 'kit':
+                                return 2;
+                            case 'content':
+                                return 3;
+                            default:
+                                return 4; // Si hubiera algún otro valor, lo ponemos al final
+                        }
+                    });
+
+                    return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+                }
+
+            }else{//se muestra el evento sin limitaciones porque no hay acts
+                    // Desencriptar el ID del evento
             $decryptedId = decrypt($id);
             // Buscar el evento con sus actividades y sus relaciones en activity_events
             $event = Event::findOrFail($decryptedId);
@@ -143,8 +177,10 @@ class UserEventController extends Controller
 
             return view('user-event.show', compact('event', 'activities','places','orderedImages'));
             }
-        
-        }else{
+            
+            
+            
+        }else{//else para user no auth
                 // Desencriptar el ID del evento
             $decryptedId = decrypt($id);
             // Buscar el evento con sus actividades y sus relaciones en activity_events
