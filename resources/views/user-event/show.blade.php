@@ -2,6 +2,12 @@
 @section('title','Evento')
 @section('content')
 {{-- falta poner la ubicacion las imgs del evento en un carrusel, las actividades y las tallas disponibles del kit--}}
+<!-- Mostrar errores de validación -->
+@if ($errors->has('error'))
+    <div class="alert alert-danger">
+        {{ $errors->first('error') }}
+    </div>
+@endif
 
 <div class="bg-white">
       <!-- Product info -->

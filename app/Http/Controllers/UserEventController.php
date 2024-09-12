@@ -193,22 +193,26 @@ class UserEventController extends Controller
         if (auth()->check()) {
             //buscar si el evento existe o no si hay capacidad o no
             $decryptedId = decrypt($id);
+            //revisar aqui el como manejar si el id es valido o no
+            /* if(){
+
+            } */
+
             // Buscar el evento
             $event = Event::findOrFail($decryptedId);
             //lo negamos aqui para tener todo el codigo abajo
-            if(!$event){//si el evento NO existe continua
-                return redirect()->back()->withErrors('error','valores incorrectos');      
-            
+            if(!$event){//si el evento NO existe continua     
+                return redirect()->back()->withErrors(['error' => 'valores incorrectos']);
             }else{
                 if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
                     //buscamos las actividades del usuario son las del evento
                     // Obtener las actividades seleccionadas (si hay alguna)
                     $selectedActivities = $request->input('activities', []);
                     if($selectedActivities == null){
-                        return redirect()->back()->withErrors('error','Necesitas seleccionar una actividad minimo'); 
+                        return redirect()->back()->withErrors(['error' => 'Necesitas seleccionar una actividad mínimo']);
                     }
-                    if($selectedActivities > 4){
-                        return redirect()->back()->withErrors('error','Solo puedes seleccionar 3 como minimo'); 
+                    if (count($selectedActivities) > 3) {
+                        return redirect()->back()->withErrors(['error' => 'Solo puedes seleccionar 3 actividades como máximo']);
                     }
 
                     //buscar si las acts del user estan el la db pero que sean las correctas
@@ -234,14 +238,21 @@ class UserEventController extends Controller
                 // Verificar si la cantidad de actividades válidas coincide con la cantidad de actividades seleccionadas
                 if ($validActivities != count($selectedActivities)) {
                     // Redireccionar con mensaje de error si alguna actividad no existe o no cumple los criterios
-                    return redirect()->back()->withErrors('Una o más actividades seleccionadas no son válidas para este usuario.');
+                    return redirect()->back()->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas para este usuario.']);
                 }
-                return 'Actividades validadas con éxito.';
+                
                 //si todo fue exitoso usar metodo atach para hacer el registro del usuario en el evento
                 //despues insertar las acts en la tabla de userEventActs que tiene relacion de uno a muchos
+                $user = auth()->user();
+                $user->events()->attach($decryptedId);
+                //alternativa de codigo si se le agrega el valor de la carrera y de la extracurricular
+                /* $user->events()->attach($eventId, [
+                    'registered_at' => now(), // O cualquier otra columna adicional que tengas
+                ]); */
+                //falta hacer la insersion de las act en las que participa el usuario
 
-                
-
+                return redirect()->route('register');
+                //return 'Registro realizado exitosamente.';
                 }else{
                     //si no tiene actividades entonces solo se valida que no este inscrito y se inscribe
                     return redirect()->back()->with('message','hola');  

@@ -37,6 +37,13 @@ class Event extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
+    //relacion de inscripcion del usuario a un evento es decir relacion con la tabla EventUser
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+
     /* public function place()
     {
         return $this->belongsTo(Place::class);
