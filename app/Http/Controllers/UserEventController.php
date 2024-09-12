@@ -14,24 +14,10 @@ class UserEventController extends Controller
     {
          
         if (auth()->check()) {// El usuario está autenticado
-        // Obtener el usuario autenticado
-            $user = auth()->user(); 
-            $age = $user->birthdate; // Fecha de cumpleaños
-            $gender = $user->gender; // Género
-            $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
-            $currentYear = Carbon::now()->year; // Obtén el año actual
             
-            // Obtener el año de nacimiento
-            $birthYear = Carbon::parse($birthdate)->year;
-            
-            // Calcular la edad que el usuario va a tener o tiene en el año vigente
-            $ageThisYear = $currentYear - $birthYear;            
-            
-            // Parte del nombre del sub que quieres comparar
-            $subName = $ageThisYear; 
-            
+            $subName = $this->getUserData('sub'); 
             // Filtrar los ActivityEvents donde el usuario puede participar
-            $activityEventIds = ActivityEvent::where('gender', $gender)
+            $activityEventIds = ActivityEvent::where('gender',$this->getUserData('gender'))
                 ->whereHas('sub', function($query) use ($subName) {
                     $query->where('name', 'LIKE', "%$subName%");
                 })
@@ -56,9 +42,7 @@ class UserEventController extends Controller
                 });
             
             // Devolver la vista con los datos obtenidos
-            return view('home', compact('events','ageThisYear','gender','activityEventIds'));
-            
-
+            return view('home', compact('events','activityEventIds'));
         
         } else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
             
@@ -75,9 +59,6 @@ class UserEventController extends Controller
         
             return view('home', compact('events'));
         }
-
-
-        //retorna cuenta de eventos que si tiene los datos del user y mostrar esos eventos por id
     }
 
 
@@ -223,7 +204,14 @@ class UserEventController extends Controller
             $decryptedId = decrypt($id);
             // Buscar el evento
             $event = Event::findOrFail($decryptedId);
+            if($event){//si el evento existe continua
+
+            }else{
+                redirect()->back()->withErrors('error','valores incorrectos');      
+            }
+
             if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
+
             }
         
             redirect()->back()->with('message','hola');  
@@ -235,5 +223,34 @@ class UserEventController extends Controller
     }
 
     //aqui metodo de inscripcion de paga
+
+    //metodo get de sub,gender del User
+    public function getUserData($valueOP){
+        $user = auth()->user();
+        switch($valueOP){
+            case $valueOP == 'gender':
+                 
+                $gender = $user->gender; // Género
+                return $gender;
+                break;
+
+            case $valueOP == 'sub':
+
+                $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
+                $currentYear = Carbon::now()->year; // Obtén el año actual
+                // Obtener el año de nacimiento
+                $birthYear = Carbon::parse($birthdate)->year;
+                
+                // Calcular la edad que el usuario va a tener o tiene en el año vigente
+                $ageThisYear = $currentYear - $birthYear;            
+                
+                // Parte del nombre del sub que quieres comparar
+                $subName = $ageThisYear; 
+
+                return $subName;
+        }
+    
+    }
+
 
 }

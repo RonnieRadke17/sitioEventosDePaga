@@ -81,9 +81,29 @@
                   <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with PayPal</button>
               </form>
           @else
-              <form class="mt-10" action="{{route('events.inscriptionFree',encrypt($event->id))}}">
-                <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">inscribirme</button>
-              </form>
+          <form class="mt-10" method="POST" action="{{ route('events.inscriptionFree', encrypt($event->id)) }}">
+            @csrf         
+            @if($activities->isNotEmpty())
+                <h3>Actividades del Evento</h3>
+                <ul>
+                    @foreach($activities as $activityEvent)
+                        <li>
+                            <label>
+                                <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
+                                {{ $activityEvent->activity->name }}
+                            </label>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p>No hay actividades disponibles para este evento.</p>
+            @endif
+        
+            <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Inscribirme
+            </button>
+          </form>
+        
           @endif
 
       
@@ -91,25 +111,7 @@
       </div>
     
 </div>
-{{-- Mostrar las actividades disponibles --}}
-<h3>Actividades del Evento</h3>
-@if($activities->isNotEmpty())
-    <ul>
-        @foreach($activities as $activityEvent)
-            <li>
-              <strong>Actividad:</strong>
-              <label>
-                <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
-                {{ $activityEvent->activity->name }}
-              </label>
-                {{-- <strong>Género:</strong> {{ $activityEvent->gender }} <br> --}}
-                {{-- <strong>Subcategoría:</strong> {{ $activityEvent->sub->name }} --}}
-            </li>
-        @endforeach
-    </ul>
-@else
-    <p>No hay actividades disponibles para este evento.</p>
-@endif
+
 <h2>Lugares Relacionados:</h2>
 <ul>
     @foreach($places as $place)

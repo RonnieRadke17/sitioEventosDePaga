@@ -22,7 +22,7 @@ use App\Http\Controllers\MercadoPagoController;
 //falta hacer uso de grupos de rutas
 Route::get('/', [UserEventController::class, 'index'])->name('home');//ruta que muestra la pagina principal
 Route::get('/events/{id}', [UserEventController::class, 'show'])->name('eventDetails.show');
-Route::get('/inscription-free/{id}', [UserEventController::class, 'inscriptionFree'])->name('events.inscriptionFree');
+Route::post('/inscription-free/{id}', [UserEventController::class, 'inscriptionFree'])->name('events.inscriptionFree');
 
 //restablecimiento de contrasena
 Route::controller(ResetPasswordController::class)->group(function () {
