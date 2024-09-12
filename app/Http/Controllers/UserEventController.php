@@ -207,14 +207,47 @@ class UserEventController extends Controller
                     if($selectedActivities == null){
                         return redirect()->back()->withErrors('error','Necesitas seleccionar una actividad minimo'); 
                     }
-                    //dd($selectedActivities);
-                    //buscar las act en la base de datos en la tabla intermedia
+                    if($selectedActivities > 4){
+                        return redirect()->back()->withErrors('error','Solo puedes seleccionar 3 como minimo'); 
+                    }
 
-                    
+                    //buscar si las acts del user estan el la db pero que sean las correctas
+                    //hacer comparacion de id_event,id_act,gender,sub usar likes
+                    // Desencriptar el id del evento
+                $decryptedId = decrypt($id);
+                
+                // Obtener el género del usuario
+                $userGender = $this->getUserData('gender');
 
+                // Obtener el sub del usuario (como parte del nombre)
+                $subName = $this->getUserData('sub');
+
+                // Consulta para validar que todas las actividades seleccionadas existen y cumplen con los criterios
+                $validActivities = ActivityEvent::where('event_id', $decryptedId)
+                    ->whereIn('activity_id', $selectedActivities) // Verificar que las actividades seleccionadas existan
+                    ->where('gender', $userGender) // Verificar que coincidan con el género del usuario
+                    ->whereHas('sub', function ($query) use ($subName) {
+                        $query->where('name', 'LIKE', "%$subName%"); // Verificar que el sub contenga el valor de subName
+                    })
+                    ->count(); // Contar cuántas actividades cumplen con los criterios
+
+                // Verificar si la cantidad de actividades válidas coincide con la cantidad de actividades seleccionadas
+                if ($validActivities != count($selectedActivities)) {
+                    // Redireccionar con mensaje de error si alguna actividad no existe o no cumple los criterios
+                    return redirect()->back()->withErrors('Una o más actividades seleccionadas no son válidas para este usuario.');
+                }
+                return 'Actividades validadas con éxito.';
+                //si todo fue exitoso usar metodo atach para hacer el registro del usuario en el evento
+                //despues insertar las acts en la tabla de userEventActs que tiene relacion de uno a muchos
+
+                
+
+                }else{
+                    //si no tiene actividades entonces solo se valida que no este inscrito y se inscribe
+                    return redirect()->back()->with('message','hola');  
                 }
             
-                redirect()->back()->with('message','hola');     
+                   
             }
         }else{//redireccionamos para que se registre el user
             

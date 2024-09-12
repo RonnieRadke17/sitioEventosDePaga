@@ -31,7 +31,7 @@ class Event extends Model
     }
 
 
-
+    
     public function user()//ya
     {
         return $this->belongsToMany(User::class)->withTimestamps();
