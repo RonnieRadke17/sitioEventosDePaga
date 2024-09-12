@@ -9,6 +9,7 @@ use App\Models\Sub;
 use App\Models\Place;
 use App\Models\ActivityEvent;
 use App\Models\ActivityCategory;
+use App\Models\EventPlace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 //aqui definimos el controlador del mapa para el evento
@@ -470,8 +471,6 @@ public function index()
             ActivityEvent::where('event_id', $event->id)->delete();
         }
 
-
-        
         //actualizacion de las imagenes
 
         // Actualizamos las imágenes del evento
@@ -512,27 +511,45 @@ public function index()
 
     public function show($id)
     {
-        //tenemos que buscar en la tabla intermedia las imagenes
-        $decryptedId = decrypt($id);
-        $event = Event::findOrFail($decryptedId);
-        return view('event.show', compact('event'));
-        //$images = Image::all();//mandamos todas las imagenes que se tienen
-        //$images = Image::all()->chunk(3);
-        //$subs = Sub::all(); // Esto te da una colección de todos las subs
-        //obtenemos todas las categorias con las actividades
-        //$places = Place::all();
-        //$activityCategories = ActivityCategory::with('activities')->get();
-        //$activities = Activity::all();
-        
-        //return view('event.create', compact('activities','subs','places','images'));  
+            // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento con sus actividades y sus relaciones en activity_events
+            $event = Event::findOrFail($decryptedId);
+            // Buscar el evento con sus relaciones (lugares en este caso)
+            $event1 = Event::with('places')->findOrFail($decryptedId);
+            // Obtener los lugares relacionados al evento
+            $places = $event1->places;
+            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+            // Buscar el evento junto con sus imágenes
+            $eventIMG = Event::with('images')->findOrFail($decryptedId);
+
+            // Ordenar las imágenes según el valor del campo 'type'
+            $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                switch ($image->type) {
+                    case 'cover':
+                        return 1;
+                    case 'kit':
+                        return 2;
+                    case 'content':
+                        return 3;
+                    default:
+                        return 4; // Si hubiera algún otro valor, lo ponemos al final
+                }
+            });
+
+            return view('event.show', compact('event', 'activities','places','orderedImages'));
     }
 
     public function destroy($id)
     {
-        $event = Event::findOrFail($id);
-        // Elimina el evento sin borrar la imagen
-        Event::destroy($id);
-
+        $decryptedId = decrypt($id);
+        //borramos las imagenes las acts y el evento, falta borrar el registro del lugar ingermedio
+        $event = Event::findOrFail($decryptedId);
+        Image::where('event_id', $event->id)->delete();
+        ActivityEvent::where('event_id', $event->id)->delete();
+        EventPlace::where('event_id', $event->id)->delete();
+        Event::where('id',$decryptedId)->delete();
         return redirect('event')->with('mensaje', 'Evento borrado');
     }
 }

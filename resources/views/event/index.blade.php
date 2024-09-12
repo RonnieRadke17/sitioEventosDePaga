@@ -25,6 +25,12 @@
                         <a href="{{ route('event.show',encrypt($event->id)) }}" class="text-indigo-600 hover:text-indigo-800">View</a>
                         <a href="{{ route('event.edit',encrypt($event->id)) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
                     </div>
+                    <form action="{{ route('event.destroy',encrypt($event->id)) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-indigo-600 hover:text-indigo-800">Delete</button>
+                    </form>
+                    
                 </div>
             </div>
         @endforeach

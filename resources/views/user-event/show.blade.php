@@ -59,24 +59,34 @@
 
         </div>
   
-        {{-- name,precio, metodos de pago,aqui debe de estar las actividades a seleccionar--}}
         <div class="mt-4 lg:row-span-3 lg:mt-0">
 
           <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{{ $event->name }}</h1>
-          <p class="text-3xl tracking-tight text-gray-900">${{$event->price}}</p>
+          <p class="text-3xl tracking-tight text-gray-900">
+            {{ $event->price ? '$' . $event->price : 'Gratis' }}
+          </p>
+          @if($event->price)
+              <!-- Si el precio no es nulo, mostrar este formulario -->
+              <form class="mt-10">
+                  <p class="text-base tracking-tight text-gray-900">Seleccione un metodo de pago</p>
+                  <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to bag</button>
+              </form>
 
-          <form class="mt-10">
-            <p class="text-base tracking-tight text-gray-900">Seleccione un metodo de pago</p>
-            <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to bag</button>
-          </form>
-          <form action="{{ route('paypal') }}" method="post">
-            @csrf
-            <input type="hidden" name="price" value="{{$event->price}}">
-            <input type="hidden" name="product_name" value="{{$event->name}}">
-            <input type="hidden" name="quantity" value="1">
-            <input type="hidden" name="event" value="{{$event->id}}">
-            <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with payPal</button>
-        </form>
+              <form action="{{ route('paypal') }}" method="post">
+                  @csrf
+                  <input type="hidden" name="price" value="{{$event->price}}">
+                  <input type="hidden" name="product_name" value="{{$event->name}}">
+                  <input type="hidden" name="quantity" value="1">
+                  <input type="hidden" name="event" value="{{$event->id}}">
+                  <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with PayPal</button>
+              </form>
+          @else
+              <form class="mt-10" action="{{route('events.inscriptionFree',encrypt($event->id))}}">
+                <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">inscribirme</button>
+              </form>
+          @endif
+
+      
         </div>  
       </div>
     
@@ -87,9 +97,13 @@
     <ul>
         @foreach($activities as $activityEvent)
             <li>
-                <strong>Actividad:</strong> {{ $activityEvent->activity->name }} <br>
-                <strong>Género:</strong> {{ $activityEvent->gender }} <br>
-                <strong>Subcategoría:</strong> {{ $activityEvent->sub->name }}
+              <strong>Actividad:</strong>
+              <label>
+                <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
+                {{ $activityEvent->activity->name }}
+              </label>
+                {{-- <strong>Género:</strong> {{ $activityEvent->gender }} <br> --}}
+                {{-- <strong>Subcategoría:</strong> {{ $activityEvent->sub->name }} --}}
             </li>
         @endforeach
     </ul>

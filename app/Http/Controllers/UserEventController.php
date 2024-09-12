@@ -83,9 +83,10 @@ class UserEventController extends Controller
 
     public function show($id)
     {
-        //falta poner si el user esta auth o no, si esta auth verificar que pueda entrar a ver el evento
+        //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
+        //en dado caso de que el evento no tenga actividades para nadie todos pueden entrar
         if (auth()->check()) {// El usuario está autenticado
-                // El usuario está autenticado
+            // El usuario está autenticado
             $user = auth()->user(); 
             // Obtener la fecha de nacimiento y género del usuario
             $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
@@ -115,7 +116,6 @@ class UserEventController extends Controller
                 if ($activityEventIds->isEmpty()) {//si no hay acts en las que pueda participar
                     // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
                     return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
-                
                 }else{//else si si hay acts donde el pueda participar
                         // Desencriptar el ID del evento
                     $decryptedId = decrypt($id);
@@ -148,38 +148,36 @@ class UserEventController extends Controller
                 }
 
             }else{//se muestra el evento sin limitaciones porque no hay acts
-                    // Desencriptar el ID del evento
-            $decryptedId = decrypt($id);
-            // Buscar el evento con sus actividades y sus relaciones en activity_events
-            $event = Event::findOrFail($decryptedId);
-            // Buscar el evento con sus relaciones (lugares en este caso)
-            $event1 = Event::with('places')->findOrFail($decryptedId);
-            // Obtener los lugares relacionados al evento
-            $places = $event1->places;
-            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
-            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
-            // Buscar el evento junto con sus imágenes
-            $eventIMG = Event::with('images')->findOrFail($decryptedId);
+                        // Desencriptar el ID del evento
+                $decryptedId = decrypt($id);
+                // Buscar el evento con sus actividades y sus relaciones en activity_events
+                $event = Event::findOrFail($decryptedId);
+                // Buscar el evento con sus relaciones (lugares en este caso)
+                $event1 = Event::with('places')->findOrFail($decryptedId);
+                // Obtener los lugares relacionados al evento
+                $places = $event1->places;
+                // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+                $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+                // Buscar el evento junto con sus imágenes
+                $eventIMG = Event::with('images')->findOrFail($decryptedId);
 
-            // Ordenar las imágenes según el valor del campo 'type'
-            $orderedImages = $eventIMG->images->sortBy(function ($image) {
-                switch ($image->type) {
-                    case 'cover':
-                        return 1;
-                    case 'kit':
-                        return 2;
-                    case 'content':
-                        return 3;
-                    default:
-                        return 4; // Si hubiera algún otro valor, lo ponemos al final
-                }
-            });
+                // Ordenar las imágenes según el valor del campo 'type'
+                $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                    switch ($image->type) {
+                        case 'cover':
+                            return 1;
+                        case 'kit':
+                            return 2;
+                        case 'content':
+                            return 3;
+                        default:
+                            return 4; // Si hubiera algún otro valor, lo ponemos al final
+                    }
+                });
 
-            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+                return view('user-event.show', compact('event', 'activities','places','orderedImages'));
             }
-            
-            
-            
+             
         }else{//else para user no auth
                 // Desencriptar el ID del evento
             $decryptedId = decrypt($id);
@@ -209,21 +207,33 @@ class UserEventController extends Controller
             });
 
             return view('user-event.show', compact('event', 'activities','places','orderedImages'));
-        }  
+        }
+          
     }
 
 
-    
-
-    public function purchase($id)//show specific event este no sirve horita para nada
+    public function inscriptionFree($id)//show specific event este no sirve horita para nada
     {
-        //verificar que exista un registro de una actividad con el genero y sub del usuario ejemplo 100mts M 20
-        //select en activityEvents donde se ponga que si hay un registro con idEvent,idActivity,Gender,idSub(likes)
-        $event = Event::findOrFail($id);
-        return view('user-event.purchase', compact('event'));
+        
+        if (auth()->check()) {// El usuario está autenticado
+            //verificar que exista un registro de una actividad con el genero y sub del usuario ejemplo 100mts M 20
+            //select en activityEvents donde se ponga que si hay un registro con idEvent,idActivity,Gender,idSub(likes)
+            
+            //buscar si el evento existe o no si hay capacidad o no
+            $decryptedId = decrypt($id);
+            // Buscar el evento
+            $event = Event::findOrFail($decryptedId);
+            if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
+            }
+        
+            redirect()->back()->with('message','hola');  
+
+        }else{//redireccionamos para que se registre el user
+            
+            return view('auth/login');
+        }
     }
 
+    //aqui metodo de inscripcion de paga
 
-    //metodo atach para poder hacer el registro
-    //pero de eso depende
 }
