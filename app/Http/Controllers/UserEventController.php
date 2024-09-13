@@ -71,8 +71,16 @@ class UserEventController extends Controller
         if (auth()->check()) {// El usuario está autenticado
             //aqui si el usuario ya esta registrado lo redireccionamos a el home
             
-            if($this->validateEventUser($id)){
+            if($this->validateEventUser($id)){//validar que el usuario no este inscrito
                 return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
+            }
+
+            if($this->validateCapacity($id) == 'withoutcapacity'){//No hay capacidad en el evento
+                return redirect()->route('home')->withErrors(['error' => 'Evento lleno']);
+            }
+
+            if($this->validateRegistrationDeadLine($id)){//la fecha del evento ya ha pasado
+                return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
             }
 
             $subName = $this->getUserData('sub'); 
@@ -209,6 +217,10 @@ class UserEventController extends Controller
                 return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
             }
 
+            if($this->validateRegistrationDeadLine($id)){//la fecha del evento ya ha pasado
+                return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
+            }
+
             //validar si el evento es con capacidad o sin validamos si el evento tiene o no capacidad
             if($this->validateCapacity($id) == 'withoutlimit'){//el evento no tiene capacidad limite
                 //metodo que inscribe 
@@ -294,7 +306,18 @@ class UserEventController extends Controller
             return 'withoutlimit';
         }
         
-    }       
+    }    
+    
+    public function validateRegistrationDeadLine($id){
+        $decryptedId = decrypt($id);
+        $event = Event::find($decryptedId);
+        $registrationDeadline = $event->registration_deadline;
+            // Comparar la fecha límite de registro con la fecha actual
+        if (Carbon::parse($registrationDeadline)->isPast()) {
+            // Si la fecha límite ha pasado, devolver un mensaje de error
+            return true;//la fecha ya ha pasado
+        }
+    }
     
     //metodo el cual inscribe al usuario en el evento aqui se inscribe si es con acts o sin acts
     public function inscription($id,$selectedActivities){//id del evento,y actividades
@@ -305,9 +328,6 @@ class UserEventController extends Controller
         $event = Event::findOrFail($decryptedId);
 
         if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
-            //buscamos las actividades del usuario son las del evento
-            // Obtener las actividades seleccionadas (si hay alguna)
-            //$selectedActivities = $request->input('activities', []);
             if($selectedActivities == null){
                 return redirect()->back()->withErrors(['error' => 'Necesitas seleccionar una actividad mínimo']);
             }
