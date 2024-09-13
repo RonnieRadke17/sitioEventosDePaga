@@ -18,13 +18,19 @@ class Activity extends Model
         return $this->belongsToMany(Event::class)->withTimestamps();
     }
 
-    
-
     /* //one to many relationship
-    public function activityCategory()
+        public function activityCategory()
+        {
+            return $this->belongsTo(ActivityCategory::class);
+        }
+    */
+
+    /**
+     * Relación con el modelo ActivityEventUser (Uno a Muchos)
+     */
+    public function activityEventUsers()
     {
-        return $this->belongsTo(ActivityCategory::class);
+        return $this->hasMany(ActivityEventUser::class);
     }
- */
 
 }

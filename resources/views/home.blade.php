@@ -1,7 +1,19 @@
 @extends('layouts.app')
 @section('title','Página principal')
 @section('content')
-    
+@if ($errors->has('error'))
+    <div class="alert alert-danger">
+        {{ $errors->first('error') }}
+    </div>
+@endif
+
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+
 <div class="container bg-gray-100 p-10">
     <h1 class="mb-4">Eventos</h1>
     <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
