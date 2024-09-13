@@ -13,6 +13,9 @@ use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\MercadoPagoController;
 
+
+use App\Http\Middleware\RoleMiddleware;
+
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
  Route::get('payment', function () {//ventana que muestra paypal
@@ -59,9 +62,17 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-Route::resource('sub', SubController::class);
-Route::resource('activity', ActivityController::class);
-Route::resource('event', EventController::class);
+/* 
+    Route::resource('sub', SubController::class);
+    Route::resource('activity', ActivityController::class);
+    Route::resource('event', EventController::class);
+*/
+
+
+ Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
+Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
+Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class);
+
 
 //mercadopago
 Route::get('/mp', [MercadoPagoController::class, 'index']);
