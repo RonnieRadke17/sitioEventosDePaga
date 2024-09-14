@@ -13,7 +13,6 @@ use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\MercadoPagoController;
 
-
 use App\Http\Middleware\RoleMiddleware;
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
@@ -47,8 +46,6 @@ Route::get('/error',[ErrorsController::class,'showWindowError'])->name('window.e
 
 //rutas del perfil
 
-
-
 //falta grupo de rutas de registro y login
 Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');
 Route::post('/process-register', [RegisterController::class, 'processRegister'])->name('process-register');
@@ -57,7 +54,9 @@ Route::post('/check-email-verification',[RegisterController::class,'checkEmailVe
 Route::post('/send-verification-code',[RegisterController::class,'sendVerificationCode'])->name('send-verification-code');
 Route::post('/signup',[RegisterController::class,'register'] )->name('signup');//ruta que registra al usr
 
-Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
+//Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
+Route::get('/login',[LoginController::class,'showLoginForm'])->name('login');//ruta que muestra la vista del login
+
 Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta que inicia sesion al usr 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr

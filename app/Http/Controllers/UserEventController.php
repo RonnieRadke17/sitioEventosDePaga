@@ -94,14 +94,14 @@ class UserEventController extends Controller
 
     public function show($id)
     {
-        //si el usuario esta logueado como admin se tiene que mostrar como sino estuviera logueado
-        // Verificar si el usuario tiene el rol requerido
-
-        //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
-        //en dado caso de que el evento no tenga actividades para nadie todos pueden entrar
-        //falta revisar el rol del usuario
-        //si el rol es admin no se debe hacer tanta validacion, solo mostrar la informacion
-        //si el rol es client si se hace toda la validacion
+        /*    
+            //si el usuario esta logueado como admin se tiene que mostrar como sino estuviera logueado
+            //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
+            //en dado caso de que el evento no tenga actividades para nadie todos pueden entrar
+            //falta revisar el rol del usuario
+            //si el rol es admin no se debe hacer tanta validacion, solo mostrar la informacion
+            //si el rol es client si se hace toda la validacion 
+        */
         if (auth()->check()) {// El usuario está autenticado
             //aqui si el usuario ya esta registrado lo redireccionamos a el home
             //revisamos si el rol del usuario es admin

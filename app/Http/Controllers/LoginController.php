@@ -19,6 +19,18 @@ use App\Http\Controllers\ResetPasswordController;
 
 class LoginController extends Controller
 {
+    //vista del form de login
+    public function showLoginForm(){
+        
+        if (auth()->check()) {
+            return redirect()->route('home');
+        }else{
+            return view('auth/login');
+        }
+    }
+
+
+
     public function login(Request $request)
     {
         // Validación de entrada

@@ -17,7 +17,12 @@ class RegisterController extends Controller
 {
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        if (auth()->check()) {
+            return redirect()->route('home');
+        }else{
+            return view('auth.register');
+        }
+        
     }
 
     //codigo de verificacion debe ser de 6 numeros
