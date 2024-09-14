@@ -33,6 +33,7 @@ class RegisterController extends Controller
                 'before_or_equal:' . now()->subYears(10)->format('Y-m-d'),
                 'date_format:Y-m-d',
             ],
+            'gender' => 'required|in:M,F',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/',
         ]);

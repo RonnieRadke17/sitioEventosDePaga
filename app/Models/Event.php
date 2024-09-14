@@ -72,5 +72,11 @@ class Event extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function eventUser()//relacion que permite mostrar solo los eventos que tienen capacidad
+    {
+        return $this->hasMany(EventUser::class, 'event_id');
+    }
+
     
 }

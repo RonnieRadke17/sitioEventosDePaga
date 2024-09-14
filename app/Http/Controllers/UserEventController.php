@@ -8,6 +8,7 @@ use App\Models\ActivityEvent;
 use App\Models\EventUser;
 use App\Models\ActivityEventUser;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 //tabla intermedia de ActivityEvent
 
 class UserEventController extends Controller
@@ -15,11 +16,13 @@ class UserEventController extends Controller
     public function index()//show all events
     {
          
-        if (auth()->check()) {// El usuario está autenticado
-            
+        if (auth()->check()) {
+            // Obtener datos del usuario autenticado
             $subName = $this->getUserData('sub'); 
+            $userId = auth()->id(); // Obtener el ID del usuario autenticado
+        
             // Filtrar los ActivityEvents donde el usuario puede participar
-            $activityEventIds = ActivityEvent::where('gender',$this->getUserData('gender'))
+            $activityEventIds = ActivityEvent::where('gender', $this->getUserData('gender'))
                 ->whereHas('sub', function($query) use ($subName) {
                     $query->where('name', 'LIKE', "%$subName%");
                 })
@@ -33,8 +36,22 @@ class UserEventController extends Controller
                 ->where(function($query) use ($activityEventIds) {
                     // Incluir eventos con actividades que el usuario puede participar
                     $query->whereIn('id', $activityEventIds)
-                        // O incluir eventos que no tienen actividades (campo activities = 0)
-                        ->orWhere('activities', 0);
+                          // O incluir eventos que no tienen actividades (campo activities = 0)
+                          ->orWhere('activities', 0);
+                })
+                ->where(function($query) {
+                    $query->where('is_limited_capacity', 0) // Permitir eventos sin límite de capacidad
+                          ->orWhere(function ($query) {
+                              $query->where('is_limited_capacity', 1) // Si tiene capacidad limitada
+                                    ->whereHas('eventUser', function ($query) {
+                                        // Contar usuarios registrados y comparar con la capacidad del evento
+                                        $query->havingRaw('COUNT(*) < events.capacity');
+                                    });
+                          });
+                })
+                ->whereDoesntHave('eventUser', function($query) use ($userId) {
+                    // Excluir los eventos donde el usuario ya esté inscrito
+                    $query->where('user_id', $userId);
                 })
                 ->get()
                 ->map(function ($event) {
@@ -44,28 +61,42 @@ class UserEventController extends Controller
                 });
             
             // Devolver la vista con los datos obtenidos
-            return view('home', compact('events','activityEventIds'));
-        
-        } else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
+            return view('home', compact('events', 'activityEventIds'));
+        }
+        else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
             
-            $events = Event::with(['images' => function($query) {
+            $events = Event::with(['images' => function($query) { 
                 $query->where('type', 'cover'); // Solo obtener imágenes de tipo 'cover'
             }])
             ->where('registration_deadline', '>', now()) // Filtrar eventos cuya fecha límite de registro no haya pasado
+            ->where(function ($query) {
+                $query->where('is_limited_capacity', 0) // Permitir eventos sin límite de capacidad
+                      ->orWhere(function ($query) {
+                          $query->where('is_limited_capacity', 1) // Si tiene capacidad limitada
+                                ->whereHas('eventUser', function ($query) {
+                                    // Contar usuarios registrados y comparar con la capacidad del evento
+                                    $query->havingRaw('COUNT(*) < events.capacity');
+                                });
+                      });
+            })
             ->get()
             ->map(function ($event) {
                 // Mostrar la imagen de tipo 'cover' si existe, si no, dejarlo en null
                 $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : null;
                 return $event;
             });
-        
+
             return view('home', compact('events'));
+
         }
     }
 
 
     public function show($id)
     {
+        //si el usuario esta logueado como admin se tiene que mostrar como sino estuviera logueado
+        // Verificar si el usuario tiene el rol requerido
+
         //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
         //en dado caso de que el evento no tenga actividades para nadie todos pueden entrar
         //falta revisar el rol del usuario
@@ -73,41 +104,79 @@ class UserEventController extends Controller
         //si el rol es client si se hace toda la validacion
         if (auth()->check()) {// El usuario está autenticado
             //aqui si el usuario ya esta registrado lo redireccionamos a el home
+            //revisamos si el rol del usuario es admin
+            // Verificar si el usuario tiene el rol requerido
+            $userLogued = Auth::user();
+            if ($userLogued->role->name == 'admin') {
             
-            if($this->validateEventUser($id)){//validar que el usuario no este inscrito
-                return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
-            }
+                return $this->showEvent($id);//mostramos el contenido como si no estuviera logueado
 
-            if($this->validateCapacity($id) == 'withoutcapacity'){//No hay capacidad en el evento
-                return redirect()->route('home')->withErrors(['error' => 'Evento lleno']);
-            }
-
-            if($this->validateRegistrationDeadLine($id)){//la fecha del evento ya ha pasado
-                return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
-            }
-
-            $subName = $this->getUserData('sub'); 
-            // Desencriptar el ID del evento
-            $decryptedId = decrypt($id);
-            // Buscar el evento
-            $event = Event::findOrFail($decryptedId);
-            if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
-                    // Filtrar las actividades del evento en las que el usuario puede participar
-                $activityEventIds = ActivityEvent::where('event_id', $event->id)
-                ->where('gender',$this->getUserData('gender')) // Filtrar por género
-                ->whereHas('sub', function($query) use ($subName) {
-                    // Filtrar por subName, que se relaciona con la edad
-                    $query->where('name', 'LIKE', "%$subName%");
-                })
-                ->pluck('id'); // Obtener solo los IDs de las actividades válidas
-                // Verificar si el usuario tiene permitido participar en alguna actividad
-
-                if ($activityEventIds->isEmpty()) {//si no hay acts en las que pueda participar
-                    // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
-                    return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
-
-                }else{//else si si hay acts donde el pueda participar
-                        // Desencriptar el ID del evento
+            }else if($userLogued->role->name == 'client'){//el usuario probablemente sea client
+                if($this->validateEventUser($id)){//validar que el usuario no este inscrito
+                    return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
+                }
+    
+                if($this->validateCapacity($id) == 'withoutcapacity'){//No hay capacidad en el evento
+                    return redirect()->route('home')->withErrors(['error' => 'Evento lleno']);
+                }
+    
+                if($this->validateRegistrationDeadLine($id)){//la fecha del evento ya ha pasado
+                    return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
+                }
+    
+                $subName = $this->getUserData('sub'); 
+                // Desencriptar el ID del evento
+                $decryptedId = decrypt($id);
+                // Buscar el evento
+                $event = Event::findOrFail($decryptedId);
+                if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
+                        // Filtrar las actividades del evento en las que el usuario puede participar
+                    $activityEventIds = ActivityEvent::where('event_id', $event->id)
+                    ->where('gender',$this->getUserData('gender')) // Filtrar por género
+                    ->whereHas('sub', function($query) use ($subName) {
+                        // Filtrar por subName, que se relaciona con la edad
+                        $query->where('name', 'LIKE', "%$subName%");
+                    })
+                    ->pluck('id'); // Obtener solo los IDs de las actividades válidas
+                    // Verificar si el usuario tiene permitido participar en alguna actividad
+    
+                    if ($activityEventIds->isEmpty()) {//si no hay acts en las que pueda participar
+                        // Si no hay actividades aptas para el usuario, redirigir a la página de inicio
+                        return redirect()->route('home')->with('error', 'No tienes acceso a este evento.');
+    
+                    }else{//else si si hay acts donde el pueda participar
+                            // Desencriptar el ID del evento
+                        $decryptedId = decrypt($id);
+                        // Buscar el evento con sus actividades y sus relaciones en activity_events
+                        $event = Event::findOrFail($decryptedId);
+                        // Buscar el evento con sus relaciones (lugares en este caso)
+                        $event1 = Event::with('places')->findOrFail($decryptedId);
+                        // Obtener los lugares relacionados al evento
+                        $places = $event1->places;
+                        // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+                        $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+                        // Buscar el evento junto con sus imágenes
+                        $eventIMG = Event::with('images')->findOrFail($decryptedId);
+    
+                        // Ordenar las imágenes según el valor del campo 'type'
+                        $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                            switch ($image->type) {
+                                case 'cover':
+                                    return 1;
+                                case 'kit':
+                                    return 2;
+                                case 'content':
+                                    return 3;
+                                default:
+                                    return 4; // Si hubiera algún otro valor, lo ponemos al final
+                            }
+                        });
+    
+                        return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+                    }
+    
+                }else{//se muestra el evento sin limitaciones porque no hay acts
+                            // Desencriptar el ID del evento
                     $decryptedId = decrypt($id);
                     // Buscar el evento con sus actividades y sus relaciones en activity_events
                     $event = Event::findOrFail($decryptedId);
@@ -119,7 +188,7 @@ class UserEventController extends Controller
                     $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
                     // Buscar el evento junto con sus imágenes
                     $eventIMG = Event::with('images')->findOrFail($decryptedId);
-
+    
                     // Ordenar las imágenes según el valor del campo 'type'
                     $orderedImages = $eventIMG->images->sortBy(function ($image) {
                         switch ($image->type) {
@@ -133,70 +202,13 @@ class UserEventController extends Controller
                                 return 4; // Si hubiera algún otro valor, lo ponemos al final
                         }
                     });
-
+    
                     return view('user-event.show', compact('event', 'activities','places','orderedImages'));
                 }
-
-            }else{//se muestra el evento sin limitaciones porque no hay acts
-                        // Desencriptar el ID del evento
-                $decryptedId = decrypt($id);
-                // Buscar el evento con sus actividades y sus relaciones en activity_events
-                $event = Event::findOrFail($decryptedId);
-                // Buscar el evento con sus relaciones (lugares en este caso)
-                $event1 = Event::with('places')->findOrFail($decryptedId);
-                // Obtener los lugares relacionados al evento
-                $places = $event1->places;
-                // Obtener todas las actividades del evento con sus géneros y subs correspondientes
-                $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
-                // Buscar el evento junto con sus imágenes
-                $eventIMG = Event::with('images')->findOrFail($decryptedId);
-
-                // Ordenar las imágenes según el valor del campo 'type'
-                $orderedImages = $eventIMG->images->sortBy(function ($image) {
-                    switch ($image->type) {
-                        case 'cover':
-                            return 1;
-                        case 'kit':
-                            return 2;
-                        case 'content':
-                            return 3;
-                        default:
-                            return 4; // Si hubiera algún otro valor, lo ponemos al final
-                    }
-                });
-
-                return view('user-event.show', compact('event', 'activities','places','orderedImages'));
             }
-             
+
         }else{//else para user no auth
-                // Desencriptar el ID del evento
-            $decryptedId = decrypt($id);
-            // Buscar el evento con sus actividades y sus relaciones en activity_events
-            $event = Event::findOrFail($decryptedId);
-            // Buscar el evento con sus relaciones (lugares en este caso)
-            $event1 = Event::with('places')->findOrFail($decryptedId);
-            // Obtener los lugares relacionados al evento
-            $places = $event1->places;
-            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
-            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
-            // Buscar el evento junto con sus imágenes
-            $eventIMG = Event::with('images')->findOrFail($decryptedId);
-
-            // Ordenar las imágenes según el valor del campo 'type'
-            $orderedImages = $eventIMG->images->sortBy(function ($image) {
-                switch ($image->type) {
-                    case 'cover':
-                        return 1;
-                    case 'kit':
-                        return 2;
-                    case 'content':
-                        return 3;
-                    default:
-                        return 4; // Si hubiera algún otro valor, lo ponemos al final
-                }
-            });
-
-            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+            return $this->showEvent($id);//mostramos el contenido como si no estuviera logueado
         }
           
     }
@@ -393,5 +405,35 @@ class UserEventController extends Controller
         }
     }
 
+    public function showEvent($id){
+            // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento con sus actividades y sus relaciones en activity_events
+            $event = Event::findOrFail($decryptedId);
+            // Buscar el evento con sus relaciones (lugares en este caso)
+            $event1 = Event::with('places')->findOrFail($decryptedId);
+            // Obtener los lugares relacionados al evento
+            $places = $event1->places;
+            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+            // Buscar el evento junto con sus imágenes
+            $eventIMG = Event::with('images')->findOrFail($decryptedId);
+
+            // Ordenar las imágenes según el valor del campo 'type'
+            $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                switch ($image->type) {
+                    case 'cover':
+                        return 1;
+                    case 'kit':
+                        return 2;
+                    case 'content':
+                        return 3;
+                    default:
+                        return 4; // Si hubiera algún otro valor, lo ponemos al final
+                }
+            });
+
+            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+    }
 
 }

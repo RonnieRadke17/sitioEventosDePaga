@@ -24,7 +24,8 @@ class RoleMiddleware
         // Verificar si el usuario tiene el rol requerido
         $user = Auth::user();
         if ($user->role->name !== 'admin') {
-            abort(403, 'No tienes permiso para acceder a esta página.');
+            //abort(403, 'No tienes permiso para acceder a esta página.');
+            return redirect()->route('home');//
         }
 
         return $next($request);

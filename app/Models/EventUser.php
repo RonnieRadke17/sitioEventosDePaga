@@ -22,4 +22,14 @@ class EventUser extends Model
     {
         return $this->hasMany(ActivityEventUser::class);
     }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
