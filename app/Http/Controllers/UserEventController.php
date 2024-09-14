@@ -9,6 +9,7 @@ use App\Models\EventUser;
 use App\Models\ActivityEventUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 //tabla intermedia de ActivityEvent
 
 class UserEventController extends Controller
@@ -222,7 +223,15 @@ class UserEventController extends Controller
             
             $event = Event::findOrFail($decryptedId);// Buscar el evento
             // Obtener las actividades seleccionadas (si hay alguna)
-            $selectedActivities = $request->input('activities', []);
+            // Supongamos que $selectedActivities es el arreglo de valores encriptados.
+            $acts = $request->input('activities', []);
+
+            // Desencriptar cada valor en el arreglo
+            $decryptedActivities = array_map(function ($encryptedActivity) {
+                return Crypt::decrypt($encryptedActivity);
+            }, $acts);
+            
+            $selectedActivities = $decryptedActivities; 
             //lo negamos aqui para tener todo el codigo abajo
             if(!$event){//si el evento NO existe continua     
                 return redirect()->back()->withErrors(['error' => 'valores incorrectos']);
