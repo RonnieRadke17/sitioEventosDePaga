@@ -112,7 +112,10 @@
                           <li>
                               <label>
                                   <input type="checkbox" name="activities[]" value="{{ encrypt($activityEvent->activity->id) }}">
-                                  {{ $activityEvent->activity->name }}
+                                  {{ $activityEvent->activity->name }} 
+                                  @if ($activityEvent->gender === 'Mix')
+                                      Mix
+                                  @endif
                               </label>
                           </li>
                       @endforeach

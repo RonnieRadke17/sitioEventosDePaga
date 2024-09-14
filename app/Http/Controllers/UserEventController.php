@@ -24,6 +24,7 @@ class UserEventController extends Controller
         
             // Filtrar los ActivityEvents donde el usuario puede participar
             $activityEventIds = ActivityEvent::where('gender', $this->getUserData('gender'))
+            ->orWhere('gender', 'Mix')//mostrar tambien las que sean mixtas
                 ->whereHas('sub', function($query) use ($subName) {
                     $query->where('name', 'LIKE', "%$subName%");
                 })
@@ -133,7 +134,8 @@ class UserEventController extends Controller
                 if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
                         // Filtrar las actividades del evento en las que el usuario puede participar
                     $activityEventIds = ActivityEvent::where('event_id', $event->id)
-                    ->where('gender',$this->getUserData('gender')) // Filtrar por género
+                    ->where('gender',$this->getUserData('gender')) // Filtrar por género(M,F)
+                    ->orWhere('gender', 'Mix')//mostrar tambien las que sean mixtas
                     ->whereHas('sub', function($query) use ($subName) {
                         // Filtrar por subName, que se relaciona con la edad
                         $query->where('name', 'LIKE', "%$subName%");
@@ -217,6 +219,7 @@ class UserEventController extends Controller
 
     public function inscriptionFree(Request $request,$id)//obtenemos el id del evento y las acts mandadas por el user
     {
+        //dd($request);
         
         if (auth()->check()) {//usuario autentificado
             $decryptedId = decrypt($id);
@@ -373,6 +376,7 @@ class UserEventController extends Controller
             $validActivities = ActivityEvent::where('event_id', $decryptedId)
                 ->whereIn('activity_id', $selectedActivities) // Verificar que las actividades seleccionadas existan
                 ->where('gender', $userGender) // Verificar que coincidan con el género del usuario
+                ->orWhere('gender', 'Mix')//mostrar tambien las que sean mixtas
                 ->whereHas('sub', function ($query) use ($subName) {
                     $query->where('name', 'LIKE', "%$subName%"); // Verificar que el sub contenga el valor de subName
                 })
