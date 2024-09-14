@@ -3,106 +3,553 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Image;
 use App\Models\Activity;
 use App\Models\Sub;
+use App\Models\Place;
+use App\Models\ActivityEvent;
+use App\Models\ActivityCategory;
+use App\Models\EventPlace;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+//aqui definimos el controlador del mapa para el evento
+use App\Http\Controllers\MapEventController;
+
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()//ya
-    {
-        $data['events'] = Event::paginate(10);
-        return view('event.index', $data);
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+public function index()
+{
+    // Obtener los eventos con la primera imagen relacionada
+    $events = Event::with('images')->get()->map(function ($event) {
+        $event->first_image = $event->images->isNotEmpty() ? $event->images->first()->image : 'default.jpg';
+        return $event;
+    });
+
+    return view('event.index', compact('events'));
+}
+
     public function create()
     {
-        //hacer un carrusel de imgs en el sistema y que las pueda elegir o subir una nueva las que quiera en si 
-        //insert into event, event_activities, img,img_events incluso en dado caso si quiero registrar una nueva actividad
-        //se tiene que hacer una insercion en actividad antes que en evento(se haria antes que todas las demas inserciones)
-
-        //aqui vamos a tener que mandar la lista de actividades para que las seleccione
-        //show the activities registered
-        $activities = Activity::all(); // Esto te da una colección de todos los modelos Activity
-        //show the subs registered
+        $images = Image::all();//mandamos todas las imagenes que se tienen
         $subs = Sub::all(); // Esto te da una colección de todos las subs
-        return view('event.create', compact('activities','subs'));        
+        $places = Place::all();
+        $activities = Activity::all();
+        return view('event.create', compact('activities','subs','places','images'));         
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $datosEvento = $request->except('_token');
+        //dd($request);
+        //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
+        $eventData = Validator::make($request->all(), [
+            'name' => 'required|string|max:60',
+            'description' => 'required|string|max:200',
+            'event_date' => 'required|date|after:today',
+            'kit_delivery' => 'nullable|date|after:today|before:event_date',//kit_delivery puede ser nulo pero sino es nulo se valida//la entrega de kits y restration sea after:today es decir se entregan despues de hoy
+            'registration_deadline' => 'required|date|after:today|before:event_date',
+            'is_limited_capacity' => 'required|boolean',
+            'capacity' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_limited_capacity') == 1) { // = true
+                        if (is_null($request->input('capacity'))) {
+                            $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
+                        }
+                        if (!is_numeric($request->input('capacity')) || intval($request->input('capacity')) != $request->input('capacity')) {
+                            $fail('The capacity must be an integer.');
+                        }
+                        if ($request->input('capacity') < 5 || $request->input('capacity') > 15000) {
+                            $fail('The capacity is not valid.');
+                        }
+                    } else { // = false
+                        if (!is_null($request->input('capacity'))) {
+                            $fail('The capacity must be null when limited capacity is disabled.');
+                        }
+                    }
+                },
+            ],
+            'price' => 'nullable|numeric|min:10|max:10000',
+            /* 
+                aqui validamos la informacion del mapa para si esta mal retornar los mensajes de error
+                aqui se valida si se selecciono algun lugar ya registrado para validarlo
+                validar si hay algun lugar seleccionado 
+            */
+            'place_id' => [
+            'required',
+            'string',
+            'max:60',
+            //aqui validamos la informacion del mapa 
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === 'Otro') {
+                        if (empty($request->input('place'))) {
+                            $fail('The place field is required when place_id is Otro.');
+                        }
+                        if (empty($request->input('address'))) {
+                            $fail('The address field is required when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,2}\.\d+$/', $request->input('lat'))) {
+                            $fail('The lat field must be a valid decimal when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,3}\.\d+$/', $request->input('lng'))) {
+                            $fail('The lng field must be a valid decimal when place_id is Otro.');
+                        }
+                    }
+                },
+            ],
 
-        if ($request->hasFile('image')) {
-            $datosEvento['image'] = $request->file('image')->store('uploads', 'public');
-        }
+            //aqui validamos la informacion de las actividades
+            'is_with_activities' =>[
+                'required',
+                'boolean',
+                'in:0,1',
+                //aqui validamos la informacion del mapa 
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === 1) {//validamos si las actividades estan bien
+                        
+                    }
+                },
+            ],
 
-        //registras primero el evento y luego a que actividades estan registradas en el evento
-        $event = Event::create($datosEvento);
+            /*
+                aqui validamos la informacion de las imagenes 
+                es una relacion de 1-m por eso cada evento tiene sus imagenes
+            */
+            'cover' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
+            'kit' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
+            'images.*' => [//content
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+            ],
+
+        ]);
+
+        if ($eventData->fails()) {//retornamos los errores de los datos del evento
+            return redirect()->back()
+                ->withErrors($eventData)
+                ->withInput();
+        }else{
         
-        $id = $event->id;
-        //aqui sigue guardar las actividades a realizar
+            //aqui falta un boolean de si es con actividades o no
+            $event = Event::create([//registra primero el evento
+                'name' => $request->name,
+                'description'=> $request->description,
+                'event_date' => $request->event_date,
+                'kit_delivery' => $request->kit_delivery,
+                'registration_deadline' => $request->registration_deadline, 
+                'is_limited_capacity'=> $request->is_limited_capacity,
+                'capacity' => $request->is_limited_capacity ? $request->capacity : null,
+                'activities' => $request->is_with_activities,//este campo es de si es con actividades el evento o no
+                'price'=> $request->price
+            ]);
+            
+            //hacemos la incersion del lugar y lo vinculamos con el evento
+            if ($request->place_id == 'Otro') {
+                
+                $place = Place::create([
+                    'name' => $request->place,
+                    'address' => $request->address,
+                    'lat' => $request->lat,
+                    'lng' => $request->lng,
+                ]);
+                //aqui hacemos la vinculacion del lugar con el evento
+                $event->places()->attach($place->id);
 
+            }else{//aqui validamos la informacion del id del lugar para hacer la vinculacion con el evento
+                //en la tabla intermedia de event_places
+                $event->places()->attach($request->place_id);
+            }
+        
+            /* aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
+                Obtener todas las actividades seleccionadas
+                aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
+                //aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
+                // Obtener todas las actividades seleccionadas
+                //aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
+             */
+            if($request->is_with_activities == 1){//comparamos  que el valor dentro sea int,string
+                try {
+                    $selectedActivities = $request->input('selected_activities');
 
-        return redirect('event')->with('mensaje', 'Evento agregado con éxito');
+                    foreach ($selectedActivities as $activityId) {
+                        // Obtener los géneros seleccionados para esta actividad
+                        $genders = $request->input("genders.$activityId", []);
+        
+                        // Obtener las subactividades seleccionadas para esta actividad
+                        $subs = $request->input("subs.$activityId", []);
+        
+                        // Iterar sobre los géneros seleccionados
+                        foreach ($genders as $gender => $value) {
+                            // Iterar sobre las subactividades seleccionadas para este género
+                            foreach ($subs[$gender] as $subId) {
+                                // Crear un nuevo ActivityEvent
+                                ActivityEvent::create([
+                                    'event_id' => $event->id,//id del evento no uso atach porque se mandan mas campos
+                                    'activity_id' => $activityId,
+                                    'gender' => $gender,
+                                    'sub_id' => $subId,
+                                ]);
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error inserting activity event: ' . $e->getMessage());
+                }
+                
+            }
+
+            //imagenes del evento
+            if ($request->hasFile('cover')) {//first image
+                $image = $request->file('cover');  
+                $path = $image->store('uploads', 'public'); 
+                $imageModel = Image::create([
+                    'image' => $path,
+                    'event_id' => $event->id,
+                    'type' => 'cover'
+                ]);
+            }
+
+            if ($request->hasFile('kit')) {//kit
+                $image = $request->file('kit');  
+                $path = $image->store('uploads', 'public'); 
+                $imageModel = Image::create([
+                    'image' => $path,
+                    'event_id' => $event->id,
+                    'type' => 'kit'
+                ]);
+            }
+
+            if ($request->hasFile('images')) {//content
+                foreach ($request->file('images') as $image) {
+                    //insercion de manera local de la img y en la DB
+                    $path = $image->store('uploads', 'public');
+                    $imageModel = Image::create([
+                        'image' => $path,
+                        //aqui va el id del evento
+                        'event_id' => $event->id,
+                        'type' => 'content'
+                    ]);
+                }
+            }
+
+            return redirect()->route('event.index');
+        }
+        
     }
 
-    // Resto de los métodos del controlador...
+    // faltan las imgs
     public function edit($id)
     {
-        $event = Event::findOrFail($id);
-        return view('event.edit', compact('event'));
-    }
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+        $places = Place::all();
+        
+        // Obtener el primer lugar asociado al evento
+        $eventPlaceId = $event->places()->pluck('place_id')->first(); // Obtener el ID del lugar asociado al evento
+    
+        $activities = Activity::all();
+        $subs = Sub::all();
+        
+         // Obtener las actividades asociadas al evento, agrupadas por activity_id
+        $eventActivities = ActivityEvent::where('event_id', $decryptedId)
+        ->get()
+        ->groupBy('activity_id'); // Agrupa las actividades por activity_id
+        //imagenes seleccionadas
 
-    /**
-     * Update the specified resource in storage.
-     */
+        // Obtener imágenes del evento por tipo
+        $coverImage = $event->images()->where('type', 'cover')->first();
+        $kitImage = $event->images()->where('type', 'kit')->first();
+        $contentImages = $event->images()->where('type', 'content')->get();
+    
+        return view('event.edit', compact('event','eventPlaceId', 'activities', 'subs', 'places','eventActivities','coverImage', 'kitImage', 'contentImages'));
+    }
+    
     public function update(Request $request, $id)
     {
-    
-    $datosEvento = $request->except(['_token', '_method']);
+        // Desencriptamos el ID si es necesario
+        $decryptedId = decrypt($id);
+        // Buscar el evento que se va a actualizar
+        $event = Event::findOrFail($decryptedId);
 
-    if ($request->hasFile('image')) {
-        $evento = Event::findOrFail($id);
-        // Store the new image
-        $datosEvento['image'] = $request->file('image')->store('uploads', 'public');
+        // Validar los datos del formulario
+        $eventData = Validator::make($request->all(), [
+            'name' => 'required|string|max:60',
+            'description' => 'required|string|max:200',
+            'event_date' => 'required|date|after:today',
+            'kit_delivery' => 'nullable|date|after:today|before:event_date',
+            'registration_deadline' => 'required|date|after:today|before:event_date',
+            'is_limited_capacity' => 'required|boolean',
+            'capacity' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_limited_capacity') == 1) {
+                        if (is_null($request->input('capacity'))) {
+                            $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
+                        }
+                        if (!is_numeric($request->input('capacity')) || intval($request->input('capacity')) != $request->input('capacity')) {
+                            $fail('The capacity must be an integer.');
+                        }
+                        if ($request->input('capacity') < 5 || $request->input('capacity') > 15000) {
+                            $fail('The capacity is not valid.');
+                        }
+                    } else {
+                        if (!is_null($request->input('capacity'))) {
+                            $fail('The capacity must be null when limited capacity is disabled.');
+                        }
+                    }
+                },
+            ],
+            'price' => 'nullable|numeric|min:10|max:10000',
+            'place_id' => [
+                'required',
+                'string',
+                'max:60',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === 'Otro') {
+                        if (empty($request->input('place'))) {
+                            $fail('The place field is required when place_id is Otro.');
+                        }
+                        if (empty($request->input('address'))) {
+                            $fail('The address field is required when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,2}\.\d+$/', $request->input('lat'))) {
+                            $fail('The lat field must be a valid decimal when place_id is Otro.');
+                        }
+                        if (!preg_match('/^-?\d{1,3}\.\d+$/', $request->input('lng'))) {
+                            $fail('The lng field must be a valid decimal when place_id is Otro.');
+                        }
+                    }
+                },
+            ],
+            'is_with_activities' => ['required', 'boolean', 'in:0,1'],
+            'cover' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'kit' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+        ]);
+
+        if ($eventData->fails()) {
+            return redirect()->back()->withErrors($eventData)->withInput();
+        }
+        
+        //actualizacion de campos de eventData
+        $updates = [];
+        if ($event->name !== $request->name) {
+            $updates['name'] = $request->name;
+        }
+        if ($event->description !== $request->description) {
+            $updates['description'] = $request->description;
+        }
+        if ($event->event_date !== $request->event_date) {
+            $updates['event_date'] = $request->event_date;
+        }
+        if ($event->kit_delivery !== $request->kit_delivery) {
+            $updates['kit_delivery'] = $request->kit_delivery;
+        }
+        if ($event->registration_deadline !== $request->registration_deadline) {
+            $updates['registration_deadline'] = $request->registration_deadline;
+        }
+        if ($event->is_limited_capacity !== $request->is_limited_capacity) {
+            $updates['is_limited_capacity'] = $request->is_limited_capacity;
+            // Si cambia la capacidad, actualizamos también
+            if ($request->is_limited_capacity == 1 && $event->capacity !== $request->capacity) {
+                $updates['capacity'] = $request->capacity;
+            } else {
+                $updates['capacity'] = null;
+            }
+        }
+        //es el campo de actividades
+        if ($event->activities !== $request->is_with_activities) {
+            $updates['activities'] = $request->is_with_activities;
+        }
+
+        if ($event->price !== $request->price) {
+            $updates['price'] = $request->price;
+        }
+
+        // Si hay cambios, actualizamos
+        if (!empty($updates)) {
+            $event->update($updates);
+        }
+
+        //actualizacion del lugar
+
+        // Actualizamos la vinculación del lugar si es necesario
+        if ($request->place_id == 'Otro') {
+            // Actualizamos o creamos un nuevo lugar
+            $place = Place::updateOrCreate(
+                ['id' => $event->places()->pluck('place_id')->first()],
+                [
+                    'name' => $request->place,
+                    'address' => $request->address,
+                    'lat' => $request->lat,
+                    'lng' => $request->lng
+                ]
+            );
+            $event->places()->sync([$place->id]);
+        } else if ($event->places()->pluck('place_id')->first() != $request->place_id) {
+            // Vinculamos el lugar existente solo si es diferente
+            $event->places()->sync([$request->place_id]);
+        }
+
+        //actualizacion de las actividades
+        // Actualizamos las actividades del evento si es necesario
+        if ($request->is_with_activities == 1) {
+            // Obtener las actividades actualmente asociadas con el evento
+            $currentActivities = ActivityEvent::where('event_id', $event->id)
+                ->get(['activity_id', 'gender', 'sub_id'])
+                ->map(function ($activityEvent) {
+                    return [
+                        'activity_id' => $activityEvent->activity_id,
+                        'gender' => $activityEvent->gender,
+                        'sub_id' => $activityEvent->sub_id
+                    ];
+                })->toArray();
+
+            // Preparar las actividades nuevas del request
+            $newActivities = [];
+            $selectedActivities = $request->input('selected_activities', []);
+            foreach ($selectedActivities as $activityId) {
+                $genders = $request->input("genders.$activityId", []);
+                $subs = $request->input("subs.$activityId", []);
+                foreach ($genders as $gender => $value) {
+                    foreach ($subs[$gender] as $subId) {
+                        $newActivities[] = [
+                            'activity_id' => $activityId,
+                            'gender' => $gender,
+                            'sub_id' => $subId
+                        ];
+                    }
+                }
+            }
+
+            // Convertir las actividades a cadenas JSON para comparar fácilmente
+            $currentActivitiesCollection = collect($currentActivities)->map(function ($activity) {
+                return json_encode($activity);  // Convertir cada actividad a JSON
+            });
+
+            $newActivitiesCollection = collect($newActivities)->map(function ($activity) {
+                return json_encode($activity);  // Convertir cada nueva actividad a JSON
+            });
+
+            // Encontrar actividades que ya no están en la nueva solicitud (deben eliminarse)
+            $activitiesToDelete = $currentActivitiesCollection->diff($newActivitiesCollection);
+            foreach ($activitiesToDelete as $activity) {
+                $activity = json_decode($activity, true);  // Decodificar la actividad a su forma original
+                ActivityEvent::where('event_id', $event->id)
+                    ->where('activity_id', $activity['activity_id'])
+                    ->where('gender', $activity['gender'])
+                    ->where('sub_id', $activity['sub_id'])
+                    ->delete();
+            }
+
+            // Encontrar actividades que no estaban antes (deben agregarse)
+            $activitiesToAdd = $newActivitiesCollection->diff($currentActivitiesCollection);
+            foreach ($activitiesToAdd as $activity) {
+                $activity = json_decode($activity, true);  // Decodificar la actividad a su forma original
+                ActivityEvent::create([
+                    'event_id' => $event->id,
+                    'activity_id' => $activity['activity_id'],
+                    'gender' => $activity['gender'],
+                    'sub_id' => $activity['sub_id']
+                ]);
+            }
+        }
+
+        if ($request->is_with_activities == 0){
+            //borramos las actividades ligadas a este evento
+            ActivityEvent::where('event_id', $event->id)->delete();
+        }
+
+        //actualizacion de las imagenes
+
+        // Actualizamos las imágenes del evento
+        if ($request->hasFile('cover')) {
+            $image = $request->file('cover');
+            $path = $image->store('uploads', 'public');
+            Image::updateOrCreate(
+                ['event_id' => $event->id, 'type' => 'cover'],
+                ['image' => $path]
+            );
+        }
+
+        if ($request->hasFile('kit')) {
+            $image = $request->file('kit');
+            $path = $image->store('uploads', 'public');
+            Image::updateOrCreate(
+                ['event_id' => $event->id, 'type' => 'kit'],
+                ['image' => $path]
+            );
+        }
+
+        Image::where('event_id', $event->id)
+                    ->where('type','content')
+                    ->delete();
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('uploads', 'public');
+                Image::create([
+                    'image' => $path,
+                    'event_id' => $event->id,
+                    'type' => 'content'
+                ]);
+            }
+        }
+        //falta redireccion con mesaje de exito
+        return redirect()->route('event.index');
     }
 
-    // Update the database record with the new data
-    Event::where('id', '=', $id)->update($datosEvento);
+    public function show($id)
+    {
+            // Desencriptar el ID del evento
+            $decryptedId = decrypt($id);
+            // Buscar el evento con sus actividades y sus relaciones en activity_events
+            $event = Event::findOrFail($decryptedId);
+            // Buscar el evento con sus relaciones (lugares en este caso)
+            $event1 = Event::with('places')->findOrFail($decryptedId);
+            // Obtener los lugares relacionados al evento
+            $places = $event1->places;
+            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
+            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
+            // Buscar el evento junto con sus imágenes
+            $eventIMG = Event::with('images')->findOrFail($decryptedId);
 
-    return redirect('event')->with('mensaje', 'Evento Modificado');
-}
+            // Ordenar las imágenes según el valor del campo 'type'
+            $orderedImages = $eventIMG->images->sortBy(function ($image) {
+                switch ($image->type) {
+                    case 'cover':
+                        return 1;
+                    case 'kit':
+                        return 2;
+                    case 'content':
+                        return 3;
+                    default:
+                        return 4; // Si hubiera algún otro valor, lo ponemos al final
+                }
+            });
 
-/**
- * Display the specified resource.
- */
-public function show($id)
-{
-    $evento = Event::findOrFail($id);
-    return view('event.show', compact('event'));
-}
+            return view('event.show', compact('event', 'activities','places','orderedImages'));
+    }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
-        $evento = Event::findOrFail($id);
-
-        // Elimina el evento sin borrar la imagen
-        Event::destroy($id);
-
+        $decryptedId = decrypt($id);
+        //borramos las imagenes las acts y el evento, falta borrar el registro del lugar ingermedio
+        $event = Event::findOrFail($decryptedId);
+        Image::where('event_id', $event->id)->delete();
+        ActivityEvent::where('event_id', $event->id)->delete();
+        EventPlace::where('event_id', $event->id)->delete();
+        Event::where('id',$decryptedId)->delete();
         return redirect('event')->with('mensaje', 'Evento borrado');
     }
 }

@@ -5,7 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserEvent extends Model
+class EmailVerification extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'email',
+        'token',
+        'expiration',
+        'status'
+       ];
 }

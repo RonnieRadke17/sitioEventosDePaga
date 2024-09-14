@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            //$table->unsignedBigInteger('activity_category_id');
+            //$table->foreign('activity_category_id')->references('id')->on('activity_categories')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EventActivity extends Model
+class Permission extends Model
 {
     use HasFactory;
 
-    public function subs()
+    protected $fillable = [
+        'name',
+    ];
+
+    public function roles()
     {
-        return $this->belongsTo(Sub::class);
+        return $this->belongsToMany(Role::class);
     }
 }

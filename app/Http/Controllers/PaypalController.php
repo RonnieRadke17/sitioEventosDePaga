@@ -25,8 +25,7 @@ class PaypalController extends Controller
             "purchase_units" => [
                 [
                     "amount" => [
-                        //cambiar despues la moneda con la cual se cobra
-                        "currency_code" => "USD",
+                        "currency_code" => "MXN",
                         "value" => $request->price
                     ]
                 ]
@@ -72,22 +71,22 @@ class PaypalController extends Controller
             $payment->save();
 
             //insert into userEvent donde va el idUser y idEvent como a su vez los id de las actividades
-
+            
 
             //aqui va la ruta de regreso a la pagina de eventos la cual tiene que mandar un mensaje de pago con exito de sweetalert
-            return "Siuuuu";
-
+            return redirect()->route('home')->with('success', 'Pago aprovado');
             unset($_SESSION['product_name']);
             unset($_SESSION['quantity']);
 
         } else {
             //aqui va la ruta de regreso a la pagina de eventos la cual tiene que mandar un mensaje de pago con rechazado de sweetalert
             return redirect()->route('cancel');
+            return redirect()->route('home')->withErrors(['error' => 'error al procesar el pago']);
         }
     }
     public function cancel()//aqui va la ruta de home con un mensaje 
     {
         //return "Pago cancelado unu.";
-        return view('home');//aqui para regresar a home tienes que mandar todos los eventos otra vez
+        return redirect()->route('cancel');//aqui para regresar a home tienes que mandar todos los eventos otra vez
     }
 }

@@ -20,9 +20,12 @@ class User extends Authenticatable
         'name',
         'paternal',
         'maternal',
-        'age',
+        'birthdate',
+        'gender',
         'email',
         'password',
+        'is_suspended',
+        'role_id',
     ];
 
     /**
@@ -58,6 +61,17 @@ class User extends Authenticatable
     public function payments()
     {
         return $this->belongsToMany(Event::class, 'payments')->withTimestamps();
+    }
+
+    /* //relations with roles
+    public function roles()
+    {
+        return $this->belongsTo(Role::class)->withTimestamps();
+    } */
+    // Relación con el modelo Role
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
 }
