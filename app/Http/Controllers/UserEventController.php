@@ -61,7 +61,7 @@ class UserEventController extends Controller
                 });
             
             // Devolver la vista con los datos obtenidos
-            return view('home', compact('events', 'activityEventIds'));
+            return view('user-event/home', compact('events', 'activityEventIds'));
         }
         else {// El usuario no está autenticado mostrar todos los eventos//falta que si ya se paso la fecha no se muestre
             
@@ -86,7 +86,7 @@ class UserEventController extends Controller
                 return $event;
             });
 
-            return view('home', compact('events'));
+            return view('user-event/home', compact('events'));
 
         }
     }

@@ -14,6 +14,7 @@ class ActivityController extends Controller
     {
         //
         $data['activities'] = Activity::paginate(10);
+        //$data['activities'] = Activity::all();
         return view('activities.index', $data);
     }
 
