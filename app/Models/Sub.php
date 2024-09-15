@@ -15,4 +15,11 @@ class Sub extends Model
     {
         return $this->hasMany(ActivityEvent::class);
     }
+
+    // Definir la relación de uno a muchos
+    public function activityEventUsers()
+    {
+        return $this->hasMany(ActivityEventUser::class, 'sub_id', 'id');
+    }
+
 }

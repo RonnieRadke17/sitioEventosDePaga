@@ -30,4 +30,13 @@ class ActivityEventUser extends Model
     {
         return $this->belongsTo(Activity::class);
     }
+
+    //relacion con el modelo sub relacion de 
+    // Definir la relación inversa, de muchos a uno
+    public function sub()
+    {
+        return $this->belongsTo(Sub::class, 'sub_id', 'id');
+    }
+
+
 }

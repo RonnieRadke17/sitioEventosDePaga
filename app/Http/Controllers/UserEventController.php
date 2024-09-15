@@ -10,6 +10,10 @@ use App\Models\ActivityEventUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Encryption\DecryptException;
+
+
 
 class UserEventController extends Controller
 {
@@ -215,18 +219,85 @@ class UserEventController extends Controller
           
     }
 
-
-    // Método para validar las actividades seleccionadas
-    public function validateSelectedActivities($selectedActivities)
+    // Mostrar detalles del evento (sin cambios)
+    public function showEvent($id)
     {
-        if ($selectedActivities == null || count($selectedActivities) == 0) {
-            return redirect()->back()->withErrors(['error' => 'Necesitas seleccionar una actividad mínimo']);
-        }
-        if (count($selectedActivities) > 3) {
-            return redirect()->back()->withErrors(['error' => 'Solo puedes seleccionar 3 actividades como máximo']);
-        }
-        return true;
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+        $event1 = Event::with('places')->findOrFail($decryptedId);
+        $places = $event1->places;
+        $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();
+        $eventIMG = Event::with('images')->findOrFail($decryptedId);
+
+        $orderedImages = $eventIMG->images->sortBy(function ($image) {
+            switch ($image->type) {
+                case 'cover':
+                    return 1;
+                case 'kit':
+                    return 2;
+                case 'content':
+                    return 3;
+                default:
+                    return 4;
+            }
+        });
+
+        return view('user-event.show', compact('event', 'activities', 'places', 'orderedImages'));
     }
+
+    public function validateActivities(Request $request, $decryptedId)
+    {
+        $event = Event::findOrFail($decryptedId);
+
+        $result = true;
+        // Validar que al menos una actividad ha sido seleccionada
+        $request->validate([
+            'activities' => 'required|array',
+        ]);
+
+        // Recorrer el array de actividades seleccionadas
+        foreach ($request->input('activities') as $encryptedActivityId => $genders) {
+            foreach ($genders as $gender => $subIds) {
+                foreach ($subIds as $encryptedSubId => $value) {
+                    if ($value == 'on') {  // Verificar si el checkbox fue marcado
+                        try {
+                            // Desencriptar el activity_id y sub_id
+                            $activityId = Crypt::decrypt($encryptedActivityId);
+                            $subId = Crypt::decrypt($encryptedSubId);
+
+                            // Aquí puedes procesar cada actividad seleccionada
+                            // Validación de la existencia de la actividad en el evento
+                            $exists = ActivityEvent::where('event_id', $decryptedId)
+                                        ->where('activity_id', $activityId)
+                                        ->where('gender', $gender)
+                                        ->where('sub_id', $subId)
+                                        ->exists();
+
+                            if (!$exists) {
+                                return redirect()->back()->withErrors(['error' => 'Actividades seleccionadas no válidas.']);
+                                $result = false;
+                                return $result;
+                                break;
+                            }
+
+                        } catch (\Exception $e) {
+                            // Error en la desencriptación o validación
+                            throw ValidationException::withMessages([
+                                'activities' => 'Uno o más valores seleccionados son inválidos.',
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Si todo es válido, retornamos verdadero
+        return $result;
+    }
+
+    
+
+
 
     // Método para inscripción gratuita
     public function inscriptionFree(Request $request, $id)
@@ -235,25 +306,29 @@ class UserEventController extends Controller
             $decryptedId = decrypt($id);
             $event = Event::findOrFail($decryptedId);
 
-            
-            // Obtener las actividades seleccionadas y desencriptarlas
-            $acts = $request->input('activities', []);
-            dd($acts);
-            $selectedActivities = array_map(function ($encryptedActivity) {
-                return Crypt::decrypt($encryptedActivity);
-            }, $acts);
-            
-            // Llamar al método de validación
-            $validation = $this->validateSelectedActivities($selectedActivities);
-            if ($validation !== true) {
-                return $validation; // Retornar el error si no es válido
+            // Validar si hay actividades seleccionadas
+            if (!$request->has('activities')) {
+                return redirect()->back()->withErrors(['error' => 'Debes seleccionar al menos una actividad.']);
             }
+
+            // Llamar al método de validación para validar las actividades seleccionadas
+            $validation = $this->validateActivities($request, $decryptedId);
+
+            if ($validation) { // Si las actividades son válidas
+                
+                return redirect()->route('home')->with('success', 'Inscripción exitosa.');
+            } else {
+                // Si la validación falla, redirigimos con un error
+                return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
+            }
+
+            
 
             if (!$event) {
                 return redirect()->back()->withErrors(['error' => 'Valores incorrectos']);
             }
 
-            if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
+            /* if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
                 return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
             }
 
@@ -268,7 +343,7 @@ class UserEventController extends Controller
                 return redirect()->route('home')->with('success', $message);
             } else if ($capacityValidation == 'withoutcapacity') {
                 return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
-            }
+            } */
         } else { // Redireccionar si el usuario no está autenticado
             return view('auth/login');
         }
@@ -391,29 +466,4 @@ class UserEventController extends Controller
         return false;
     }
 
-    // Mostrar detalles del evento (sin cambios)
-    public function showEvent($id)
-    {
-        $decryptedId = decrypt($id);
-        $event = Event::findOrFail($decryptedId);
-        $event1 = Event::with('places')->findOrFail($decryptedId);
-        $places = $event1->places;
-        $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();
-        $eventIMG = Event::with('images')->findOrFail($decryptedId);
-
-        $orderedImages = $eventIMG->images->sortBy(function ($image) {
-            switch ($image->type) {
-                case 'cover':
-                    return 1;
-                case 'kit':
-                    return 2;
-                case 'content':
-                    return 3;
-                default:
-                    return 4;
-            }
-        });
-
-        return view('user-event.show', compact('event', 'activities', 'places', 'orderedImages'));
-    }
 }
