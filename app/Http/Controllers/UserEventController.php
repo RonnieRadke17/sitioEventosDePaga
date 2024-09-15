@@ -10,7 +10,6 @@ use App\Models\ActivityEventUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-//tabla intermedia de ActivityEvent
 
 class UserEventController extends Controller
 {
@@ -236,12 +235,14 @@ class UserEventController extends Controller
             $decryptedId = decrypt($id);
             $event = Event::findOrFail($decryptedId);
 
+            
             // Obtener las actividades seleccionadas y desencriptarlas
             $acts = $request->input('activities', []);
+            dd($acts);
             $selectedActivities = array_map(function ($encryptedActivity) {
                 return Crypt::decrypt($encryptedActivity);
             }, $acts);
-
+            
             // Llamar al método de validación
             $validation = $this->validateSelectedActivities($selectedActivities);
             if ($validation !== true) {

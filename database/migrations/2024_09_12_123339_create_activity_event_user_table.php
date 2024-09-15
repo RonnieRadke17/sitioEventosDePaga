@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_user_id')->constrained('event_user')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('activity_id')->constrained('activities')->onUpdate('cascade')->onDelete('cascade');
+            $table->enum('gender',['M','F','Mix']);
+            $table->foreignId('sub_id')->constrained()->onUpdate('cascade')->onDelete('cascade');//falta relacion con el modelo 
             $table->timestamps();
         });
     }
