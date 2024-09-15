@@ -274,10 +274,11 @@ class UserEventController extends Controller
                                         ->exists();
 
                             if (!$exists) {
-                                return redirect()->back()->withErrors(['error' => 'Actividades seleccionadas no válidas.']);
                                 $result = false;
                                 return $result;
                                 break;
+                                return redirect()->back()->withErrors(['error' => 'Actividades seleccionadas no válidas.']);
+                                
                             }
 
                         } catch (\Exception $e) {
@@ -294,10 +295,6 @@ class UserEventController extends Controller
         // Si todo es válido, retornamos verdadero
         return $result;
     }
-
-    
-
-
 
     // Método para inscripción gratuita
     public function inscriptionFree(Request $request, $id)
@@ -317,12 +314,11 @@ class UserEventController extends Controller
             if ($validation) { // Si las actividades son válidas
                 
                 return redirect()->route('home')->with('success', 'Inscripción exitosa.');
+                //validamos ahora si el usuario puede participar en las actividades seleccionadas
             } else {
                 // Si la validación falla, redirigimos con un error
                 return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
             }
-
-            
 
             if (!$event) {
                 return redirect()->back()->withErrors(['error' => 'Valores incorrectos']);
