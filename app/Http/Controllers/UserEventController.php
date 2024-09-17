@@ -325,92 +325,30 @@ class UserEventController extends Controller
     public function inscriptionFree(Request $request, $id)
     {
         if (auth()->check()) { // Usuario autenticado
-            
-            
-
-            // Llamar al método de validación para validar las actividades seleccionadas
-            
                 
-                if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
-                    return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
-                }
+            if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
+                return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
+            }
     
-                if ($this->validateRegistrationDeadLine($id)) { // Validar fecha límite
-                    return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
-                }
+            if ($this->validateRegistrationDeadLine($id)) { // Validar fecha límite
+                return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
+            }
     
-                // Validar capacidad
-                $capacityValidation = $this->validateCapacity($id);
-                if ($capacityValidation == 'withoutlimit' || $capacityValidation == 'withcapacity') {
-                    $message = $this->inscription($request,$id);
-                    return redirect()->route('home')->with('success', $message);
-                } else if ($capacityValidation == 'withoutcapacity') {
-                    return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
-                }
+            // Validar capacidad
+            $capacityValidation = $this->validateCapacity($id);
+            if ($capacityValidation == 'withoutlimit' || $capacityValidation == 'withcapacity') {
+                $message = $this->inscription($request,$id);
+                return redirect()->route('home')->with('success', $message);
+            } else if ($capacityValidation == 'withoutcapacity') {
+                return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
+            }
             
         } else { // Redireccionar si el usuario no está autenticado
             return view('auth/login');
         }
     }
 
-    // Método para inscripción (con actividades o sin actividades)
-    /* public function inscription($id, $selectedActivities)
-    {
-        $decryptedId = decrypt($id);
-        $event = Event::findOrFail($decryptedId);
-
-        if ($event->activities == 1) { // Si el evento tiene actividades
-            // Llamar al método de validación
-            $validation = $this->validateSelectedActivities($selectedActivities);
-            if ($validation !== true) {
-                return $validation; // Retornar el error si no es válido
-            }
-
-            // Validación y lógica de inscripción de actividades
-            $userGender = $this->getUserData('gender');
-            $subName = $this->getUserData('sub');
-            dd($selectedActivities);
-            $validActivities = ActivityEvent::where('event_id', $decryptedId)
-                ->whereIn('activity_id', $selectedActivities)
-                ->where(function ($query) use ($userGender) {
-                    $query->where('gender', $userGender)
-                          ->orWhere('gender', 'Mix');
-                })
-                ->whereHas('sub', function ($query) use ($subName) {
-                    $query->where('name', 'LIKE', "%$subName%");
-                })
-                ->count();
-
-            if ($validActivities != count($selectedActivities)) {
-                return redirect()->back()->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas para este usuario.']);
-            }
-
-            // Inserción en la tabla intermedia
-            $user = auth()->user();
-            $eventUser = EventUser::create([
-                'user_id' => $user->id,
-                'event_id' => $decryptedId,
-            ]);
-
-            // Insertar cada actividad en 'activity_event_users'
-            foreach ($selectedActivities as $activityId) {
-                ActivityEventUser::create([
-                    'event_user_id' => $eventUser->id,
-                    'activity_id' => $activityId,
-                ]);
-            }
-            return 'Registro realizado exitosamente.';
-        } else {
-            // El evento no tiene actividades, solo inscribirse
-            $user = auth()->user();
-            $eventUser = EventUser::create([
-                'user_id' => $user->id,
-                'event_id' => $decryptedId,
-            ]);
-            return 'Registro realizado exitosamente.';
-        }
-    } */
-
+    //metodo de inscripcion
     public function inscription(Request $request, $id)
     {
         $decryptedId = decrypt($id);
@@ -423,10 +361,8 @@ class UserEventController extends Controller
             // Llamar al método de validación para validar las actividades seleccionadas
             $validation = $this->validateActivities($request, $id);
 
-            if (!$validation) { // Si las actividades NO son validas
+            if (!$validation) { // Si las actividades NO son validas es porque el usuario cambio algun valor de la act,gender,sub
                 return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
-                
-                //validamos ahora si el usuario puede participar en las actividades seleccionadas
             }else{
 
                 // Obtener el género y la sub del usuario
