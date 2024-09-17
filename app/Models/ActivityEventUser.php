@@ -13,6 +13,8 @@ class ActivityEventUser extends Model
     protected $fillable = [
         'event_user_id',
         'activity_id',
+        'gender',
+        'sub_id',
     ];
 
      /**
@@ -30,4 +32,13 @@ class ActivityEventUser extends Model
     {
         return $this->belongsTo(Activity::class);
     }
+
+    //relacion con el modelo sub relacion de 
+    // Definir la relación inversa, de muchos a uno
+    public function sub()
+    {
+        return $this->belongsTo(Sub::class, 'sub_id', 'id');
+    }
+
+
 }

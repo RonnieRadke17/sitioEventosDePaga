@@ -8,6 +8,17 @@
         {{ $errors->first('error') }}
     </div>
 @endif
+@if ($errors->has('activities'))
+    <div class="alert alert-danger">
+        {{ $errors->first('activities') }}
+    </div>
+@endif
+@if ($errors->has('event'))
+    <div class="alert alert-danger">
+        {{ $errors->first('event') }}
+    </div>
+@endif
+
 
 <div class="bg-white">
       <!-- Product info -->
@@ -111,8 +122,11 @@
                       @foreach($activities as $activityEvent)
                           <li>
                               <label>
-                                  <input type="checkbox" name="activities[]" value="{{ encrypt($activityEvent->activity->id) }}">
-                                  {{ $activityEvent->activity->name }}
+                                <input type="checkbox" name="activities[{{ encrypt($activityEvent->activity->id) }}][{{ encrypt($activityEvent->gender) }}][{{ encrypt($activityEvent->sub_id) }}]">
+                                  <label>{{ $activityEvent->activity->name }} </label>
+                                  @if ($activityEvent->gender === 'Mix')
+                                      Mix
+                                  @endif
                               </label>
                           </li>
                       @endforeach

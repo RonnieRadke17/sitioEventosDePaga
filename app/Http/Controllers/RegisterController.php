@@ -33,10 +33,11 @@ class RegisterController extends Controller
             'paternal' => 'required|string|max:255|min:4|max:20',
             'maternal' => 'required|string|max:255|min:4|max:20',
             'birthdate' => [
-                'required',
-                'date',
-                'before_or_equal:' . now()->subYears(10)->format('Y-m-d'),
-                'date_format:Y-m-d',
+            'required',
+            'date',
+            'before_or_equal:' . now()->subYears(10)->format('Y-m-d'), // Mínimo 10 años
+            'after_or_equal:' . now()->subYears(80)->format('Y-m-d'), // Máximo 80 años
+            'date_format:Y-m-d',
             ],
             'gender' => 'required|in:M,F',
             'email' => 'required|string|email|unique:users,email',

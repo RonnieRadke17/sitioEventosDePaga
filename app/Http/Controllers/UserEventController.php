@@ -10,7 +10,10 @@ use App\Models\ActivityEventUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-//tabla intermedia de ActivityEvent
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Encryption\DecryptException;
+
+
 
 class UserEventController extends Controller
 {
@@ -24,6 +27,7 @@ class UserEventController extends Controller
         
             // Filtrar los ActivityEvents donde el usuario puede participar
             $activityEventIds = ActivityEvent::where('gender', $this->getUserData('gender'))
+            ->orWhere('gender', 'Mix')//mostrar tambien las que sean mixtas
                 ->whereHas('sub', function($query) use ($subName) {
                     $query->where('name', 'LIKE', "%$subName%");
                 })
@@ -95,6 +99,16 @@ class UserEventController extends Controller
 
     public function show($id)
     {
+        try {
+            // Desencriptar el event_id
+            $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            return redirect()->route('home')->withErrors(['error' => 'Error al acceder a ese evento.']);
+            
+        }
+
         /*    
             //si el usuario esta logueado como admin se tiene que mostrar como sino estuviera logueado
             //aqui verificamos que hay acts en este evento para el usuario que sino hay se redirecciona al home
@@ -108,11 +122,7 @@ class UserEventController extends Controller
             //revisamos si el rol del usuario es admin
             // Verificar si el usuario tiene el rol requerido
             $userLogued = Auth::user();
-            if ($userLogued->role->name == 'admin') {
-            
-                return $this->showEvent($id);//mostramos el contenido como si no estuviera logueado
-
-            }else if($userLogued->role->name == 'client'){//el usuario probablemente sea client
+            if($userLogued->role->name == 'client' || $userLogued->role->name == 'admin'){//el usuario probablemente sea client
                 if($this->validateEventUser($id)){//validar que el usuario no este inscrito
                     return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
                 }
@@ -133,7 +143,8 @@ class UserEventController extends Controller
                 if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
                         // Filtrar las actividades del evento en las que el usuario puede participar
                     $activityEventIds = ActivityEvent::where('event_id', $event->id)
-                    ->where('gender',$this->getUserData('gender')) // Filtrar por género
+                    ->where('gender',$this->getUserData('gender')) // Filtrar por género(M,F)
+                    ->orWhere('gender', 'Mix')//mostrar tambien las que sean mixtas
                     ->whereHas('sub', function($query) use ($subName) {
                         // Filtrar por subName, que se relaciona con la edad
                         $query->where('name', 'LIKE', "%$subName%");
@@ -214,235 +225,268 @@ class UserEventController extends Controller
           
     }
 
-
-    public function inscriptionFree(Request $request,$id)//obtenemos el id del evento y las acts mandadas por el user
+    // Mostrar detalles del evento (sin cambios)
+    public function showEvent($id)
     {
-        
-        if (auth()->check()) {//usuario autentificado
+        try {
+            // Desencriptar el event_id
             $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            return redirect()->route('home')->withErrors(['error' => 'Error al acceder a ese evento.']);
             
-            $event = Event::findOrFail($decryptedId);// Buscar el evento
-            // Obtener las actividades seleccionadas (si hay alguna)
-            // Supongamos que $selectedActivities es el arreglo de valores encriptados.
-            $acts = $request->input('activities', []);
+        }
+        //$decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+        $event1 = Event::with('places')->findOrFail($decryptedId);
+        $places = $event1->places;
+        $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();
+        $eventIMG = Event::with('images')->findOrFail($decryptedId);
 
-            // Desencriptar cada valor en el arreglo
-            $decryptedActivities = array_map(function ($encryptedActivity) {
-                return Crypt::decrypt($encryptedActivity);
-            }, $acts);
+        $orderedImages = $eventIMG->images->sortBy(function ($image) {
+            switch ($image->type) {
+                case 'cover':
+                    return 1;
+                case 'kit':
+                    return 2;
+                case 'content':
+                    return 3;
+                default:
+                    return 4;
+            }
+        });
+
+        return view('user-event.show', compact('event', 'activities', 'places', 'orderedImages'));
+    }
+
+    public function validateActivities(Request $request, $id)
+    {
+        try {
+            // Desencriptar el event_id
+            $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            throw ValidationException::withMessages([
+                'event' => 'Error en el evento',
+            ]);
+        }
+        $event = Event::findOrFail($decryptedId);
+        $result = true;
+
+        // Validar que al menos una actividad ha sido seleccionada
+        // Validar que al menos una actividad ha sido seleccionada y que no excede el máximo permitido
+        $request->validate([
+            'activities' => 'required|array|max:3', //maximo 3
+        ], [
+            'activities.required' => 'Debes seleccionar al menos una actividad.',
+            'activities.max' => 'No puedes seleccionar más de 3 actividades.',
+        ]);
             
-            $selectedActivities = $decryptedActivities; 
-            //lo negamos aqui para tener todo el codigo abajo
-            if(!$event){//si el evento NO existe continua     
-                return redirect()->back()->withErrors(['error' => 'valores incorrectos']);
-            }
+        // Recorrer el array de actividades seleccionadas
+        foreach ($request->input('activities') as $encryptedActivityId => $genders) {
+            foreach ($genders as $encryptedGender => $subIds) {
+                foreach ($subIds as $encryptedSubId => $value) {
+                    if ($value == 'on') {  // Verificar si el checkbox fue marcado
+                        try {
+                            // Desencriptar el activity_id, gender y sub_id
+                            $activityId = Crypt::decrypt($encryptedActivityId);
+                            $gender = Crypt::decrypt($encryptedGender);
+                            $subId = Crypt::decrypt($encryptedSubId);
 
-            if($this->validateEventUser($id)){//validar que el usuario no este inscrito
-                return redirect()->route('home')->withErrors(['error' => 'Ya estas registrado en ese evento.']);
-            }
+                            // Validación de la existencia de la actividad en el evento
+                            $exists = ActivityEvent::where('event_id', $decryptedId)
+                                        ->where('activity_id', $activityId)
+                                        ->where('gender', $gender)
+                                        ->where('sub_id', $subId)
+                                        ->exists();
 
-            if($this->validateRegistrationDeadLine($id)){//la fecha del evento ya ha pasado
+                            if (!$exists) {
+                                return false; // La actividad no es válida
+                            }
+
+                        } catch (DecryptException $e) {
+                            // Error en la desencriptación
+                            throw ValidationException::withMessages([
+                                'activities' => 'Error en las actividades.',
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Si todo es válido, retornamos verdadero
+        return $result;
+    }
+
+    // Método para inscripción gratuita
+    public function inscriptionFree(Request $request, $id)
+    {
+        if (auth()->check()) { // Usuario autenticado
+                
+            if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
+                return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
+            }
+    
+            if ($this->validateRegistrationDeadLine($id)) { // Validar fecha límite
                 return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
             }
-
-            //validar si el evento es con capacidad o sin validamos si el evento tiene o no capacidad
-            if($this->validateCapacity($id) == 'withoutlimit'){//el evento no tiene capacidad limite
-                //metodo que inscribe 
-                $message = $this->inscription($id,$selectedActivities);
-                //retornar a una vista
+    
+            // Validar capacidad
+            $capacityValidation = $this->validateCapacity($id);
+            if ($capacityValidation == 'withoutlimit' || $capacityValidation == 'withcapacity') {
+                $message = $this->inscription($request,$id);
                 return redirect()->route('home')->with('success', $message);
-
-            }else if($this->validateCapacity($id) == 'withcapacity'){//hay capacidad en el evento
-                //aqui se inscribe al evento metodo que haga eso aqui
-                $message = $this->inscription($id,$selectedActivities);
-                //retornar a una vista
-                return redirect()->route('home')->with('success', $message);
-
-            }else if($this->validateCapacity($id) == 'withoutcapacity'){//No hay capacidad en el evento
-
+            } else if ($capacityValidation == 'withoutcapacity') {
                 return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
             }
-                //si el codigo falla aqui va desde la linea if($event->activities == 1){
-
-        }else{//redireccionamos para que se registre el user
             
+        } else { // Redireccionar si el usuario no está autenticado
             return view('auth/login');
         }
     }
 
-    //aqui metodo de inscripcion de paga
+    //metodo de inscripcion
+    public function inscription(Request $request, $id)
+    {
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
 
-    //metodo get de sub,gender del User
-    public function getUserData($valueOP){
-        $user = auth()->user();
-        switch($valueOP){
-            case $valueOP == 'gender':
-                 
-                $gender = $user->gender; // Género
-                return $gender;
-                break;
+        if ($event->activities == 1) { // Si el evento tiene actividades
 
-            case $valueOP == 'sub':
+            //aqui validamos que las acts esten bien
+            // Validar si hay actividades seleccionadas minimo 1 y maximo 3
+            // Llamar al método de validación para validar las actividades seleccionadas
+            $validation = $this->validateActivities($request, $id);
 
-                $birthdate = $user->birthdate; // Suponiendo que 'birthdate' es una fecha válida en formato 'YYYY-MM-DD'
-                $currentYear = Carbon::now()->year; // Obtén el año actual
-                // Obtener el año de nacimiento
-                $birthYear = Carbon::parse($birthdate)->year;
-                
-                // Calcular la edad que el usuario va a tener o tiene en el año vigente
-                $ageThisYear = $currentYear - $birthYear;            
-                
-                // Parte del nombre del sub que quieres comparar
-                $subName = $ageThisYear; 
+            if (!$validation) { // Si las actividades NO son validas es porque el usuario cambio algun valor de la act,gender,sub
+                return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
+            }else{
 
-                return $subName;
+                // Obtener el género y la sub del usuario
+            $userGender = $this->getUserData('gender'); // Método que obtiene el género del usuario ('M' o 'F')
+            $subName = $this->getUserData('sub'); // Método que obtiene la sub del usuario
+
+            // Inserción en la tabla intermedia para la inscripción
+            $user = auth()->user();
+            $eventUser = EventUser::create([
+                'user_id' => $user->id,
+                'event_id' => $decryptedId,
+            ]);
+
+            // Recorrer las actividades seleccionadas y desencriptarlas
+            foreach ($request->input('activities') as $encryptedActivityId => $genders) {
+                foreach ($genders as $encryptedGender => $subIds) {
+                    foreach ($subIds as $encryptedSubId => $value) {
+                        if ($value == 'on') { // Verificar si el checkbox fue marcado
+                            try {
+                                // Desencriptar los valores
+                                $activityId = Crypt::decrypt($encryptedActivityId);
+                                $gender = Crypt::decrypt($encryptedGender);
+                                $subId = Crypt::decrypt($encryptedSubId);
+
+                                // Insertar en la tabla 'activity_event_users'
+                                ActivityEventUser::create([
+                                    'event_user_id' => $eventUser->id,
+                                    'activity_id' => $activityId,
+                                    'gender' => $gender, // Inserta el género
+                                    'sub_id' => $subId,  // Inserta el sub_id
+                                ]);
+
+                            } catch (DecryptException $e) {
+                                // Error en la desencriptación
+                                return redirect()->back()->withErrors(['error' => 'Uno o más valores seleccionados son inválidos.']);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return 'Registro realizado exitosamente.';
+            }
+
+            
+        } else {
+            // El evento no tiene actividades, solo inscribirse
+            $user = auth()->user();
+            $eventUser = EventUser::create([
+                'user_id' => $user->id,
+                'event_id' => $decryptedId,
+            ]);
+            return 'Registro realizado exitosamente.';
         }
-    
     }
 
-    //metodo para validar que un usuario no esta inscrito a un evento
-    public function validateEventUser($id){
+
+    // Método para obtener datos del usuario
+    public function getUserData($valueOP)
+    {
+        $user = auth()->user();
+        switch ($valueOP) {
+            case 'gender':
+                return $user->gender;
+
+            case 'sub':
+                $birthdate = $user->birthdate;
+                $currentYear = Carbon::now()->year;
+                $birthYear = Carbon::parse($birthdate)->year;
+                $ageThisYear = $currentYear - $birthYear;
+                return $ageThisYear;
+        }
+    }
+
+    // Método para validar que un usuario no está inscrito a un evento
+    public function validateEventUser($id)
+    {
+        try {
+            // Desencriptar el event_id
+            $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            throw ValidationException::withMessages([
+                'event' => 'Error en el evento',
+            ]);
+        }
         $decryptedId = decrypt($id);
         $user = auth()->user();
-        $eventUser = EventUser::where('user_id', $user->id)->where('event_id',$decryptedId)->first();
-        if($eventUser){
-            return true;//encontró un registro del usuario
-        }else{
-            return false;//NO encontró un registro del usuario
-        }
+        $eventUser = EventUser::where('user_id', $user->id)->where('event_id', $decryptedId)->first();
+        return $eventUser ? true : false;
     }
 
-    //metodo para validar la capacidad del evento
-    public function validateCapacity($id){
+    // Método para validar la capacidad del evento
+    public function validateCapacity($id)
+    {
         $decryptedId = decrypt($id);
         $event = Event::find($decryptedId);
         $limitedCapacity = $event->is_limited_capacity;
 
-        if($limitedCapacity){//si es de capacidad limitada
+        if ($limitedCapacity) {
             $capacity = $event->capacity;
             $users = EventUser::where('event_id', $decryptedId)->count();
-            if($users < $capacity){
-                return 'withcapacity';//hay capacidad
-            }else{
-                return 'withoutcapacity';//NO hay capacidad
-            }    
-        }else{
+            if ($users < $capacity) {
+                return 'withcapacity';
+            } else {
+                return 'withoutcapacity';
+            }
+        } else {
             return 'withoutlimit';
         }
-        
-    }    
-    
-    public function validateRegistrationDeadLine($id){
+    }
+
+    // Método para validar la fecha límite de inscripción
+    public function validateRegistrationDeadLine($id)
+    {
         $decryptedId = decrypt($id);
         $event = Event::find($decryptedId);
         $registrationDeadline = $event->registration_deadline;
-            // Comparar la fecha límite de registro con la fecha actual
+
         if (Carbon::parse($registrationDeadline)->isPast()) {
-            // Si la fecha límite ha pasado, devolver un mensaje de error
-            return true;//la fecha ya ha pasado
+            return true;
         }
-    }
-    
-    //metodo el cual inscribe al usuario en el evento aqui se inscribe si es con acts o sin acts
-    public function inscription($id,$selectedActivities){//id del evento,y actividades
-
-        $decryptedId = decrypt($id);
-            
-        // Buscar el evento
-        $event = Event::findOrFail($decryptedId);
-
-        if($event->activities == 1){//si el evento tiene acts entonces se hace toda la validacion
-            if($selectedActivities == null){
-                return redirect()->back()->withErrors(['error' => 'Necesitas seleccionar una actividad mínimo']);
-            }
-            if (count($selectedActivities) > 3) {
-                return redirect()->back()->withErrors(['error' => 'Solo puedes seleccionar 3 actividades como máximo']);
-            }
-            /* 
-                buscar si las acts del user estan el la db pero que sean las correctas
-                hacer comparacion de id_event,id_act,gender,sub usar likes
-                Desencriptar el id del evento
-                Obtener el género del usuario 
-            */
-            $userGender = $this->getUserData('gender');
-
-            // Obtener el sub del usuario (como parte del nombre)
-            $subName = $this->getUserData('sub');
-
-            // Consulta para validar que todas las actividades seleccionadas existen y cumplen con los criterios
-            $validActivities = ActivityEvent::where('event_id', $decryptedId)
-                ->whereIn('activity_id', $selectedActivities) // Verificar que las actividades seleccionadas existan
-                ->where('gender', $userGender) // Verificar que coincidan con el género del usuario
-                ->whereHas('sub', function ($query) use ($subName) {
-                    $query->where('name', 'LIKE', "%$subName%"); // Verificar que el sub contenga el valor de subName
-                })
-                ->count(); // Contar cuántas actividades cumplen con los criterios
-
-            // Verificar si la cantidad de actividades válidas coincide con la cantidad de actividades seleccionadas
-            if ($validActivities != count($selectedActivities)) {
-                // Redireccionar con mensaje de error si alguna actividad no existe o no cumple los criterios
-                return redirect()->back()->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas para este usuario.']);
-            }
-            //incersion en la tabla intermedia
-            $user = auth()->user();
-            $eventUser = EventUser::create([
-                'user_id' => $user->id,
-                'event_id' => $decryptedId,
-            ]);
-            
-            //incersion de las act en la tabla de ActivityEventUser
-            // Bucle para insertar cada actividad en 'activity_event_users'
-            foreach ($selectedActivities as $activityId) {
-                // Crear el registro en la tabla 'activity_event_users'
-                ActivityEventUser::create([
-                    'event_user_id' => $eventUser->id,  // El ID del registro en 'event_user'
-                    'activity_id'   => $activityId,     // El ID de la actividad
-                ]);
-            }
-            //return redirect()->route('home')->with('success', 'Registro exitoso');
-            return 'Registro realizado exitosamente.';
-        }else{
-            //el evento no tiene actividades entonces solo se inscribe
-            //incersion en la tabla intermedia
-            $user = auth()->user();
-            $eventUser = EventUser::create([
-                'user_id' => $user->id,
-                'event_id' => $decryptedId,
-            ]);
-            return 'Registro realizado exitosamente.';
-            //return redirect()->route('home')->with('success', 'Registro exitoso');
-        }
-    }
-
-    public function showEvent($id){
-            // Desencriptar el ID del evento
-            $decryptedId = decrypt($id);
-            // Buscar el evento con sus actividades y sus relaciones en activity_events
-            $event = Event::findOrFail($decryptedId);
-            // Buscar el evento con sus relaciones (lugares en este caso)
-            $event1 = Event::with('places')->findOrFail($decryptedId);
-            // Obtener los lugares relacionados al evento
-            $places = $event1->places;
-            // Obtener todas las actividades del evento con sus géneros y subs correspondientes
-            $activities = ActivityEvent::where('event_id', $event->id)->with(['activity', 'sub'])->get();// Cargar la actividad y la sub
-            // Buscar el evento junto con sus imágenes
-            $eventIMG = Event::with('images')->findOrFail($decryptedId);
-
-            // Ordenar las imágenes según el valor del campo 'type'
-            $orderedImages = $eventIMG->images->sortBy(function ($image) {
-                switch ($image->type) {
-                    case 'cover':
-                        return 1;
-                    case 'kit':
-                        return 2;
-                    case 'content':
-                        return 3;
-                    default:
-                        return 4; // Si hubiera algún otro valor, lo ponemos al final
-                }
-            });
-
-            return view('user-event.show', compact('event', 'activities','places','orderedImages'));
+        return false;
     }
 
 }
