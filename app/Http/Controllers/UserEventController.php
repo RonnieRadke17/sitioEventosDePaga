@@ -347,7 +347,7 @@ class UserEventController extends Controller
                 // Validar capacidad
                 $capacityValidation = $this->validateCapacity($id);
                 if ($capacityValidation == 'withoutlimit' || $capacityValidation == 'withcapacity') {
-                    $message = $this->inscription($id, $selectedActivities);
+                    $message = $this->inscription($request,$id);
                     return redirect()->route('home')->with('success', $message);
                 } else if ($capacityValidation == 'withoutcapacity') {
                     return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
@@ -359,7 +359,7 @@ class UserEventController extends Controller
     }
 
     // Método para inscripción (con actividades o sin actividades)
-    public function inscription($id, $selectedActivities)
+    /* public function inscription($id, $selectedActivities)
     {
         $decryptedId = decrypt($id);
         $event = Event::findOrFail($decryptedId);
@@ -414,7 +414,66 @@ class UserEventController extends Controller
             ]);
             return 'Registro realizado exitosamente.';
         }
+    } */
+
+    public function inscription(Request $request, $id)
+    {
+        $decryptedId = decrypt($id);
+        $event = Event::findOrFail($decryptedId);
+
+        if ($event->activities == 1) { // Si el evento tiene actividades
+
+            // Obtener el género y la sub del usuario
+            $userGender = $this->getUserData('gender'); // Método que obtiene el género del usuario ('M' o 'F')
+            $subName = $this->getUserData('sub'); // Método que obtiene la sub del usuario
+
+            // Inserción en la tabla intermedia para la inscripción
+            $user = auth()->user();
+            $eventUser = EventUser::create([
+                'user_id' => $user->id,
+                'event_id' => $decryptedId,
+            ]);
+
+            // Recorrer las actividades seleccionadas y desencriptarlas
+            foreach ($request->input('activities') as $encryptedActivityId => $genders) {
+                foreach ($genders as $encryptedGender => $subIds) {
+                    foreach ($subIds as $encryptedSubId => $value) {
+                        if ($value == 'on') { // Verificar si el checkbox fue marcado
+                            try {
+                                // Desencriptar los valores
+                                $activityId = Crypt::decrypt($encryptedActivityId);
+                                $gender = Crypt::decrypt($encryptedGender);
+                                $subId = Crypt::decrypt($encryptedSubId);
+
+                                // Insertar en la tabla 'activity_event_users'
+                                ActivityEventUser::create([
+                                    'event_user_id' => $eventUser->id,
+                                    'activity_id' => $activityId,
+                                    'gender' => $gender, // Inserta el género
+                                    'sub_id' => $subId,  // Inserta el sub_id
+                                ]);
+
+                            } catch (DecryptException $e) {
+                                // Error en la desencriptación
+                                return redirect()->back()->withErrors(['error' => 'Uno o más valores seleccionados son inválidos.']);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return 'Registro realizado exitosamente.';
+        } else {
+            // El evento no tiene actividades, solo inscribirse
+            $user = auth()->user();
+            $eventUser = EventUser::create([
+                'user_id' => $user->id,
+                'event_id' => $decryptedId,
+            ]);
+            return 'Registro realizado exitosamente.';
+        }
     }
+
 
     // Método para obtener datos del usuario
     public function getUserData($valueOP)

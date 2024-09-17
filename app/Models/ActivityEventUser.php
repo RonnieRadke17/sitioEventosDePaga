@@ -13,6 +13,8 @@ class ActivityEventUser extends Model
     protected $fillable = [
         'event_user_id',
         'activity_id',
+        'gender',
+        'sub_id',
     ];
 
      /**
