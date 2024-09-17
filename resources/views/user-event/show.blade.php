@@ -8,6 +8,17 @@
         {{ $errors->first('error') }}
     </div>
 @endif
+@if ($errors->has('activities'))
+    <div class="alert alert-danger">
+        {{ $errors->first('activities') }}
+    </div>
+@endif
+@if ($errors->has('event'))
+    <div class="alert alert-danger">
+        {{ $errors->first('event') }}
+    </div>
+@endif
+
 
 <div class="bg-white">
       <!-- Product info -->

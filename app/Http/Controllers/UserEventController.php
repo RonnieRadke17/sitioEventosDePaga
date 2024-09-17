@@ -269,17 +269,21 @@ class UserEventController extends Controller
         } catch (DecryptException $e) {
             // Error en la desencriptación
             throw ValidationException::withMessages([
-                'event' => 'Uno o más valores seleccionados son inválidos.',
+                'event' => 'Error en el evento',
             ]);
         }
         $event = Event::findOrFail($decryptedId);
         $result = true;
 
         // Validar que al menos una actividad ha sido seleccionada
+        // Validar que al menos una actividad ha sido seleccionada y que no excede el máximo permitido
         $request->validate([
-            'activities' => 'required|array',
+            'activities' => 'required|array|max:3', //maximo 3
+        ], [
+            'activities.required' => 'Debes seleccionar al menos una actividad.',
+            'activities.max' => 'No puedes seleccionar más de 3 actividades.',
         ]);
-
+            
         // Recorrer el array de actividades seleccionadas
         foreach ($request->input('activities') as $encryptedActivityId => $genders) {
             foreach ($genders as $encryptedGender => $subIds) {
@@ -305,7 +309,7 @@ class UserEventController extends Controller
                         } catch (DecryptException $e) {
                             // Error en la desencriptación
                             throw ValidationException::withMessages([
-                                'activities' => 'Uno o más valores seleccionados son inválidos.',
+                                'activities' => 'Error en las actividades.',
                             ]);
                         }
                     }
@@ -322,20 +326,11 @@ class UserEventController extends Controller
     {
         if (auth()->check()) { // Usuario autenticado
             
-            // Validar si hay actividades seleccionadas
-            if (!$request->has('activities')) {
-                return redirect()->back()->withErrors(['error' => 'Debes seleccionar al menos una actividad.']);
-            }
+            
 
             // Llamar al método de validación para validar las actividades seleccionadas
-            $validation = $this->validateActivities($request, $id);
-
-            if (!$validation) { // Si las actividades NO son validas
-                return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
+            
                 
-                //validamos ahora si el usuario puede participar en las actividades seleccionadas
-            } else {
-                //return redirect()->route('home')->with('success', 'Inscripción exitosa.');
                 if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
                     return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
                 }
@@ -352,7 +347,7 @@ class UserEventController extends Controller
                 } else if ($capacityValidation == 'withoutcapacity') {
                     return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
                 }
-            }
+            
         } else { // Redireccionar si el usuario no está autenticado
             return view('auth/login');
         }
@@ -423,7 +418,18 @@ class UserEventController extends Controller
 
         if ($event->activities == 1) { // Si el evento tiene actividades
 
-            // Obtener el género y la sub del usuario
+            //aqui validamos que las acts esten bien
+            // Validar si hay actividades seleccionadas minimo 1 y maximo 3
+            // Llamar al método de validación para validar las actividades seleccionadas
+            $validation = $this->validateActivities($request, $id);
+
+            if (!$validation) { // Si las actividades NO son validas
+                return redirect()->route('home')->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
+                
+                //validamos ahora si el usuario puede participar en las actividades seleccionadas
+            }else{
+
+                // Obtener el género y la sub del usuario
             $userGender = $this->getUserData('gender'); // Método que obtiene el género del usuario ('M' o 'F')
             $subName = $this->getUserData('sub'); // Método que obtiene la sub del usuario
 
@@ -463,6 +469,9 @@ class UserEventController extends Controller
             }
 
             return 'Registro realizado exitosamente.';
+            }
+
+            
         } else {
             // El evento no tiene actividades, solo inscribirse
             $user = auth()->user();
@@ -495,6 +504,16 @@ class UserEventController extends Controller
     // Método para validar que un usuario no está inscrito a un evento
     public function validateEventUser($id)
     {
+        try {
+            // Desencriptar el event_id
+            $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            throw ValidationException::withMessages([
+                'event' => 'Error en el evento',
+            ]);
+        }
         $decryptedId = decrypt($id);
         $user = auth()->user();
         $eventUser = EventUser::where('user_id', $user->id)->where('event_id', $decryptedId)->first();
