@@ -111,7 +111,7 @@
                       @foreach($activities as $activityEvent)
                           <li>
                               <label>
-                                <input type="checkbox" name="activities[{{ encrypt($activityEvent->activity->id) }}][{{ $activityEvent->gender }}][{{ encrypt($activityEvent->sub_id) }}]">
+                                <input type="checkbox" name="activities[{{ encrypt($activityEvent->activity->id) }}][{{ encrypt($activityEvent->gender) }}][{{ encrypt($activityEvent->sub_id) }}]">
                                   <label>{{ $activityEvent->activity->name }} </label>
                                   @if ($activityEvent->gender === 'Mix')
                                       Mix
