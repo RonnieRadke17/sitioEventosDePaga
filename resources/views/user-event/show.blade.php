@@ -1,8 +1,6 @@
 @extends('layouts.app')
 @section('title','Evento')
 @section('content')
-{{-- falta poner la ubicacion las imgs del evento en un carrusel, las actividades y las tallas disponibles del kit--}}
-<!-- Mostrar errores de validación -->
 @if ($errors->has('error'))
     <div class="alert alert-danger">
         {{ $errors->first('error') }}
@@ -18,8 +16,6 @@
         {{ $errors->first('event') }}
     </div>
 @endif
-
-
 <div class="bg-white">
       <!-- Product info -->
       <div class="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
@@ -82,16 +78,20 @@
           <p class="text-3xl tracking-tight text-gray-900">
             {{ $event->price ? '$' . $event->price : 'Gratis' }}
           </p>
-            @if($event->price)
-                <!-- Si el precio no es nulo, mostrar este formulario -->
-                @if($activities->isNotEmpty())
+          @if($event->price)
+            <form class="mt-10" method="POST" action="{{ route('events.confirmPayment', encrypt($event->id)) }}">
+              @csrf         
+              @if($activities->isNotEmpty())
                   <h3>Actividades del Evento</h3>
                   <ul>
                       @foreach($activities as $activityEvent)
                           <li>
                               <label>
-                                  <input type="checkbox" name="activities[]" value="{{ $activityEvent->activity->id }}">
-                                  {{ $activityEvent->activity->name }}
+                                <input type="checkbox" name="activities[{{ encrypt($activityEvent->activity->id) }}][{{ encrypt($activityEvent->gender) }}][{{ encrypt($activityEvent->sub_id) }}]">
+                                  <label>{{ $activityEvent->activity->name }} </label>
+                                  @if ($activityEvent->gender === 'Mix')
+                                      Mix
+                                  @endif
                               </label>
                           </li>
                       @endforeach
@@ -99,20 +99,9 @@
               @else
                   <p>No hay actividades disponibles para este evento.</p>
               @endif
-
-              <form class="mt-10">
                   <p class="text-base tracking-tight text-gray-900">Seleccione un metodo de pago</p>
                   <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Comprar</button>
-              </form>
-
-              <form action="{{ route('paypal') }}" method="post">
-                  @csrf
-                  <input type="hidden" name="price" value="{{$event->price}}">
-                  <input type="hidden" name="product_name" value="{{$event->name}}">
-                  <input type="hidden" name="quantity" value="1">
-                  <input type="hidden" name="event" value="{{$event->id}}">
-                  <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with PayPal</button>
-              </form>
+            </form>
           @else
             <form class="mt-10" method="POST" action="{{ route('events.inscriptionFree', encrypt($event->id)) }}">
               @csrf         
@@ -157,15 +146,15 @@
 
 
 @if($orderedImages->isNotEmpty())
-<!-- Bucle para mostrar las imágenes en el orden 'cover', 'kit', 'content' -->
-<div >
-    @foreach($orderedImages as $image)
-        <img  src="{{ asset('storage/' . $image->image) }}" alt="Event Image">
-    @endforeach
-</div>
-@else
-<!-- Imagen por defecto si no tiene imágenes -->
-<img class="w-full h-48 object-cover" src="{{ asset('storage/default.jpg') }}" alt="Default Image">
+  <!-- Bucle para mostrar las imágenes en el orden 'cover', 'kit', 'content' -->
+  <div >
+      @foreach($orderedImages as $image)
+          <img  src="{{ asset('storage/' . $image->image) }}" alt="Event Image">
+      @endforeach
+  </div>
+  @else
+  <!-- Imagen por defecto si no tiene imágenes -->
+  <img class="w-full h-48 object-cover" src="{{ asset('storage/default.jpg') }}" alt="Default Image">
 @endif
 
 

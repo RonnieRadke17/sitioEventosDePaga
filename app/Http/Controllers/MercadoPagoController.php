@@ -32,7 +32,7 @@ class MercadoPagoController extends Controller
             )
         )
         ]);
-        //tio austria dijo que mandar un array de los ids de las actividades que se registra y de todas maneras mostrarlas
+        // austria dijo que mandar un array de los ids de las actividades que se registra y de todas maneras mostrarlas
         //consiliaciopn cuando genero la orden de pago catalog de ordenes de pago
         //falta redireccionar a la pagina principal o una pagina de evento pagado con exito
         //y hacer la incersion de la informacion a la base de datos del pago y de lo que se pago

@@ -25,6 +25,7 @@ use App\Http\Middleware\RoleMiddleware;
 Route::get('/', [UserEventController::class, 'index'])->name('home');//ruta que muestra la pagina principal
 Route::get('/events/{id}', [UserEventController::class, 'show'])->name('eventDetails.show');
 Route::post('/inscription-free/{id}', [UserEventController::class, 'inscriptionFree'])->name('events.inscriptionFree');
+Route::post('/confirmPayment/{id}', [UserEventController::class, 'confirmPayment'])->name('events.confirmPayment');
 
 //restablecimiento de contrasena
 Route::controller(ResetPasswordController::class)->group(function () {
