@@ -93,13 +93,13 @@
         <!-- Campo para el nombre del titular de la tarjeta -->
         <div class="form-group">
             <label for="cardholder-name">Nombre del titular de la tarjeta</label>
-            <input type="text" id="cardholder-name" name="cardholder-name" placeholder="Nombre del titular" required>
+            <input type="text" id="cardholdername" name="name" placeholder="Nombre del titular" required>
         </div>
 
         <!-- Campo para el correo electrónico -->
         <div class="form-group">
-            <label for="payer-email">Correo electrónico</label>
-            <input type="email" id="payer-email" name="payer-email" placeholder="Correo electrónico" required>
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="payer-email" name="email" placeholder="Correo electrónico" required>
         </div>
 
         <!-- Elemento para mostrar el campo de la tarjeta -->

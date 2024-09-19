@@ -40,8 +40,8 @@ class StripeController extends Controller
                 'quantity' => 1,
                 'amount' => $event->price,
                 'currency' => 'mxn',
-                'payer_name' => $request->cardholder-name,//cambiar por el valor del request de la vista de stripe
-                'payer_email' => $request->payer-email,//cambiar por el valor del request de la vista de stripe
+                'payer_name' => $request->name,
+                'payer_email' => $request->email,
                 'payment_status' => 'COMPLETED',
                 'payment_method' => 'Stripe',
                 
