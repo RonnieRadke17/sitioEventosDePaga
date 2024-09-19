@@ -41,4 +41,9 @@ return [
         'token' => env('MP_ACCESS_TOKEN'),
     ],
 
+    'stripe' => [
+    'secret' => env('STRIPE_SECRET'),
+    ],
+
+
 ];

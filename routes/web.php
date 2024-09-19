@@ -15,6 +15,16 @@ use App\Http\Controllers\MercadoPagoController;
 
 use App\Http\Middleware\RoleMiddleware;
 
+
+use App\Http\Controllers\StripeController;
+
+Route::get('/pago', function () {
+    return view('stripe');
+})->name('stripe.form');
+
+Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');
+
+
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
  Route::get('payment', function () {//ventana que muestra paypal

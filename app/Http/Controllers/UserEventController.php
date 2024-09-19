@@ -562,7 +562,9 @@ class UserEventController extends Controller
         }
 
          // Almacena los datos en la sesión
+
     $request->session()->put('activities', $activities);
+    
 
         return view('user-event/buy', compact('event','places','orderedImages'));
 

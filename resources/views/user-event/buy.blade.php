@@ -1,5 +1,12 @@
 @extends('layouts.app')
 @section('content')
+@if (session('success'))
+    <p style="color: green;">{{ session('success') }}</p>
+@endif
+
+@if (session('error'))
+    <p style="color: red;">{{ session('error') }}</p>
+@endif
 
 @if($orderedImages->isNotEmpty())
 <div >
@@ -20,12 +27,14 @@
     </div>
 </div>
 
-    ventana donde muestra las actividades seleccionadas y botones de pago
     <form action="{{ route('paypal') }}" method="post">
         @csrf
         <input type="hidden" name="event" value="{{encrypt($event->id)}}"> 
         <button type="submit" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pay with PayPal</button>
     </form>
+
+    <a href="{{ route('stripe.form',encrypt($event->id)) }}" class="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Pago con Tarjeta</a>
+    
 
 @endsection
 
