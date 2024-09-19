@@ -33,7 +33,7 @@ class StripeController extends Controller
              $payment = Payment::create([
                 'payment_id' => $charge->id,
                 'user_id' => 1,//cambiar
-                'event_id' => session()->get('id_events'),//cambiar
+                'event_id' => session()->get('id'),//cambiar
                 'product_name' => 1,//cambiar
                 'quantity' => 1,
                 'amount' => 'costo por 1000',
@@ -49,10 +49,10 @@ class StripeController extends Controller
              //insert into userEvent donde va el idUser y idEvent como a su vez los id de las actividades
              $eventUser = EventUser::create([
                 'user_id' => auth()->id(),
-                'event_id' => session()->get('id_events'),
+                'event_id' => session()->get('id'),
             ]);
             
-            $event = Event::find(session()->get('id_events'));
+            $event = Event::find(session()->get('id'));
 
             if($event->activities == 1){
                 // Recupera los datos de la sesión
@@ -85,9 +85,11 @@ class StripeController extends Controller
                     }
                 }
             } 
+            //elimina los valores extraidos
+            session()->forget('activities');
+            session()->forget('id');
 
-
-            return back()->with('success', 'Pago realizado correctamente');
+            return redirect()->route('home')->with('success','Pago realizado correctamente');
         } catch (Exception $e) {
             return back()->with('error', 'Error al procesar el pago: ' . $e->getMessage());
         }

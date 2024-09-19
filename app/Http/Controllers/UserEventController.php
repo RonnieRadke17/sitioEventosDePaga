@@ -98,6 +98,8 @@ class UserEventController extends Controller
 
     public function show($id)
     {
+        session()->forget('activities');
+        session()->forget('id');
         try {
             // Desencriptar el event_id
             $decryptedId = decrypt($id);
@@ -564,6 +566,7 @@ class UserEventController extends Controller
          // Almacena los datos en la sesión
 
     $request->session()->put('activities', $activities);
+    session()->put('id', $decryptedId);
     
 
         return view('user-event/buy', compact('event','places','orderedImages'));
