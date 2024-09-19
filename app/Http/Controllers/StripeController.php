@@ -19,11 +19,12 @@ class StripeController extends Controller
         try {
             // Configura la clave secreta de Stripe
             Stripe::setApiKey(env('STRIPE_SECRET'));
+            $event = Event::find(session()->get('id'));
 
             // Crear el cargo
             //nota multiplicar el monto del producto por 100 porque se tiene que mandar en centavos :)
             $charge = Charge::create([
-                'amount' => 1000, // El monto debe ser en centavos (10 USD = 1000 centavos)
+                'amount' => $event->price * 1000, // El monto debe ser en centavos (10 USD = 1000 centavos)
                 'currency' => 'mxn',
                 'source' => $request->stripeToken,
                 'description' => 'Pago único con Stripe',
@@ -34,12 +35,12 @@ class StripeController extends Controller
                 'payment_id' => $charge->id,
                 'user_id' => 1,//cambiar
                 'event_id' => session()->get('id'),//cambiar
-                'product_name' => 1,//cambiar
+                'product_name' => $event->name,//cambiar
                 'quantity' => 1,
-                'amount' => 'costo por 1000',
+                'amount' => $event->price,
                 'currency' => 'mxn',
-                'payer_name' => 'hola',
-                'payer_email' => 'hola',
+                'payer_name' => 'hola',//cambiar
+                'payer_email' => 'hola',//cambiar
                 'payment_status' => 'COMPLETED',
                 'payment_method' => 'Stripe',
                 
@@ -52,7 +53,7 @@ class StripeController extends Controller
                 'event_id' => session()->get('id'),
             ]);
             
-            $event = Event::find(session()->get('id'));
+            //$event = Event::find(session()->get('id'));
 
             if($event->activities == 1){
                 // Recupera los datos de la sesión
