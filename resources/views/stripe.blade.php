@@ -1,120 +1,86 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stripe Payment</title>
-    <script src="https://js.stripe.com/v3/"></script> <!-- Cargar Stripe.js -->
+@extends('layouts.app')
+
+@section('title', 'Pago con Stripe')
+
+@section('head')
+    <!-- Cargar Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script> 
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Estilos básicos de ejemplo para personalizar el formulario */
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input,
+        /* Estilos personalizados para mejorar la experiencia de usuario */
         .StripeElement {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .StripeElement {
+            background-color: #f8f9fa;
             padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            transition: border-color 0.2s ease-in-out;
         }
 
-        #card-element {
-            margin-bottom: 20px;
+        .StripeElement:focus {
+            border-color: #6366f1;
         }
 
         #payment-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            background-color: #6366f1;
+            transition: background-color 0.2s ease-in-out;
         }
 
         #payment-button:hover {
-            background-color: #45a049;
+            background-color: #4f46e5;
         }
 
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
-
-        .alert-success {
-            color: #155724;
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-        }
-
-        .alert-danger {
-            color: #721c24;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+        /* Mejorar el espaciado general */
+        .form-group {
+            margin-bottom: 1.5rem; /* Incrementar el margen inferior para más espacio */
         }
     </style>
-</head>
-<body>
+@endsection
 
-<div class="container">
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+@section('content')
+<div class="container mx-auto py-12 flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
+        
 
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    <form id="payment-form" action="{{ route('stripe.payment') }}" method="POST">
-        @csrf
-        <!-- Campo para el nombre del titular de la tarjeta -->
-        <div class="form-group">
-            <label for="cardholder-name">Nombre del titular de la tarjeta</label>
-            <input type="text" id="cardholdername" name="name" placeholder="Nombre del titular" required>
-        </div>
-
-        <!-- Campo para el correo electrónico -->
-        <div class="form-group">
-            <label for="email">Correo electrónico</label>
-            <input type="email" id="payer-email" name="email" placeholder="Correo electrónico" required>
-        </div>
-
-        <!-- Elemento para mostrar el campo de la tarjeta -->
-        <div class="form-group">
-            <label for="card-element">Detalles de la tarjeta</label>
-            <div id="card-element" class="StripeElement">
-                <!-- Stripe Elements se insertará aquí -->
+        @if (session('error'))
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                {{ session('error') }}
             </div>
-        </div>
+        @endif
 
-        <!-- Errores del elemento de tarjeta -->
-        <div id="card-errors" role="alert"></div>
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Realiza tu pago</h2>
+        
+        <form id="payment-form" action="{{ route('stripe.payment') }}" method="POST" class="space-y-6">
+            @csrf
+            <!-- Campo para el nombre del titular de la tarjeta -->
+            <div class="form-group">
+                <label for="cardholder-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del titular de la tarjeta</label>
+                <input type="text" id="cardholdername" name="name" placeholder="Nombre del titular" required
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
 
-        <button type="submit" id="payment-button">Pagar</button>
-    </form>
+            <!-- Campo para el correo electrónico -->
+            <div class="form-group">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+                <input type="email" id="payer-email" name="email" placeholder="Correo electrónico" required
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Elemento para mostrar el campo de la tarjeta -->
+            <div class="form-group">
+                <label for="card-element" class="block text-sm font-medium text-gray-700 mb-1">Detalles de la tarjeta</label>
+                <div id="card-element" class="StripeElement mt-1 block w-full p-3"></div>
+            </div>
+
+            <!-- Errores del elemento de tarjeta -->
+            <div id="card-errors" role="alert" class="text-red-600 text-sm mt-2"></div>
+
+            <button type="submit" id="payment-button"
+                class="w-full py-4 px-4 border border-transparent rounded-md shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Pagar
+            </button>
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -185,5 +151,6 @@
     }
 </script>
 
-</body>
-</html>
+
+
+@endsection

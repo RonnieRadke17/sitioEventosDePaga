@@ -7,11 +7,7 @@
     </div>
 @endif
 
-@if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+
 
 
 <div class="container bg-gray-100 p-10">
