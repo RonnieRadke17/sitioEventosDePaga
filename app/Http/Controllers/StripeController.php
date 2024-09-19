@@ -33,14 +33,15 @@ class StripeController extends Controller
             //incercion en payments,EventUser,ActivitYEventUser
              $payment = Payment::create([
                 'payment_id' => $charge->id,
-                'user_id' => 1,//cambiar
-                'event_id' => session()->get('id'),//cambiar
-                'product_name' => $event->name,//cambiar
+                //'user_id' => 1,//cambiar
+                'user_id' =>auth()->id(), //cambiar
+                'event_id' => session()->get('id'),
+                'product_name' => $event->name,
                 'quantity' => 1,
                 'amount' => $event->price,
                 'currency' => 'mxn',
-                'payer_name' => 'hola',//cambiar
-                'payer_email' => 'hola',//cambiar
+                'payer_name' => $request->cardholder-name,//cambiar por el valor del request de la vista de stripe
+                'payer_email' => $request->payer-email,//cambiar por el valor del request de la vista de stripe
                 'payment_status' => 'COMPLETED',
                 'payment_method' => 'Stripe',
                 
