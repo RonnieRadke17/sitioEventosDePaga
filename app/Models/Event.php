@@ -38,10 +38,20 @@ class Event extends Model
     }
 
     //relacion de inscripcion del usuario a un evento es decir relacion con la tabla EventUser
-    public function users()
+   /*  public function users()
     {
         return $this->belongsToMany(User::class);
-    }
+    } */
+   /*  public function users()
+{
+    return $this->belongsToMany(User::class, 'user_events')->withTimestamps();
+} */
+// En el modelo Event.php
+public function users()
+{
+    return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
+                ->withTimestamps(); // Agrega withTimestamps si quieres que los timestamps de la tabla pivote estén disponibles
+}
 
 
     /* public function place()

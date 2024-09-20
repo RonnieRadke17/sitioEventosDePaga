@@ -30,7 +30,13 @@
 </div>
 
 
-    
+<a href="{{ route('event.index') }}" class="btn btn-primary rounded-circle position-fixed" style="bottom: 20px; left: 20px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;">
+    <i class="fas fa-pencil-alt"></i>
+</a>
+
+<!-- Incluir Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
     
 

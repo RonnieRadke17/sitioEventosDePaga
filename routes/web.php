@@ -12,6 +12,7 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\MercadoPagoController;
+use App\Http\Controllers\AdminEventController;
 
 use App\Http\Middleware\RoleMiddleware;
 
@@ -92,3 +93,27 @@ Route::get('/create-preference', [MercadoPagoController::class, 'generatePrefere
 Route::post('paypal', [PaypalController::class, 'paypal'])->name('paypal');
 Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
+
+
+
+
+//User Event
+// Ruta para ver los eventos en los que el usuario está registrado
+Route::get('/UserEvent', [UserEventController::class, 'userRegisteredEvents'])->name('user.events');
+// Ruta para mostrar los detalles de un evento registrado
+Route::get('/UserEvent/{id}', [UserEventController::class, 'show'])->name('user-event.show');
+
+
+//AdminEvent
+Route::get('/registrations', [AdminEventController::class, 'viewRegistrations'])->name('registrations');
+// Ruta para mostrar todos los usuarios registrados (solo para el rol Admin)
+// Ver todos los usuarios
+Route::get('/users', [AdminEventController::class, 'viewAllUsers'])->name('admin.users.index');
+// Suspender o reactivar un usuario
+Route::patch('/users/{user}/suspend', [AdminEventController::class, 'suspendUser'])->name('admin.users.suspend');
+// Mostrar el formulario para editar un usuario
+Route::get('/users/{user}/edit', [AdminEventController::class, 'editUser'])->name('admin.users.edit');
+// Actualizar un usuario (ruta corregida para usar PATCH en lugar de POST)
+Route::patch('/users/{user}', [AdminEventController::class, 'updateUser'])->name('admin.users.update');
+// Eliminar un usuario
+Route::delete('/users/{user}', [AdminEventController::class, 'destroyUser'])->name('admin.users.destroy');

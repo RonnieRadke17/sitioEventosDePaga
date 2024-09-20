@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 @section('title','Registro')
 @section('content')
 
@@ -86,34 +86,47 @@
         @enderror
     </div>
 
-  <!-- Campo de Contraseña con Icono de Ojo -->
-<div class="mb-4 relative">
-    <label for="password" class="block text-gray-800 text-sm font-medium mb-1">Contraseña</label>
-    <input id="password" type="password" name="password" required class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-    <!-- Botón de Icono de Ojo con mejor diseño -->
-    <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 h-full" onclick="togglePassword('password')">
-        <svg class="h-5 w-5 text-gray-500 hover:text-orange-500 transition-colors duration-200" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm0 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zm-3 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" />
-        </svg>
-    </button>
-    @error('password')
-        <span class="text-red-500 text-sm">{{ $message }}</span>
-    @enderror
-</div>
+    <!-- Campo de Contraseña con Icono de Ojo -->
+    <div class="mb-4 relative">
+        <label for="password" class="block text-gray-800 text-sm font-medium mb-1">Contraseña</label>
+        <input id="password" type="password" name="password" required class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+        <!-- Botón de Icono de Ojo con mejor diseño -->
+        <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 h-full" onclick="togglePassword('password')">
+            <svg class="h-5 w-5 text-gray-500 hover:text-orange-500 transition-colors duration-200" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm0 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zm-3 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" />
+            </svg>
+        </button>
+        @error('password')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+        @enderror
+    </div>
 
-<!-- Campo de Confirmar Contraseña con Icono de Ojo -->
-<div class="mb-6 relative">
-    <label for="password_confirmation" class="block text-gray-800 text-sm font-medium mb-1">Confirmar Contraseña</label>
-    <input id="password_confirmation" type="password" name="password_confirmation" required class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-    <!-- Botón de Icono de Ojo con mejor diseño -->
-    <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 h-full" onclick="togglePassword('password_confirmation')">
-        <svg class="h-5 w-5 text-gray-500 hover:text-orange-500 transition-colors duration-200" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm0 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zm-3 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" />
-        </svg>
-    </button>
-</div>
+    <!-- Campo de Confirmar Contraseña con Icono de Ojo -->
+    <div class="mb-6 relative">
+        <label for="password_confirmation" class="block text-gray-800 text-sm font-medium mb-1">Confirmar Contraseña</label>
+        <input id="password_confirmation" type="password" name="password_confirmation" required class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+        <!-- Botón de Icono de Ojo con mejor diseño -->
+        <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 h-full" onclick="togglePassword('password_confirmation')">
+            <svg class="h-5 w-5 text-gray-500 hover:text-orange-500 transition-colors duration-200" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm0 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zm-3 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" />
+            </svg>
+        </button>
+    </div>
 
-
+    <!-- Aceptación de Términos y Condiciones -->
+    <div class="mb-6">
+        <div class="flex items-start">
+            <div class="flex items-center h-5">
+                <input id="terms" name="terms" type="checkbox" class="focus:ring-orange-500 h-4 w-4 text-orange-600 border-gray-300 rounded" required>
+            </div>
+            <div class="ml-3 text-sm">
+                <label for="terms" class="font-medium text-gray-700">Acepto los <a href="#" class="text-orange-600 hover:text-orange-500">términos y condiciones</a>.</label>
+            </div>
+        </div>
+        @error('terms')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+        @enderror
+    </div>
 
     <!-- Botón de Registro -->
     <button type="submit" class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">

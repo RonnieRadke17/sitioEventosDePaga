@@ -24,7 +24,8 @@
                     <div class="mt-4">
                         <a href="{{ route('event.show',encrypt($event->id)) }}" class="text-indigo-600 hover:text-indigo-800">View</a>
                         <a href="{{ route('event.edit',encrypt($event->id)) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
-                    </div>
+                        <a href="{{ route('registrations', ['event_id' => $event->id]) }}" class="mt-4 block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Ver Inscritos</a>
+                    </div> 
                     <form action="{{ route('event.destroy',encrypt($event->id)) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro?');">
                         @csrf
                         @method('DELETE')

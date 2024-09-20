@@ -94,6 +94,25 @@ class UserEventController extends Controller
 
         }
     }
+    
+    public function userRegisteredEvents()
+{
+    // Asegúrate de que el usuario está autenticado
+    if (auth()->check()) {
+        $user = auth()->user(); // Obtener el usuario autenticado
+
+        // Obtener los eventos a los que el usuario está registrado
+        $events = $user->events()->with('images')->get(); // Relación 'events' ya debe estar en el modelo User
+
+        // Devolver la vista 'UserEvent' con los eventos
+        return view('event.UserEvent', compact('events'));
+    } else {
+        // Si el usuario no está autenticado, redirigir al login
+        return redirect()->route('login');
+    }
+} // <- Esta llave cierra la función
+
+
 
 
     public function show($id)
@@ -572,5 +591,8 @@ class UserEventController extends Controller
         return view('user-event/buy', compact('event','places','orderedImages'));
 
     }
+   
+
+    
 
 }
