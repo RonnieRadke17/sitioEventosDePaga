@@ -108,7 +108,7 @@ Route::get('/UserEvent/{id}', [UserEventController::class, 'show'])->name('user-
 Route::get('/registrations', [AdminEventController::class, 'viewRegistrations'])->name('registrations');
 // Ruta para mostrar todos los usuarios registrados (solo para el rol Admin)
 // Ver todos los usuarios
-Route::get('/users', [AdminEventController::class, 'viewAllUsers'])->name('admin.users.index');
+Route::get('/users', [AdminEventController::class, 'viewAllUsers'])->name('admin.users.index')->middleware(RoleMiddleware::class);
 // Suspender o reactivar un usuario
 Route::patch('/users/{user}/suspend', [AdminEventController::class, 'suspendUser'])->name('admin.users.suspend');
 // Mostrar el formulario para editar un usuario

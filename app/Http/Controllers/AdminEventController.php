@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Carbon\Carbon; // Importa Carbon
 
@@ -77,6 +78,26 @@ class AdminEventController extends Controller
         $user->delete();
         return redirect()->route('admin.users.index')->with('mensaje', 'Usuario eliminado.');
     }
+    public function viewRegistrations(Request $request)
+    {
+        // Obtener el ID del evento desde la solicitud
+        $eventId = $request->input('event_id');
 
+        // Verificar si se ha proporcionado un ID de evento
+        if (!$eventId) {
+            return redirect()->back()->with('error', 'No se ha especificado un evento.');
+        }
+
+        // Buscar el evento por su ID
+        $event = Event::findOrFail($eventId);
+
+        // Obtener los usuarios registrados en este evento
+        $registeredUsers = $event->users()->get();
+
+        // Pasar los datos a la vista
+        return view('admin.registrations', compact('event', 'registeredUsers')); // Actualizar aquí la referencia a la vista
+    }
+
+    // Otro
     
 }

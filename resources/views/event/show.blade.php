@@ -12,30 +12,26 @@
                 <p class="text-xl text-blue-700 mt-2">{{ $event->description }}</p>
             </div>
             <!-- Carrusel de Imágenes -->
-            <div id="demo" class="carousel slide rounded-lg shadow-lg overflow-hidden mb-10" data-bs-ride="carousel">
+            <div id="eventCarousel" class="carousel slide rounded-lg shadow-lg overflow-hidden mb-10 max-w-full mx-auto" data-bs-ride="carousel" style="max-width: 600px;">
                 <!-- Indicadores -->
                 <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                    <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                    <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                    @foreach($orderedImages as $index => $image)
+                        <button type="button" data-bs-target="#eventCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}"></button>
+                    @endforeach
                 </div>
                 <!-- Slides -->
                 <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="https://c4.wallpaperflare.com/wallpaper/863/547/576/cristiano-ronaldo-real-madrid-2014-wallpaper-thumb.jpg" class="d-block w-100" alt="Slide 1">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://m.media-amazon.com/images/I/61fcnYK93bL._AC_UF894,1000_QL80_.jpg" class="d-block w-100" alt="Slide 2">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://4kwallpapers.com/images/wallpapers/cristiano-ronaldo-2560x1440-9595.jpg" class="d-block w-100" alt="Slide 3">
-                    </div>
+                    @foreach($orderedImages as $index => $image)
+                        <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                            <img src="{{ asset('storage/' . $image->image) }}" class="d-block w-full h-auto max-h-96 object-cover" alt="Event Image">
+                        </div>
+                    @endforeach
                 </div>
                 <!-- Controles -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon"></span>
                 </button>
             </div>
@@ -147,7 +143,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @if($orderedImages->isNotEmpty())
                     @foreach($orderedImages as $image)
-                        <img class="rounded-lg shadow-lg" src="{{ asset('storage/' . $image->image) }}" alt="Event Image">
+                        <img class="rounded-lg shadow-lg max-h-64 object-cover" src="{{ asset('storage/' . $image->image) }}" alt="Event Image">
                     @endforeach
                 @else
                     <img class="w-full h-48 object-cover rounded-lg shadow-lg" src="{{ asset('storage/default.jpg') }}" alt="Default Image">

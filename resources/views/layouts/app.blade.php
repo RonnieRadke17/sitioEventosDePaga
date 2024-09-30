@@ -11,6 +11,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     <style>
+        /* Estilos para asegurar que el footer se quede en la parte inferior */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Asegura que el contenido ocupe al menos el alto de la pantalla */
+        }
+
+        .content-wrapper {
+            flex: 1; /* Permite que este contenedor se expanda para ocupar el espacio disponible */
+            display: flex;
+            flex-direction: column;
+        }
+
         /* Estilos personalizados para el modal */
         .modal {
             display: none;
@@ -106,27 +119,26 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
-   <!-- Barra de Navegación -->
-<nav class="bg-blue-900 text-white shadow-lg">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-    <!-- Logo y Título con Hipervínculo -->
-    <div class="flex items-center space-x-4">
-        <img class="h-17 w-16" src="{{ asset('images/Novalogo.png') }}" alt="Workflow">
-        <a href="{{ route('home') }}" class="text-xl font-bold text-white hover:text-gray-200">Eventos Deportivos</a>
-    </div>
-
-        
+    <!-- Contenedor principal que asegura que el contenido se ajuste correctamente -->
+    <div class="content-wrapper">
+        <!-- Barra de Navegación -->
+        <nav class="bg-blue-900 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+                <!-- Logo y Título con Hipervínculo -->
+                <div class="flex items-center space-x-4">
+                    <img class="h-17 w-16" src="{{ asset('images/Novalogo.png') }}" alt="Workflow">
+                    <a href="{{ route('home') }}" class="text-xl font-bold text-white hover:text-gray-200">Eventos Deportivos</a>
+                </div>
                 <div class="relative">
                     <!-- Imagen de perfil con ruta actualizada -->
                     @auth
-    <button type="button" class="bg-blue-500 hover:bg-blue-400 flex items-center justify-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white p-1" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-        <span class="sr-only">Open user menu</span>
-        <div class="bg-white rounded-full p-1"> <!-- Contenedor con fondo blanco -->
-            <img class="h-8 w-8 rounded-full" src="{{ asset('images/user.png') }}" alt="">
-        </div>
-    </button>
-@endauth
-
+                        <button type="button" class="bg-blue-500 hover:bg-blue-400 flex items-center justify-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white p-1" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                            <span class="sr-only">Open user menu</span>
+                            <div class="bg-white rounded-full p-1"> <!-- Contenedor con fondo blanco -->
+                                <img class="h-8 w-8 rounded-full" src="{{ asset('images/user.png') }}" alt="">
+                            </div>
+                        </button>
+                    @endauth
                     @guest
                         <div class="flex space-x-4">
                             <a href="{{ route('login') }}" class="bg-white text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
@@ -135,60 +147,65 @@
                     @endguest
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <!-- Menú Lateral -->
-    <div class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-40" id="lateral-menu-overlay"></div>
-    <div class="hidden fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-50" id="lateral-menu">
-        <div class="py-4 px-6">
-            <!-- Sección de Perfil en el Menú Lateral -->
-            <div class="w-full bg-blue-100 p-4 rounded-lg flex flex-col items-center">
-                <!-- Imagen desde resources -->
-                <img class="h-16 w-16 rounded-full" src="{{ asset('/images/user.png') }}" alt="User profile picture">
-                
-                <!-- Mostrar el nombre del usuario autenticado -->
-                <span class="mt-2 font-bold text-blue-900">
+        <!-- Menú Lateral -->
+        <div class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-40" id="lateral-menu-overlay"></div>
+        <div class="hidden fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-50" id="lateral-menu">
+            <div class="py-4 px-6">
+                <!-- Sección de Perfil en el Menú Lateral -->
+                <div class="w-full bg-blue-100 p-4 rounded-lg flex flex-col items-center">
+                    <!-- Imagen desde resources -->
+                    <img class="h-16 w-16 rounded-full" src="{{ asset('/images/user.png') }}" alt="User profile picture">
+                    
+                    <!-- Mostrar el nombre del usuario autenticado -->
+                    <span class="mt-2 font-bold text-blue-900">
+                        @auth
+                            {{ Auth::user()->name }}
+                        @endauth
+                    </span>
+                </div>
+
+                <div class="mt-4 border-t border-gray-200 pt-4">
                     @auth
-                        {{ Auth::user()->name }}
+                        @if(Auth::user()->role->name == 'admin')
+                            <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">Your Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">Eventos</a> -->
+                        @endif
                     @endauth
-                </span>
-            </div>
-
-            <!--     Elementos del Menú -->
-            <div class="mt-4 border-t border-gray-200 pt-4">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">Your Profile</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">Settings</a>
-                <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">Salir</a>
-                <div class="mt-4">
-                    <a href="#" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Team</a>
-                    <a href="#" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Projects</a>
-                    <a href="#" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Calendar</a>
+                    <div class="mt-4">
+                        <a href="{{ route('admin.users.index') }}" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Todos los usuarios</a>
+                        <a href="https://dashboard.stripe.com/test/payments"  target="_blank" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Transacciones</a>
+                        <a href="#" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Calendar</a>
+                        <a href="{{ route('logout') }}" class="text-gray-600 hover:bg-blue-100 hover:text-blue-700 block px-3 py-2 rounded-md text-base font-medium">Salir</a>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal de Éxito -->
+        @if(session('success'))
+            <div id="successModal" class="modal flex">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="modal-title">¡Éxito!</span>
+                        <span class="close-button" id="closeModal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        {{ session('success') }}
+                    </div>
+                </div>
+            </div>       
+        @endif
+
+        <!-- Contenido de la página -->
+        <div class="flex-grow">
+            @yield('content')
+        </div>
     </div>
 
-    <!-- Modal de Éxito -->
-    @if(session('success'))
-    <div id="successModal" class="modal flex">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title">¡Éxito!</span>
-                <span class="close-button" id="closeModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                {{ session('success') }}
-            </div>
-        </div>
-    </div>       
-    @endif
-
-    @yield('content')
-    
-
     <!-- Footer -->
-    <footer class="bg-blue-900 text-white text-center py-4 mt-12">
+    <footer class="bg-blue-900 text-white text-center py-4">
         <p>&copy; 2024 Eventos Deportivos. Todos los derechos reservados.</p>
         <div class="mt-2">
             <a href="#" class="text-gray-300 hover:text-blue-400 mx-2">Política de Privacidad</a>

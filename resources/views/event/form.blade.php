@@ -102,50 +102,112 @@
             </div>     
             
             <table class="min-w-full bg-white border border-gray-200" id="activity_table">
-                <thead>
-                    <tr class="bg-gray-100 border-b">
-                        <th class="py-2 px-4 text-left">Nombre</th>
-                        <th class="py-2 px-4 text-left">Seleccionar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($activities as $activity)
-                    <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
-                        <td class="py-2 px-4">{{ $activity->name }}</td>
-                        <td class="py-2 px-4 text-center">
-                            <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}"
-                            {{ (isset($eventActivities[$activity->id]) || in_array($activity->id, old('selected_activities', []))) ? 'checked' : '' }}>
-                        </td>
-                    </tr>
-            
-                    <!-- Mostrar géneros y subgéneros asociados si la actividad está seleccionada -->
-                    <tr class="activity-details" id="activity-{{ $activity->id }}-details">
-                        <td colspan="2" class="py-2 px-4">
-                            @foreach(['M', 'F', 'Mix'] as $gender)
-                            <div class="mb-2">
-                                <label class="block font-semibold">
-                                    <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
-                                    {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->count() > 0) || in_array($gender, old('genders.'.$activity->id, [])) ? 'checked' : '' }}>
-                                    {{ $gender }}
-                                </label>
-            
-                                <!-- Mostrar subgéneros si el género está seleccionado -->
-                                <div class="pl-4 gender-subs" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
-                                    @foreach ($subs as $sub)
-                                    <label class="block">
-                                        <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
-                                        {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->where('sub_id', $sub->id)->count() > 0) || in_array($sub->id, old('subs.'.$activity->id.'.'.$gender, [])) ? 'checked' : '' }}>
-                                        {{ $sub->name }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endforeach
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <thead>
+        <tr class="bg-gray-100 border-b">
+            <th class="py-2 px-4 text-left">Nombre</th>
+            <th class="py-2 px-4 text-left">Seleccionar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($activities as $activity)
+        <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
+            <td class="py-2 px-4">{{ $activity->name }}</td>
+            <td class="py-2 px-4 text-center">
+                <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}"
+                {{ (isset($eventActivities[$activity->id]) || in_array($activity->id, old('selected_activities', []))) ? 'checked' : '' }} class="activity-checkbox">
+            </td>
+        </tr>
+
+        <!-- Mostrar géneros y subgéneros asociados si la actividad está seleccionada -->
+        <tr class="activity-details hidden" id="activity-{{ $activity->id }}-details">
+            <td colspan="2" class="py-2 px-4">
+                @foreach(['M', 'F', 'Mix'] as $gender)
+                <div class="mb-2">
+                    <label class="block font-semibold">
+                        <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
+                        {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->count() > 0) || in_array($gender, old('genders.'.$activity->id, [])) ? 'checked' : '' }} class="gender-checkbox">
+                        {{ $gender }}
+                    </label>
+
+                    <!-- Mostrar subgéneros si el género está seleccionado -->
+                    <div class="pl-4 gender-subs hidden" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
+                        @foreach ($subs as $sub)
+                        <label class="block">
+                            <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
+                            {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->where('sub_id', $sub->id)->count() > 0) || in_array($sub->id, old('subs.'.$activity->id.'.'.$gender, [])) ? 'checked' : '' }}>
+                            {{ $sub->name }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ocultar todos los detalles de actividad por defecto
+        document.querySelectorAll('.activity-details').forEach(function(detailsRow) {
+            detailsRow.classList.add('hidden');
+        });
+
+        // Evento para mostrar/ocultar detalles de actividad
+        document.querySelectorAll('.activity-checkbox').forEach(function(activityCheckbox) {
+            activityCheckbox.addEventListener('change', function() {
+                var activityId = this.closest('tr').dataset.activityId;
+                var detailsRow = document.getElementById('activity-' + activityId + '-details');
+
+                if (this.checked) {
+                    detailsRow.classList.remove('hidden');
+                } else {
+                    detailsRow.classList.add('hidden');
+                    // Desmarcar géneros y subgéneros si se deselecciona la actividad
+                    detailsRow.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
+                }
+            });
+
+            // Mostrar detalles si el checkbox está preseleccionado al cargar
+            if (activityCheckbox.checked) {
+                var activityId = activityCheckbox.closest('tr').dataset.activityId;
+                var detailsRow = document.getElementById('activity-' + activityId + '-details');
+                detailsRow.classList.remove('hidden');
+            }
+        });
+
+        // Evento para mostrar/ocultar subgéneros según el género seleccionado
+        document.querySelectorAll('.gender-checkbox').forEach(function(genderCheckbox) {
+            genderCheckbox.addEventListener('change', function() {
+                var genderId = this.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
+                var activityId = this.name.match(/\[(.*?)\]/)[1];
+                var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
+
+                if (this.checked) {
+                    subsDiv.classList.remove('hidden');
+                } else {
+                    subsDiv.classList.add('hidden');
+                    // Desmarcar subgéneros si se deselecciona el género
+                    subsDiv.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
+                }
+            });
+
+            // Mostrar subgéneros si el género está preseleccionado al cargar
+            if (genderCheckbox.checked) {
+                var genderId = genderCheckbox.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
+                var activityId = genderCheckbox.name.match(/\[(.*?)\]/)[1];
+                var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
+                subsDiv.classList.remove('hidden');
+            }
+        });
+    });
+</script>
+
             
                 <div class="flex justify-between mt-4">
                     <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
