@@ -51,11 +51,12 @@ class User extends Authenticatable
         ];
     }
 
-    //relations with events
-    public function events()
+    //relations with events ALEXIS metodo
+    
+    /* public function events()
     {
         return $this->belongsToMany(Event::class)->withTimestamps();
-    }
+    } */
 
     //relations with payments
     public function payments()
@@ -73,5 +74,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_user', 'user_id', 'event_id');
+    }
+    
 
 }

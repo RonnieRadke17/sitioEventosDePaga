@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->enum('status',['Success','Cancel','In progress']);
+            $table->enum('status',['In progress','Success','Cancel'])->default('In progress');
+            $table->datetime('expiration');
             $table->timestamps();
         });
     }

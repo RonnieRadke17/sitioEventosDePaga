@@ -7,11 +7,7 @@
     </div>
 @endif
 
-@if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+
 
 
 <div class="container bg-gray-100 p-10">
@@ -33,8 +29,16 @@
     </div>
 </div>
 
+    @auth
+        @if(Auth::user()->role->name == 'admin')
+            <a href="{{ route('event.index') }}" class="btn btn-primary rounded-circle position-fixed" style="bottom: 20px; left: 20px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-pencil-alt"></i></a>
+        @endif
+    @endauth
 
-    
+
+<!-- Incluir Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
     
 

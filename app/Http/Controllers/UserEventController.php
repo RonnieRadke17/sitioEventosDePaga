@@ -6,14 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\ActivityEvent;
 use App\Models\EventUser;
+use App\Models\PaymentRequest;
 use App\Models\ActivityEventUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Encryption\DecryptException;
-
-
 
 class UserEventController extends Controller
 {
@@ -95,10 +94,31 @@ class UserEventController extends Controller
 
         }
     }
+    
+    public function userRegisteredEvents()
+{
+    // Asegúrate de que el usuario está autenticado
+    if (auth()->check()) {
+        $user = auth()->user(); // Obtener el usuario autenticado
+
+        // Obtener los eventos a los que el usuario está registrado
+        $events = $user->events()->with('images')->get(); // Relación 'events' ya debe estar en el modelo User
+
+        // Devolver la vista 'UserEvent' con los eventos
+        return view('event.UserEvent', compact('events'));
+    } else {
+        // Si el usuario no está autenticado, redirigir al login
+        return redirect()->route('login');
+    }
+} // <- Esta llave cierra la función
+
+
 
 
     public function show($id)
     {
+        session()->forget('activities');
+        session()->forget('id');
         try {
             // Desencriptar el event_id
             $decryptedId = decrypt($id);
@@ -356,8 +376,6 @@ class UserEventController extends Controller
 
         if ($event->activities == 1) { // Si el evento tiene actividades
 
-            //aqui validamos que las acts esten bien
-            // Validar si hay actividades seleccionadas minimo 1 y maximo 3
             // Llamar al método de validación para validar las actividades seleccionadas
             $validation = $this->validateActivities($request, $id);
 
@@ -408,8 +426,8 @@ class UserEventController extends Controller
             }
 
             
-        } else {
-            // El evento no tiene actividades, solo inscribirse
+        } else { // El evento no tiene actividades, solo inscribirse
+           
             $user = auth()->user();
             $eventUser = EventUser::create([
                 'user_id' => $user->id,
@@ -488,5 +506,93 @@ class UserEventController extends Controller
         }
         return false;
     }
+
+
+    //metodo para confirmar la la compra y revisar que esta validado todo
+    //se tiene que validar las acts si hay, que estan bien validadas y que el evento no este inscrito que no este expirado y todas esas cuestiones
+    public function confirmPayment(Request $request,$id)
+    {
+        /* 
+            $event = Event::find($request->event_id);
+            $event->is_paid = true;
+            $event->save();
+            return response()->json(['message' => 'Pago confirmado']); 
+        */
+        //validamos que la informacion del evento siga siendo valida
+        $activities = $request->input('activities');
+        
+        try {
+            // Desencriptar el event_id
+            $decryptedId = decrypt($id);
+            //$event = Event::findOrFail($decryptedId);
+        } catch (DecryptException $e) {
+            // Error en la desencriptación
+            return redirect()->route('home')->withErrors(['error' => 'Error al acceder a ese evento.']);
+        }
+        if ($this->validateEventUser($id)) { // Validar que el usuario no esté inscrito
+            return redirect()->route('home')->withErrors(['error' => 'Ya estás registrado en ese evento.']);
+        }
+
+        if ($this->validateRegistrationDeadLine($id)) { // Validar fecha límite
+            return redirect()->route('home')->withErrors(['error' => 'Evento expirado']);
+        }
+
+        // Validar capacidad
+        $capacityValidation = $this->validateCapacity($id);
+
+        if ($capacityValidation == 'withoutcapacity') {
+            
+            return redirect()->route('home')->withErrors(['error' => 'Evento agotado']);
+        }
+
+        $event = Event::findOrFail($decryptedId);
+        //mandar valores de compra a la ventana
+        $event1 = Event::with('places')->findOrFail($decryptedId);
+        $places = $event1->places;
+        $eventIMG = Event::with('images')->findOrFail($decryptedId);
+        $orderedImages = $eventIMG->images->sortBy(function ($image) {
+            switch ($image->type) {
+                case 'cover':
+                    return 1;
+            }
+        });
+        if ($event->activities == 1) { // Si el evento tiene actividades
+        
+            $validation = $this->validateActivities($request, $id);
+
+            if (!$validation) { // Si las actividades NO son validas es porque el usuario cambio algun valor de la act,gender,sub
+                return redirect()->back()->withErrors(['error' => 'Una o más actividades seleccionadas no son válidas.']);
+            }else{
+                //crear orden de pago
+                PaymentRequest::create([
+                    'user_id' => Auth::id(),
+                    'event_id' => $decryptedId,
+                    //status por default es in process
+                    'expiration' => Carbon::now()->addMinutes(15),
+                ]);
+            }
+
+
+        }else{//crear orden de pago
+            PaymentRequest::create([
+                'user_id' => Auth::id(),
+                'event_id' => $decryptedId,
+                //status por default es in process
+                'expiration' => Carbon::now()->addMinutes(15),
+            ]);
+        }
+
+         // Almacena los datos en la sesión
+
+    $request->session()->put('activities', $activities);
+    session()->put('id', $decryptedId);
+    
+
+        return view('user-event/buy', compact('event','places','orderedImages'));
+
+    }
+   
+
+    
 
 }
