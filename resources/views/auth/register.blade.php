@@ -52,15 +52,30 @@
             <span class="text-red-500 text-sm">{{ $message }}</span>
         @enderror
     </div>
+    <!-- Enlaces de Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-    <!-- Fecha de nacimiento -->
-    <div class="mb-4">
-        <label for="birthdate" class="block text-gray-800 text-sm font-medium mb-1">Fecha de Nacimiento</label>
-        <input id="birthdate" type="date" name="birthdate" value="{{ old('birthdate') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-        @error('birthdate')
-            <span class="text-red-500 text-sm">{{ $message }}</span>
-        @enderror
-    </div>
+<!-- Fecha de nacimiento -->
+<div class="mb-4">
+    <label for="birthdate" class="block text-gray-800 text-sm font-medium mb-1">Fecha de Nacimiento</label>
+    <input id="birthdate" type="text" name="birthdate" value="{{ old('birthdate') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+    @error('birthdate')
+        <span class="text-red-500 text-sm">{{ $message }}</span>
+    @enderror
+</div>
+
+<!-- Script de inicialización de Flatpickr -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#birthdate", {
+            dateFormat: "Y-m-d", // Formato de fecha que se enviará en el formulario
+            maxDate: "today",    // Limita la fecha máxima al día de hoy
+            locale: "es"         // Configura el calendario en español
+        });
+    });
+</script>
+
 
     <!-- Género -->
     <div class="mb-4">
