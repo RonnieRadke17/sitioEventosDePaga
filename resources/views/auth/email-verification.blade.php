@@ -43,7 +43,7 @@
         <!-- Temporizador visual -->
         <div class="flex justify-center mb-4">
             <div id="timer" class="relative w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center shadow-inner">
-                <span id="timerText" class="text-lg font-bold text-blue-500">5:00</span>
+                <span id="timerText" class="text-lg font-bold text-blue-500">{{ $remainingTimeFormatted }}</span>
                 <svg class="absolute top-0 left-0 w-full h-full">
                     <circle cx="50%" cy="50%" r="28" stroke="#e5e7eb" stroke-width="4" fill="none"></circle>
                     <circle id="countdownCircle" cx="50%" cy="50%" r="28" stroke="#3b82f6" stroke-width="4" fill="none" stroke-dasharray="176" stroke-dashoffset="176" class="transition-all duration-1000 ease-linear"></circle>
@@ -82,23 +82,23 @@
 </style>
 
 <script>
-    // Función para formatear el tiempo
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        if (seconds >= 60) {
-            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-        } else {
-            return seconds;
-        }
-    }
-
-    // Temporizador de cuenta regresiva
-    let countdown = 300;
+    // Obtener el tiempo restante desde el backend
+    let countdown = {{ $remainingSeconds }};
     const timerText = document.getElementById('timerText');
     const countdownCircle = document.getElementById('countdownCircle');
     const resendForm = document.getElementById('resendForm');
     const totalDuration = countdown;  // Duración total del temporizador en segundos
+
+    // Función para formatear el tiempo
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60); // Redondear a enteros
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+}
+
+
+    // Mostrar el tiempo restante al cargar
+    timerText.textContent = formatTime(countdown);
 
     const timerInterval = setInterval(() => {
         countdown--;
