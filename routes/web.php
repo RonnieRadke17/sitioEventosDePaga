@@ -13,10 +13,7 @@ use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\AdminEventController;
-
 use App\Http\Middleware\RoleMiddleware;
-
-
 use App\Http\Controllers\StripeController;
 
 Route::get('/pago', function () {
@@ -44,10 +41,8 @@ Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');//formulario para restablecer la contrasena
     Route::post('/password/send-passwod-code', 'sendPasswordCode')->name('password.send-password-code');//manda el correo
     Route::post('/password/reset-password', 'reset')->name('password.update');//restablece la contrasena
-
     Route::post('/password/send-code-password', 'reSendPasswordCode')->name('password.send-code');//manda el correo
     //ruta de ventana cuenta bloqueada
-
 });
 
 Route::view('acount/suspended', 'auth/passwords/message')->name('acount.suspended');
@@ -73,17 +68,13 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-/* 
     Route::resource('sub', SubController::class);
     Route::resource('activity', ActivityController::class);
     Route::resource('event', EventController::class);
-*/
 
-
- Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
+ /* Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
 Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
-Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class);
-
+Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class); */
 
 //mercadopago
 Route::get('/mp', [MercadoPagoController::class, 'index']);

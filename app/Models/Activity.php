@@ -10,6 +10,7 @@ class Activity extends Model
     use HasFactory;
     protected $fillable = [
      'name',
+     'mix'
     ];
 
     //relation with event
@@ -17,13 +18,6 @@ class Activity extends Model
     {
         return $this->belongsToMany(Event::class)->withTimestamps();
     }
-
-    /* //one to many relationship
-        public function activityCategory()
-        {
-            return $this->belongsTo(ActivityCategory::class);
-        }
-    */
 
     /**
      * Relación con el modelo ActivityEventUser (Uno a Muchos)

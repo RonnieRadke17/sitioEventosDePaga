@@ -7,7 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{{ url('activity') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{route('activity.store')}}" method="POST">
         @csrf
         @include('activities.form',['mode'=>'Registrar'])
     </form>

@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
                 'gender' => "M",
                 'email' => 'menesesmaturanoalexis33@gmail.com',
                 'password' => base64_encode('Knives1.'),
-                'role_id' => 2
+                'role_id' => 2//revisar este apartado
             ],
         );
 

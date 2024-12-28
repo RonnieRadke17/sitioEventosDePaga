@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Activity;
+use Illuminate\Support\Facades\Validator;
 
 class ActivityController extends Controller
 {
@@ -32,12 +33,26 @@ class ActivityController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $activityData = $request->except('_token');
-        Activity::create($activityData);
-
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'mix' => 'required|in:0,1',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        // Insertar la actividad
+        Activity::create([
+            'name' => $request->input('name'),
+            'mix' => $request->input('mix'),
+        ]);
+    
         return redirect('activity')->with('mensaje', 'Evento agregado con éxito');
     }
+
 
     /**
      * Display the specified resource.

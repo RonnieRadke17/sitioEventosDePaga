@@ -15,7 +15,11 @@
     <ul>
         @forelse($activities as $activity)
         <li>
-            {{$activity->name}} <a href="{{route('activity.edit', $activity->id)}}" class="btn btn-warning">Editar</a>
+            {{$activity->name}} 
+            @if($activity->mix == 1)
+            <span>(mix)</span>
+            @endif
+            <a href="{{route('activity.edit', $activity->id)}}" class="btn btn-warning">Editar</a>
             <form action="{{route('activity.destroy', $activity->id)}}" method="POST">
                 @csrf
                 @method('DELETE')
