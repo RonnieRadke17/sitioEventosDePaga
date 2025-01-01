@@ -8,4 +8,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0', // Acepta conexiones externas
+        port: 5173,      // Cambia el puerto si es necesario
+        hmr: {
+            host: '192.168.1.70', // Cambia por tu dirección IP
+        },
+    },
 });

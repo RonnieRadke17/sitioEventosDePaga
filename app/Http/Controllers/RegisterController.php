@@ -40,7 +40,7 @@ class RegisterController extends Controller
             ],
             'gender' => 'required|in:M,F',
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/',
+            'password' => 'required|string|min:8|confirmed',/* |regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/ */
         ]);
 
         if ($validator->fails()) {

@@ -2,18 +2,27 @@
         <!-- Paso 1: Event Details -->
         <div id="step-1">
             <div class="mb-4">
-                <label for="name" class="block text-gray-700">Event Name</label>
+                {{-- <label for="name" class="block text-gray-700">Event Name</label>
                 <input type="text" name="name" id="name" class="w-full px-4 py-2 border rounded-lg" value="{{ old('name', $event->name ?? '') }}">
                 @error('name')
                     <span class="text-danger">{{ $message }}</span>
-                @enderror
+                @enderror --}}
+                <div class="relative">
+                    <input type="text" id="floating_outlined" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-dark bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                    <label for="floating_outlined" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Floating outlined</label>
+                </div>
             </div>
+
             <div class="mb-4">
-                <label for="description" class="block text-gray-700">Description</label>
+                {{-- <label for="description" class="block text-gray-700">Description</label>
                 <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg">{{ old('description', $event->description ?? '') }}</textarea>
                 @error('description')
                     <span class="text-danger">{{ $message }}</span>
-                @enderror
+                @enderror --}}
+                <div class="relative">
+                    <input type="text" id="floating_outlined" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-dark bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                    <label for="floating_outlined" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Floating outlined</label>
+                </div>
             </div>
             <div class="flex mb-4">
                 <div class="w-1/2 pr-2">
@@ -54,19 +63,27 @@
         
             <div class="" id="div-content">
                 <div class="mb-4 hidden" id="capacity-field">
-                    <label for="capacity" class="block text-gray-700">Capacity</label>
+                    {{-- <label for="capacity" class="block text-gray-700">Capacity</label>
                     <input type="number" name="capacity" id="capacity" class="w-full px-4 py-2 border rounded-lg" value="{{ old('capacity', $event->capacity ?? '') }}">
                     @error('capacity')
                         <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                    @enderror --}}
+                    <div class="relative">
+                        <input type="text" id="floating_outlined" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-dark bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                        <label for="floating_outlined" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Floating outlined</label>
+                    </div>
                 </div>
                 
                 <div class="mb-4" id="price-content">
-                    <label for="price" class="block text-gray-700">Price</label>
+                    {{-- <label for="price" class="block text-gray-700">Price</label>
                     <input type="number" name="price" id="price" class="w-full px-4 py-2 border rounded-lg" step="0.01" min="0" value="{{ old('price', $event->price ?? '') }}">
                     @error('price')
                         <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                    @enderror --}}
+                    <div class="relative">
+                        <input type="text" id="floating_outlined" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-dark bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                        <label for="floating_outlined" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Floating outlined</label>
+                    </div>
                 </div>
             </div>
             
@@ -93,127 +110,50 @@
         <!-- revisar la tabla todo lo relacionado con mostrar info-->
         <div id="step-2" class="hidden">
             <!--aqui se muestra el boton que muestra las actividades -->
-            <div class="mb-4">
+            
+            {{-- <div class="mb-4">
                 <label for="is_with_activities" class="block text-gray-700">Actividades</label>
                 <select name="is_with_activities" id="is_with_activities" class="w-full px-4 py-2 border rounded-lg">
                     <option value="0" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 0 ? 'selected' : '' }}>No</option>
                     <option value="1" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 1 ? 'selected' : '' }}>Yes</option>
                 </select>
-            </div>     
-            
-            <table class="min-w-full bg-white border border-gray-200" id="activity_table">
-    <thead>
-        <tr class="bg-gray-100 border-b">
-            <th class="py-2 px-4 text-left">Nombre</th>
-            <th class="py-2 px-4 text-left">Seleccionar</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($activities as $activity)
-        <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
-            <td class="py-2 px-4">{{ $activity->name }}</td>
-            <td class="py-2 px-4 text-center">
-                <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}"
-                {{ (isset($eventActivities[$activity->id]) || in_array($activity->id, old('selected_activities', []))) ? 'checked' : '' }} class="activity-checkbox">
-            </td>
-        </tr>
+            </div> --}}
+        
 
-        <!-- Mostrar géneros y subgéneros asociados si la actividad está seleccionada -->
-        <tr class="activity-details hidden" id="activity-{{ $activity->id }}-details">
-            <td colspan="2" class="py-2 px-4">
-                @foreach(['M', 'F', 'Mix'] as $gender)
-                <div class="mb-2">
-                    <label class="block font-semibold">
-                        <input type="checkbox" name="genders[{{ $activity->id }}][{{ $gender }}]" value="{{ $gender }}"
-                        {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->count() > 0) || in_array($gender, old('genders.'.$activity->id, [])) ? 'checked' : '' }} class="gender-checkbox">
-                        {{ $gender }}
+            @foreach($activities as $activity)
+                <div class="flex items-center space-x-4 space-y-2">
+                    <input type="checkbox" id="activity-{{ $activity->id }}" name="selected_activities[]" value="{{ $activity->id }}" class="hidden peer">
+                    <label for="activity-{{ $activity->id }}" class="
+                        flex items-center justify-between w-full p-2 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer 
+                        dark:hover:text-gray-300 dark:border-gray-700 
+                        peer-checked:border-blue-600 hover:text-gray-600 
+                        dark:peer-checked:text-gray-300 peer-checked:text-gray-600 
+                        hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                        <div class="block">
+                            <span class="text-lg font-semibold">{{ $activity->name }}</span>
+                        </div>
                     </label>
-
-                    <!-- Mostrar subgéneros si el género está seleccionado -->
-                    <div class="pl-4 gender-subs hidden" id="activity-{{ $activity->id }}-gender-{{ $gender }}-subs">
-                        @foreach ($subs as $sub)
-                        <label class="block">
-                            <input type="checkbox" name="subs[{{ $activity->id }}][{{ $gender }}][]" value="{{ $sub->id }}"
-                            {{ (isset($eventActivities[$activity->id]) && $eventActivities[$activity->id]->where('gender', $gender)->where('sub_id', $sub->id)->count() > 0) || in_array($sub->id, old('subs.'.$activity->id.'.'.$gender, [])) ? 'checked' : '' }}>
-                            {{ $sub->name }}
-                        </label>
-                        @endforeach
-                    </div>
                 </div>
-                @endforeach
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+            @endforeach
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ocultar todos los detalles de actividad por defecto
-        document.querySelectorAll('.activity-details').forEach(function(detailsRow) {
-            detailsRow.classList.add('hidden');
-        });
 
-        // Evento para mostrar/ocultar detalles de actividad
-        document.querySelectorAll('.activity-checkbox').forEach(function(activityCheckbox) {
-            activityCheckbox.addEventListener('change', function() {
-                var activityId = this.closest('tr').dataset.activityId;
-                var detailsRow = document.getElementById('activity-' + activityId + '-details');
-
-                if (this.checked) {
-                    detailsRow.classList.remove('hidden');
-                } else {
-                    detailsRow.classList.add('hidden');
-                    // Desmarcar géneros y subgéneros si se deselecciona la actividad
-                    detailsRow.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
-                        checkbox.checked = false;
-                    });
-                }
-            });
-
-            // Mostrar detalles si el checkbox está preseleccionado al cargar
-            if (activityCheckbox.checked) {
-                var activityId = activityCheckbox.closest('tr').dataset.activityId;
-                var detailsRow = document.getElementById('activity-' + activityId + '-details');
-                detailsRow.classList.remove('hidden');
-            }
-        });
-
-        // Evento para mostrar/ocultar subgéneros según el género seleccionado
-        document.querySelectorAll('.gender-checkbox').forEach(function(genderCheckbox) {
-            genderCheckbox.addEventListener('change', function() {
-                var genderId = this.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
-                var activityId = this.name.match(/\[(.*?)\]/)[1];
-                var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
-
-                if (this.checked) {
-                    subsDiv.classList.remove('hidden');
-                } else {
-                    subsDiv.classList.add('hidden');
-                    // Desmarcar subgéneros si se deselecciona el género
-                    subsDiv.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
-                        checkbox.checked = false;
-                    });
-                }
-            });
-
-            // Mostrar subgéneros si el género está preseleccionado al cargar
-            if (genderCheckbox.checked) {
-                var genderId = genderCheckbox.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
-                var activityId = genderCheckbox.name.match(/\[(.*?)\]/)[1];
-                var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
-                subsDiv.classList.remove('hidden');
-            }
-        });
-    });
-</script>
 
             
-                <div class="flex justify-between mt-4">
-                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
-                    <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
-                    
-                </div>
+        
+
+
+
+
+            
+
+            
+            
+
+            <div class="flex justify-between mt-4">
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-1">Previous</button>
+                <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="to-step-3">Next</button>
+            </div>
+
         </div>
 
         <!-- Paso 3: Maps -->
@@ -291,30 +231,60 @@
         </div>
 
         <!-- Paso 4: Imgs -->
-        {{-- <div id="step-4" class="hidden">
+        <div id="step-4" class="hidden">
             <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
             
+            <!-- Imagen de portada -->
             <div class="mb-4" id="uploadImgs">
                 <label for="cover">Imagen de portada:</label>
-                <input type="file" name="cover">
+                <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
+                
+                <!-- Mostrar imagen de portada existente -->
+                @if (isset($coverImage))
+                    <p>Imagen portada actual:</p>
+                    <img src="{{ asset('storage/' . $coverImage->image) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" />
+                @endif
+
+                <!-- Vista previa si hay una imagen seleccionada -->
+                <img id="cover-preview" class="mt-2" style="display: none; max-width: 100px;"/>
                 @error('cover')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
+
+            <!-- Imagen del kit (opcional) -->
             <div class="mb-4" id="uploadImgs">
-                <label for="kit">Imagen del kit(opcional):</label>
-                <input type="file" name="kit">
+                <label for="kit">Imagen del kit (opcional):</label>
+                <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
+                
+                <!-- Mostrar imagen del kit existente -->
+                @if (isset($kitImage))
+                    <p>Imagen kit actual:</p>
+                    <img src="{{ asset('storage/' . $kitImage->image) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" />
+                @endif
+
+                <!-- Vista previa si hay una imagen seleccionada -->
+                <img id="kit-preview" class="mt-2" style="display: none; max-width: 100px;"/>
                 @error('kit')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
 
-
+            <!-- Imágenes de contenido (opcional) -->
             <div class="mb-4" id="uploadImgs">
-                <label for="images">Imagenes de contenido(opcional):</label>
+                <label for="images">Imágenes de contenido (opcional):</label>
                 <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
+                
+                <!-- Mostrar imágenes de contenido existentes -->
+                <div class="mt-2">
+                    @if(isset($contentImages))
+                    @foreach ($contentImages as $image)
+                        <img src="{{ asset('storage/' . $image->image) }}" alt="Imagen contenido previa" class="mt-2" style="max-width: 100px;" />
+                    @endforeach
+                    @endif
+                </div>
             </div>
-            
+
             <div class="mb-4 max-h-72 overflow-y-auto">
                 <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
             </div>
@@ -328,178 +298,78 @@
                 @endforeach
                 @endif
             </div>
+
             <div class="flex justify-between mt-4">
                 <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
                 
                 <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
             </div>
-        </div> 
-
-        <script>
-            function previewImages(event) {
-                let previewContainer = document.getElementById('preview-container');
-                previewContainer.innerHTML = '';
-                let files = event.target.files;
-                
-                Array.from(files).forEach(file => {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        let div = document.createElement('div');
-                        div.className = 'relative';
-                        div.innerHTML = `
-                            <img src="${e.target.result}" class="w-full h-32 object-cover">
-                        `;
-                        previewContainer.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        </script> --}}
-
-        <!-- Paso 4: Imgs -->
-    {{-- <div id="step-4" class="hidden">
-        <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
-        
-        <!-- Imagen de portada -->
-        <div class="mb-4" id="uploadImgs">
-            <label for="cover">Imagen de portada:</label>
-            <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
-            
-            <!-- Si existe una imagen previa -->
-            @if ($errors->any() && old('cover'))
-                <p>Imagen subida previamente: <img src="{{ asset('storage/' . old('cover')) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" /></p>
-            @endif
-
-            <!-- Vista previa si hay una imagen seleccionada -->
-            <img id="cover-preview" class="mt-2" style="display: none; max-width: 100px;"/>
-            @error('cover')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
         </div>
 
-        <!-- Imagen del kit (opcional) -->
-        <div class="mb-4" id="uploadImgs">
-            <label for="kit">Imagen del kit (opcional):</label>
-            <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
-            
-            <!-- Si existe una imagen previa -->
-            @if ($errors->any() && old('kit'))
-                <p>Imagen subida previamente: <img src="{{ asset('storage/' . old('kit')) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" /></p>
-            @endif
 
-            <!-- Vista previa si hay una imagen seleccionada -->
-            <img id="kit-preview" class="mt-2" style="display: none; max-width: 100px;"/>
-            @error('kit')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-        </div>
-
-        <!-- Imágenes de contenido (opcional) -->
-        <div class="mb-4" id="uploadImgs">
-            <label for="images">Imágenes de contenido (opcional):</label>
-            <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
-        </div>
-        
-        <div class="mb-4 max-h-72 overflow-y-auto">
-            <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
-        </div>
-
-        <div class="mb-4">
-            @if ($errors->has('images.*'))
-            @foreach ($errors->get('images.*') as $messages)
-                @foreach ($messages as $message)
-                    <span class="text-danger">{{ $message }}</span>
-                @endforeach
-            @endforeach
-            @endif
-        </div>
-
-        <div class="flex justify-between mt-4">
-            <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
-            
-            <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
-        </div>
-    </div> --}}
-
-
-    <!-- Paso 4: Imgs -->
-<div id="step-4" class="hidden">
-    <h2 class="text-lg font-semibold mb-4">Imagenes</h2>
+    {{-- detalles de las actividades --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ocultar todos los detalles de actividad por defecto
+            document.querySelectorAll('.activity-details').forEach(function(detailsRow) {
+                detailsRow.classList.add('hidden');
+            });
     
-    <!-- Imagen de portada -->
-    <div class="mb-4" id="uploadImgs">
-        <label for="cover">Imagen de portada:</label>
-        <input type="file" name="cover" id="cover" accept="image/*" onchange="previewSingleImage(event, 'cover-preview')">
-        
-        <!-- Mostrar imagen de portada existente -->
-        @if (isset($coverImage))
-            <p>Imagen portada actual:</p>
-            <img src="{{ asset('storage/' . $coverImage->image) }}" alt="Imagen portada previa" class="mt-2" id="cover-preview" style="max-width: 100px;" />
-        @endif
+            // Evento para mostrar/ocultar detalles de actividad
+            document.querySelectorAll('.activity-checkbox').forEach(function(activityCheckbox) {
+                activityCheckbox.addEventListener('change', function() {
+                    var activityId = this.closest('tr').dataset.activityId;
+                    var detailsRow = document.getElementById('activity-' + activityId + '-details');
+    
+                    if (this.checked) {
+                        detailsRow.classList.remove('hidden');
+                    } else {
+                        detailsRow.classList.add('hidden');
+                        // Desmarcar géneros y subgéneros si se deselecciona la actividad
+                        detailsRow.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                            checkbox.checked = false;
+                        });
+                    }
+                });
+    
+                // Mostrar detalles si el checkbox está preseleccionado al cargar
+                if (activityCheckbox.checked) {
+                    var activityId = activityCheckbox.closest('tr').dataset.activityId;
+                    var detailsRow = document.getElementById('activity-' + activityId + '-details');
+                    detailsRow.classList.remove('hidden');
+                }
+            });
+    
+            // Evento para mostrar/ocultar subgéneros según el género seleccionado
+            document.querySelectorAll('.gender-checkbox').forEach(function(genderCheckbox) {
+                genderCheckbox.addEventListener('change', function() {
+                    var genderId = this.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
+                    var activityId = this.name.match(/\[(.*?)\]/)[1];
+                    var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
+    
+                    if (this.checked) {
+                        subsDiv.classList.remove('hidden');
+                    } else {
+                        subsDiv.classList.add('hidden');
+                        // Desmarcar subgéneros si se deselecciona el género
+                        subsDiv.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                            checkbox.checked = false;
+                        });
+                    }
+                });
+    
+                // Mostrar subgéneros si el género está preseleccionado al cargar
+                if (genderCheckbox.checked) {
+                    var genderId = genderCheckbox.name.match(/\[(.*?)\]/g)[1].replace(/[\[\]]/g, '');
+                    var activityId = genderCheckbox.name.match(/\[(.*?)\]/)[1];
+                    var subsDiv = document.getElementById('activity-' + activityId + '-gender-' + genderId + '-subs');
+                    subsDiv.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
 
-        <!-- Vista previa si hay una imagen seleccionada -->
-        <img id="cover-preview" class="mt-2" style="display: none; max-width: 100px;"/>
-        @error('cover')
-            <span class="text-danger">{{ $message }}</span>
-        @enderror
-    </div>
-
-    <!-- Imagen del kit (opcional) -->
-    <div class="mb-4" id="uploadImgs">
-        <label for="kit">Imagen del kit (opcional):</label>
-        <input type="file" name="kit" id="kit" accept="image/*" onchange="previewSingleImage(event, 'kit-preview')">
-        
-        <!-- Mostrar imagen del kit existente -->
-        @if (isset($kitImage))
-            <p>Imagen kit actual:</p>
-            <img src="{{ asset('storage/' . $kitImage->image) }}" alt="Imagen kit previa" class="mt-2" id="kit-preview" style="max-width: 100px;" />
-        @endif
-
-        <!-- Vista previa si hay una imagen seleccionada -->
-        <img id="kit-preview" class="mt-2" style="display: none; max-width: 100px;"/>
-        @error('kit')
-            <span class="text-danger">{{ $message }}</span>
-        @enderror
-    </div>
-
-    <!-- Imágenes de contenido (opcional) -->
-    <div class="mb-4" id="uploadImgs">
-        <label for="images">Imágenes de contenido (opcional):</label>
-        <input type="file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event)">
-        
-        <!-- Mostrar imágenes de contenido existentes -->
-        <div class="mt-2">
-            @if(isset($contentImages))
-            @foreach ($contentImages as $image)
-                <img src="{{ asset('storage/' . $image->image) }}" alt="Imagen contenido previa" class="mt-2" style="max-width: 100px;" />
-            @endforeach
-            @endif
-        </div>
-    </div>
-
-    <div class="mb-4 max-h-72 overflow-y-auto">
-        <div id="preview-container" class="grid grid-cols-3 gap-4"></div>
-    </div>
-
-    <div class="mb-4">
-        @if ($errors->has('images.*'))
-        @foreach ($errors->get('images.*') as $messages)
-            @foreach ($messages as $message)
-                <span class="text-danger">{{ $message }}</span>
-            @endforeach
-        @endforeach
-        @endif
-    </div>
-
-    <div class="flex justify-between mt-4">
-        <button type="button" class="w-1/2 px-4 py-2 bg-gray-500 text-white rounded-lg" id="return-step3">regresar</button>
-        
-        <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
-    </div>
-</div>
-
-
-<!-- JavaScript para la vista previa -->
+    <!-- JavaScript para la vista previa -->
     <script>
         // Función para previsualizar una sola imagen (portada y kit)
         function previewSingleImage(event, previewId) {
@@ -538,4 +408,3 @@
             });
         }
     </script>
-

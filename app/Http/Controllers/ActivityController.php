@@ -34,7 +34,7 @@ class ActivityController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|min:5|max:255',
             'mix' => 'required|in:0,1',
         ]);
     

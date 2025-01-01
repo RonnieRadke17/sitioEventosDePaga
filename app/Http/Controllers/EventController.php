@@ -41,7 +41,7 @@ public function index()
 
     public function store(Request $request)
     {
-        //dd($request);
+        dd($request);
         //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
         $eventData = Validator::make($request->all(), [
             'name' => 'required|string|max:60',
