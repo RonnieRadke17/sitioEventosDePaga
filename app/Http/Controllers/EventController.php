@@ -41,7 +41,7 @@ public function index()
 
     public function store(Request $request)
     {
-        dd($request);
+        //dd($request);
         //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
         $eventData = Validator::make($request->all(), [
             'name' => 'required|string|max:60',
@@ -75,7 +75,7 @@ public function index()
                 aqui se valida si se selecciono algun lugar ya registrado para validarlo
                 validar si hay algun lugar seleccionado 
             */
-            'place_id' => [
+            /* 'place_id' => [
             'required',
             'string',
             'max:60',
@@ -96,10 +96,10 @@ public function index()
                         }
                     }
                 },
-            ],
+            ], */
 
             //aqui validamos la informacion de las actividades
-            'is_with_activities' =>[
+           /*  'is_with_activities' =>[
                 'required',
                 'boolean',
                 'in:0,1',
@@ -109,7 +109,7 @@ public function index()
                         
                     }
                 },
-            ],
+            ], */
 
             /*
                 aqui validamos la informacion de las imagenes 
@@ -151,12 +151,13 @@ public function index()
                 'registration_deadline' => $request->registration_deadline, 
                 'is_limited_capacity'=> $request->is_limited_capacity,
                 'capacity' => $request->is_limited_capacity ? $request->capacity : null,
-                'activities' => $request->is_with_activities,//este campo es de si es con actividades el evento o no
+                //'activities' => $request->is_with_activities,//este campo es de si es con actividades el evento o no
+                'activities' => 0,//este campo es de si es con actividades el evento o no
                 'price'=> $request->price
             ]);
             
             //hacemos la incersion del lugar y lo vinculamos con el evento
-            if ($request->place_id == 'Otro') {
+            /* if ($request->place_id == 'Otro') {
                 
                 $place = Place::create([
                     'name' => $request->place,
@@ -170,7 +171,7 @@ public function index()
             }else{//aqui validamos la informacion del id del lugar para hacer la vinculacion con el evento
                 //en la tabla intermedia de event_places
                 $event->places()->attach($request->place_id);
-            }
+            } */
         
             /* aqui hacemos la incersion de las actividades del evento en la tabla intermedia activity_event
                 Obtener todas las actividades seleccionadas
@@ -179,7 +180,7 @@ public function index()
                 // Obtener todas las actividades seleccionadas
                 //aqui falta poner la opcion de con o sin actividades del evento eso involucra el enum de la DB
              */
-            if($request->is_with_activities == 1){//comparamos  que el valor dentro sea int,string
+            /* if($request->is_with_activities == 1){//comparamos  que el valor dentro sea int,string
                 try {
                     $selectedActivities = $request->input('selected_activities');
 
@@ -208,7 +209,7 @@ public function index()
                     \Log::error('Error inserting activity event: ' . $e->getMessage());
                 }
                 
-            }
+            } */
 
             //imagenes del evento
             if ($request->hasFile('cover')) {//first image
@@ -552,4 +553,15 @@ public function index()
         Event::where('id',$decryptedId)->delete();
         return redirect('event')->with('mensaje', 'Evento borrado');
     }
+
+    /* event_data*/
+    
+
+    
+    /*event_activities*/
+
+    /*event_place*/
+
+    /*event_imgs*/
+
 }

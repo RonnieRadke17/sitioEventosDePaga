@@ -11,37 +11,21 @@
 
     {{-- script que muestra el contenido el en form y el mapa del evento revisar los items de las subs--}}
     <script src="{{ asset('js/formContent.js') }}"></script>
-    {{-- stilo de las imgs del sistema --}}
-    <style>
-        .scroll-container {
-            max-height: 60vh; /* Ajusta esto según sea necesario */
-            overflow-y: auto;
-        }
-    </style>
 @endsection
 
-@section('content')
-{{-- <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full md:w-2/3 lg:w-1/2">
-        <!-- Step indicators -->
-        <div class="mb-6 flex justify-between items-center">
-            <div class="w-1/3 text-center">
-                <span class="block w-8 h-8 bg-blue-500 text-white rounded-full mx-auto">1</span>
-                <span class="text-gray-700 text-sm">Event Details</span>
-            </div>
-            <div class="w-1/3 text-center">
-                <span class="block w-8 h-8 bg-gray-300 text-white rounded-full mx-auto">2</span>
-                <span class="text-gray-700 text-sm">Activities</span>
-            </div>
-        </div>
-        
-        
-    </div>
-</div> --}}
 
+{{-- aqui se revisa el valor del cual se va a usar para el evento --}}
+
+
+@section('content')
 <!-- Formulario -->
 <form action="{{ route('event.store') }}" method="post" id="multi-step-form" enctype="multipart/form-data" class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200 dark:text-white dark:bg-gray-600 dark:border-gray-600">
     @csrf
+
+    @if($action == 'data')
+    
+    @endif
+
     @include('event.form',['mode'=>'Registrar'])
 </form>
 <!-- Flatpickr JS -->
