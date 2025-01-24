@@ -28,14 +28,14 @@
                 <div class="w-1/2 pr-2">
                     
                     <label for="event_date" class="block text-gray-700 dark:text-white">Fecha del evento</label>
-                    <input type="text" name="event_date" id="event_date" class="w-full px-4 py-2 border rounded-lg" placeholder="YYYY-MM-DD HH:MM" value="{{ old('event_date', $event->event_date ?? '') }}">
+                    <input type="text" name="event_date" id="event_date" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="YYYY-MM-DD HH:MM" value="{{ old('event_date', $event->event_date ?? '') }}">
                     @error('event_date')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="w-1/2 pl-2">
                     <label for="registration_deadline" class="block text-gray-700 dark:text-white">Fecha límite de inscripción</label>
-                    <input type="text" name="registration_deadline" id="registration_deadline" class="w-full px-4 py-2 border rounded-lg" placeholder="YYYY-MM-DD HH:MM" value="{{ old('registration_deadline', $event->registration_deadline ?? '') }}">
+                    <input type="text" name="registration_deadline" id="registration_deadline" class="w-full px-4 py-2  dark:bg-gray-800 border rounded-lg" placeholder="YYYY-MM-DD HH:MM" value="{{ old('registration_deadline', $event->registration_deadline ?? '') }}">
                     @error('registration_deadline')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
