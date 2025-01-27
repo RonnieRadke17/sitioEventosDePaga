@@ -7,10 +7,7 @@
     </div>
 @endif
 
-
-
-
-<div class="container bg-gray-100 p-10">
+<div class="container p-10">
     <h1 class="mb-4">Eventos</h1>
     <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         @foreach($events as $event)
@@ -38,9 +35,4 @@
 
 <!-- Incluir Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-
-    
-
-
 @endsection
