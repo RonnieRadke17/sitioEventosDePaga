@@ -23,13 +23,6 @@ Route::get('/pago', function () {
 
 Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');
 
-
-Route::get('/test', function () {
-    return view('test');
-});
-
-
-
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
  Route::get('payment', function () {//ventana que muestra paypal
