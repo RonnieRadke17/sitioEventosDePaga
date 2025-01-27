@@ -6,12 +6,26 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ActivityEvent;
 use App\Models\Activity;
-
+use App\Models\Event;
+use App\Models\Sub;
 
 class ActivityEventController extends Controller
 {
-    //aqui se hace el registro de las actividades seleccionadas y modificacion y eliminacion, sin formularios
-   
+
+    /* gestion de actividades de eventos */
+    public function create(string $id){//get id for event
+        try {
+            $encriptedId = $id;
+            $decriptedId = decrypt($id);
+            $event = Event::find($decriptedId);
+            $activities = Activity::all();
+            $subs = Sub::all();
+        } catch (\Throwable $th) {
+            return redirect('event')->with('mensaje', 'Evento borrado');
+        }
+        return view('event.create-activities',compact('encriptedId','event', 'activities', 'subs'));     
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -62,7 +76,18 @@ class ActivityEventController extends Controller
         }
     }
 
-   
+    public function store(Request $request){
+        dd($request);
+
+    }    
+
+
+
+    public function edit(string $id)
+    {
+           
+    }
+
     /**
      * Update the specified resource in storage.
      */

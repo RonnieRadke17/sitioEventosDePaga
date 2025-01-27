@@ -7,6 +7,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivityEventController;
 use App\Http\Controllers\SubController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ErrorsController;
@@ -21,13 +22,6 @@ Route::get('/pago', function () {
 })->name('stripe.form');
 
 Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');
-
-
-Route::get('/test', function () {
-    return view('test');
-});
-
-
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
@@ -73,6 +67,11 @@ Route::get('/login',[LoginController::class,'showLoginForm'])->name('login');//r
 Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta que inicia sesion al usr 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
+
+    Route::resource('activities-event', ActivityEventController::class); 
+
+    Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event
+
 
     Route::resource('sub', SubController::class);
     Route::resource('activity', ActivityController::class);

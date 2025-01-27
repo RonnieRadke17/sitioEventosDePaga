@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/3 mx-auto">
+<div class="min-h-screen flex items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/3 mx-auto dark:text-white dark:bg-gray-600 dark:border-gray-600">
 
         <!-- Mensaje de sesión -->
         @if (session('message'))
@@ -33,12 +33,12 @@
 
         <!-- Información del usuario y código -->
         @if(isset($remainingTimeFormatted))
-            <p class="text-gray-600 mb-2">Tu código de verificación expira en <span class="font-bold">{{ $remainingTimeFormatted }}</span>.</p>
+            <p class="text-gray-600 mb-2 dark:text-white">Tu código de verificación expira en <span class="font-bold">{{ $remainingTimeFormatted }}</span>.</p>
         @endif
 
-        <p class="mb-2 text-gray-800">Hola, <span class="font-bold">{{ $user['name'] }}</span></p>
-        <p class="text-gray-600">Te hemos enviado un código de verificación al correo:</p>
-        <p class="mb-4 text-gray-800">Email: <span class="font-bold">{{ $user['email'] }}</span></p>
+        <p class="mb-2 text-gray-800 dark:text-white">Hola, <span class="font-bold">{{ $user['name'] }}</span></p>
+        <p class="text-gray-600 dark:text-white">Te hemos enviado un código de verificación al correo:</p>
+        <p class="mb-4 text-gray-800 dark:text-white">Email: <span class="font-bold">{{ $user['email'] }}</span></p>
 
         <!-- Temporizador visual -->
         <div class="flex justify-center mb-4">
@@ -52,10 +52,17 @@
         </div>
 
         <!-- Formulario de verificación -->
-        <p class="mb-4 text-gray-600">Ingresa el código de verificación:</p>
         <form action="{{ route('check-email-verification') }}" method="POST" class="mb-4">
             @csrf
-            <input type="number" name="code" placeholder="Código de verificación" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="mb-4">
+                <div class="relative">
+                    <input type="number" name="code" id="code" class="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                    <label for="code" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">Código de verificación</label>
+                </div>
+                @error('number')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
             <input type="submit" value="Verificar" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600">
         </form>
 
