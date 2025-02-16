@@ -13,12 +13,12 @@
 {{-- toggle para activar o desactivar el evento --}}
 {{-- esto seria por medio de ajax --}}
 <br>  
-@if ($activitiesEvent)
+{{-- @if ($activitiesEvent)
     hola
-    <a href="{{route('event.edit', encrypt($event->id))}}">Desactivar evento</a>
+    <a href="{{route('activities-event.edit', encrypt($event->id))}}">Actividades</a>
 @else
-    <a href="{{route('event.edit', encrypt($event->id))}}">Activar evento</a>
-@endguest
+<a href="{{route('activities-event.create', encrypt($event->id))}}">Actividades</a>
+@endguest --}}
 
 {{-- botones de  activitiesEvent--}}
 

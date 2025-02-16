@@ -68,7 +68,7 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-    Route::resource('activities-event', ActivityEventController::class); 
+    Route::resource('activities-event', ActivityEventController::class);//no existe index de esta ventana 
 
     Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event
 

@@ -11,24 +11,13 @@
                     </select>
                 </div>     
                 
-                {{-- tabla acts --}}
-                {{-- <ul class="grid w-full gap-1 md:grid-cols-1 max-h-48 overflow-y-auto">
-                    @foreach($activities as $activity)
-                    <li>
-                        <button type="button" for="react-option" class="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-100 dark:border-gray-700 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">                           
-                            <div class="flex items-center p-1">
-                                <input id="red-checkbox" type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <div class="w-full text-lg font-semibold ml-2">{{ $activity->name }}</div>
-                            </div>
-                        </button>
-                    </li>
-                    @endforeach
-                </ul> --}}
+
                 <ul class="grid w-full gap-1 md:grid-cols-1 max-h-48 overflow-y-auto">
                     @foreach($activities as $activity)
                     <li>
                         <button type="button" onclick="toggleAccordion(this)" class="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-100 dark:border-gray-700 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div class="flex items-center p-1">
+                                {{-- QUITAR EL ID DE LOS CHECKBOXK --}}
                                 <input id="red-checkbox-{{ $activity->id }}" type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <div class="w-full text-lg font-semibold ml-2">{{ $activity->name }}</div>
                             </div>
@@ -38,17 +27,34 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="bg-gray-100 border-b">
-                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">M</th>
-                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">F</th>
-                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">Mix</th>
+                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">
+                                            M
+                                        </th>
+                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">
+                                            F
+                                        </th>
+                                        @if($activity->mix == 1)
+                                        <th class="py-3 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">
+                                            Mix
+                                        </th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($subs as $sub)
-                                    <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
-                                        <td class="py-2 px-4">{{ $sub->name }}</td>
-                                        <td class="py-2 px-4">{{ $sub->name }}</td>
-                                        <td class="py-2 px-4">{{ $sub->name }}</td>
+                                    <tr class="border-b cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
+                                        <td class="py-2 px-4">
+                                            <input type="checkbox" name="genders[{{ $activity->id }}][M][{{ $sub->id }}]" value="{{ $sub->id }}">{{ $sub->name }}
+                                        </td>
+                                        <td class="py-2 px-4">
+                                            <input type="checkbox" name="genders[{{ $activity->id }}][F][{{ $sub->id }}]" value="{{ $sub->id }}">{{ $sub->name }}
+                                        </td>
+                                        @if($activity->mix == 1)
+                                        <td class="py-2 px-4">
+                                            <input type="checkbox" name="genders[{{ $activity->id }}][Mix][{{ $sub->id }}]" value="{{ $sub->id }}">{{ $sub->name }}
+                                        </td>
+                                        @endif
+                                        
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -88,22 +94,3 @@
     
     
  
-{{-- <table class="min-w-full bg-white border border-gray-200 dark:text-white dark:bg-gray-600 dark:border-gray-600 hidden" id="activity_table">
-                    <thead>
-                        <tr class="bg-gray-100 border-b">
-                            <th class="py-2 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">Nombre</th>
-                            <th class="py-2 px-4 text-left dark:text-white dark:bg-gray-600 dark:border-gray-600">Seleccionar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($activities as $activity)
-                        <tr class="border-b hover:bg-gray-50 cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
-                            <td class="py-2 px-4">{{ $activity->name }}</td>
-                            <td class="py-2 px-4 text-center">
-                                <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}"
-                                {{ (isset($eventActivities[$activity->id]) || in_array($activity->id, old('selected_activities', []))) ? 'checked' : '' }}>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table> --}}

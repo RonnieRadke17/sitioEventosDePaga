@@ -190,10 +190,9 @@ class EventController extends Controller
         // Buscar el evento con sus actividades y sus relaciones en activity_events
         $event = Event::findOrFail($decryptedId);
         //hacer consulta de si encuentra registros ligados al evento
-        $activitiesEvent = ActivityEvent::where('event_id', $event)->exists();
-        $eventPlace = EventPlace::where('event_id', $event)->exists();
-        $eventImages = Image::where('event_id', $event)->exists();
-
+        $activitiesEvent = ActivityEvent::where('event_id', $event->id)->exists();
+        $eventPlace = EventPlace::where('event_id', $event->id)->exists();
+        $eventImages = Image::where('event_id', $event->id)->exists();
         return view('event.show', compact('event','activitiesEvent',"eventPlace","eventImages"));
     }
 
