@@ -17,8 +17,7 @@
                     <li>
                         <button type="button" onclick="toggleAccordion(this)" class="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-100 dark:border-gray-700 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div class="flex items-center p-1">
-                                {{-- QUITAR EL ID DE LOS CHECKBOXK --}}
-                                <input id="red-checkbox-{{ $activity->id }}" type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <input type="checkbox" name="selected_activities[]" value="{{ $activity->id }}" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <div class="w-full text-lg font-semibold ml-2">{{ $activity->name }}</div>
                             </div>
                         </button>
@@ -42,7 +41,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($subs as $sub)
-                                    <tr class="border-b cursor-pointer activity-row" data-activity-id="{{ $activity->id }}">
+                                    <tr class="border-b cursor-pointer activity-row">
                                         <td class="py-2 px-4">
                                             <input type="checkbox" name="genders[{{ $activity->id }}][M][{{ $sub->id }}]" value="{{ $sub->id }}">{{ $sub->name }}
                                         </td>

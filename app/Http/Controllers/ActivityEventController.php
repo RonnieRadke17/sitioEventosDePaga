@@ -120,7 +120,7 @@ class ActivityEventController extends Controller
         }
     
         try {
-            DB::transaction(function () use ($request) {
+            $result = DB::transaction(function () use ($request) {
                 $decryptedId = Crypt::decrypt($request->id_event);
     
                 foreach ($request->selected_activities as $activityId) {
@@ -143,8 +143,14 @@ class ActivityEventController extends Controller
     
                 Event::where('id', $decryptedId)->update(['activities' => '1']);
             });
+
+            if($result){
+                return redirect()->route('home')->with('success', 'Actividades registradas correctamente.');
+            }else {
+                return redirect()->route('home')->with('success', 'Error.');
+            }
     
-            return redirect()->route('home')->with('success', 'Actividades registradas correctamente.');
+            
         } catch (\Exception $e) {
             return redirect()->route('home')->withErrors(['error' => 'Error al registrar actividades: ' . $e->getMessage()]);
         }

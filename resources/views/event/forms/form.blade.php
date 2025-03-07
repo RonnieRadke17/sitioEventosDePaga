@@ -103,7 +103,6 @@
             @endif
         
             <div class="flex justify-center mt-4">
-                {{-- <button type="button" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2" id="to-step-2">Next</button> --}}
                 <button type="submit" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2">{{$mode}}</button>
             </div>
         </div>
