@@ -3,16 +3,17 @@
             <h2 class="text-3xl font-bold text-center text-orange-600 mb-2">{{$mode}} actividades</h2>
             <div id="step-2">
                 
-                <div class="mb-4" >
-                    <label for="is_with_activities" class="block text-gray-700 dark:text-white">Actividades</label>
+                <div class="mb-4">
                     <select name="is_with_activities" id="is_with_activities" class="w-full px-4 py-2 border rounded-lg dark:text-white dark:bg-gray-600 dark:border-gray-600">
-                        <option value="0" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 0 ? 'selected' : '' }}>No</option>
-                        <option value="1" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 1 ? 'selected' : '' }}>Yes</option>
+                        <option value="0" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 0 ? 'selected' : '' }}>Sin actividades</option>
+                        <option value="1" {{ old('is_with_activities', isset($event) ? $event->activities : '') == 1 ? 'selected' : '' }}>Con actividades</option>
                     </select>
+                    @error('is_with_activities')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>     
                 
-
-                <ul class="grid w-full gap-1 md:grid-cols-1 max-h-48 overflow-y-auto">
+                <ul class="grid w-full gap-1 md:grid-cols-1 max-h-48 overflow-y-auto" id="list-activities">
                     @foreach($activities as $activity)
                     <li>
                         <button type="button" onclick="toggleAccordion(this)" class="inline-flex items-center justify-between w-full p-1 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-100 dark:border-gray-700 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
@@ -62,7 +63,9 @@
                     </li>
                     @endforeach
                 </ul>
-                                
+                @error('selected_activities')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror          
             </div>
             <div class="flex justify-center mt-4">
                 {{-- <button type="button" class="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg ml-2" id="to-step-2">Next</button> --}}

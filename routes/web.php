@@ -16,6 +16,25 @@ use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\EventMapController;
+
+
+//rutas del mapa de los eventos
+Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/event-map/create/{id}', [EventMapController::class, 'create'])->name('event-map.create');
+
+
+
+/* Route::resource('activities-event', ActivityEventController::class);//no existe index de esta ventana 
+Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event */
+// Resource sin index
+Route::resource('activities-event', ActivityEventController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');
+
+
+
 
 Route::get('/pago', function () {
     return view('stripe');
@@ -67,11 +86,6 @@ Route::get('/login',[LoginController::class,'showLoginForm'])->name('login');//r
 Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta que inicia sesion al usr 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
-
-    Route::resource('activities-event', ActivityEventController::class);//no existe index de esta ventana 
-
-    Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event
-
 
     Route::resource('sub', SubController::class);
     Route::resource('activity', ActivityController::class);

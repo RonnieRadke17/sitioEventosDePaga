@@ -12,7 +12,7 @@ class Place extends Model
         'name',
         'address',
         'lat',
-        'lng'
+        'lon'
     ];
 
     //relationship with event m-m    

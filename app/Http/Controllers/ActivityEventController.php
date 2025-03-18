@@ -17,91 +17,34 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class ActivityEventController extends Controller
-{
+{/* gestion de actividades de eventos */
 
-    /* gestion de actividades de eventos */
+    
     public function create(string $id){//get id for event
         $value = $this->validateRegistrationDeadline($id);//si el valor es tal entonces si se puede
         if($value){
             $event = Event::find(decrypt($id));
             $activities = Activity::all();
             $subs = Sub::all();
-            return view('event.create-activities',compact('id','event', 'activities', 'subs'));
+            return view('activity-event.create',compact('id','event', 'activities', 'subs'));
         }else{
             return redirect()->route('home')->withErrors(['error' => 'No se puede agregar actividades porque la fecha de inscripción ya pasó.']);
         }    
     }
-
-    /* public function store(Request $request){
-        $id = $request->id_event;
-        $acts = true;
-        $value = $this->validateRegistrationDeadline($id);//si el valor es tal entonces si se puede
-
-        $validator = Validator::make($request->all(), [
-            'selected_activities' => 'required|array|min:1', // Debe ser un array y no estar vacío
-            'selected_activities.*' => 'integer|exists:activities,id', // Cada valor debe ser un ID válido en la tabla activities
-            'genders' => 'required|array', // Debe ser un array
-            'genders.*' => 'array', // Cada actividad debe contener géneros
-            'genders.*.*' => 'array', // Cada género debe contener subcategorías
-            'genders.*.*.*' => 'integer|exists:subs,id', // Cada sub_id debe existir en la tabla subs
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-
-        if($value){
-            if($request->is_with_activities == "1"){//si es con actividades
-                $decryptedId = Crypt::decrypt($request->id_event);
-                //metodo de incersion de actividades
-                foreach ($request->selected_activities as $activityId) {
-                    // Verificamos si hay categorías de género seleccionadas
-                    if (!isset($request->genders[$activityId]) || empty($request->genders[$activityId])) {
-                        continue; // Si no hay categorías, pasamos a la siguiente actividad
-                    }
-                    
-                    foreach ($request->genders[$activityId] as $gender => $subIds) {
-                        foreach ($subIds as $subId) {
-                            // Verificar que el sub_id exista en la base de datos antes de insertar
-                            if (!Sub::where('id', $subId)->exists()) {
-                                return redirect()->route('home')->withErrors(['error' => "El sub_id $subId no es válido."]);
-                            }
-
-                            ActivityEvent::create([
-                                'event_id'   => $decryptedId,
-                                'activity_id' => $activityId,
-                                'gender'     => $gender,
-                                'sub_id'     => $subId,
-                            ]);
-                        }
-                    }
-
-                    $eventUpdate = Event::find($decryptedId);
-                    $eventUpdate->update([
-                        'activities' => '1'
-                    ]);
-
-                }   
-                return redirect()->route('home')->withErrors(['error' => 'si registro']);
-            }else{//redireccionamos al evento
-                return response()->json(['message' => 'es sin acts.'], 200);
-            }
-        }else{
-            return redirect()->route('home')->withErrors(['error' => 'No se puede agregar actividades porque la fecha de inscripción ya pasó.']);
-        }
-    } */ 
-        
+    
     public function store(Request $request)
     {
+        //dd($request);
         $id = $request->id_event;
-        $value = $this->validateRegistrationDeadline($id);
+        $encryptedId = $request->id_event;
+        $value = $this->validateRegistrationDeadline($id);//validacion de fecha de inscripcion si todavia es valido el insertar acts
     
         // Validación de datos
         $validator = Validator::make($request->all(), [
-            'selected_activities' => 'required|array|min:1',
+            'is_with_activities' => 'required|in:0,1',
+            'selected_activities' => 'array|min:1',
             'selected_activities.*' => 'integer|exists:activities,id',
-            'genders' => 'required|array',
+            'genders' => 'array',
             'genders.*' => 'array',
             'genders.*.*' => 'array',
             'genders.*.*.*' => 'integer|exists:subs,id',
@@ -115,11 +58,11 @@ class ActivityEventController extends Controller
             return redirect()->route('home')->withErrors(['error' => 'No se puede agregar actividades porque la fecha de inscripción ya pasó.']);
         }
     
-        if ($request->is_with_activities != "1") {
-            return response()->json(['message' => 'es sin acts.'], 200);
+        if ($request->is_with_activities != "1") {//si no hay actividades solo redireccionas a el evento especifico
+            return redirect()->route('event.show', $encryptedId);//redireccionar a ruta de show
         }
     
-        try {
+        /* try {
             $result = DB::transaction(function () use ($request) {
                 $decryptedId = Crypt::decrypt($request->id_event);
     
@@ -153,7 +96,7 @@ class ActivityEventController extends Controller
             
         } catch (\Exception $e) {
             return redirect()->route('home')->withErrors(['error' => 'Error al registrar actividades: ' . $e->getMessage()]);
-        }
+        } */
     }
        
 

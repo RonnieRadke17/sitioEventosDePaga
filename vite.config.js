@@ -9,12 +9,12 @@ export default defineConfig({
         }),
     ],
     server: {
-        //host: '192.168.1.106', //conexiones externas
-        host: '192.168.1.72', // direccion en otro lado
+        host: '127.0.0.1', //conexiones externas
+        //host: '192.168.1.72', // direccion en otro lado
         port: 5173,      // Cambia el puerto si es necesario
         hmr: {
-            host: '192.168.1.72', // direccion en casa
-            //host: '192.168.1.106', // direccion en otro lado
+            //host: '192.168.1.72', // direccion en casa
+            host: '127.0.0.1', // direccion en otro lado
         },
         headers: {
             'Access-Control-Allow-Origin': '*',

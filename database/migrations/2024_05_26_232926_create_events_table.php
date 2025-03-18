@@ -13,18 +13,11 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();//nombre del evento
             $table->text('description');
             $table->datetime('event_date');//datetime sobre la fecha del evento
-            $table->datetime('kit_delivery')->nullable();//fecha de entrega de kits puede que se den o no
             $table->datetime('registration_deadline');//datetime del ultimo dia para inscribirse y la hora
-            /* 
-                aqui definimos que si la capacidad es limitada si se ocupa el campo capacidad 
-                si no es limitada no se ocupa ese campo 
-            */
-            $table->boolean('is_limited_capacity')->default(true);
-            $table->integer('capacity')->nullable();
-            $table->boolean('activities');//campo para ver si el evento va a tener actividades
+            $table->integer('capacity')->nullable();//si el campo esta vacio es porque no hay limite de cupos
             $table->enum('status',['Activo','Inactivo','Cancelado',])->nullable()->default('Activo');
             $table->decimal('price', 10, 2)->nullable();//se pone el precio nulo por si es un evento gratuito
             $table->timestamps();

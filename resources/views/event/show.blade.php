@@ -10,19 +10,12 @@
 @endsection
 @section('content')
 
-{{-- toggle para activar o desactivar el evento --}}
-{{-- esto seria por medio de ajax --}}
-<br>  
-{{-- @if ($activitiesEvent)
-    hola
-    <a href="{{route('activities-event.edit', encrypt($event->id))}}">Actividades</a>
-@else
-<a href="{{route('activities-event.create', encrypt($event->id))}}">Actividades</a>
-@endguest --}}
+@if (session('success'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+        {{ session('success') }}
+    </div>
+@endif
 
-{{-- botones de  activitiesEvent--}}
-
-<br>{{-- ya esta --}}
 <a href="{{ route('event.edit',encrypt($event->id)) }}">Informacion del evento</a>
 
 <a href="{{ route('event.edit',encrypt($event->id)) }}" class="inline-flex items-center justify-center p-5 text-base font-medium text-gray-500 rounded-lg bg-gray-50 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white">
@@ -32,34 +25,30 @@
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
     </svg>
 </a> 
-
-
 <br>
 
 @if ($activitiesEvent)
     hola
-    <a href="{{route('activities-event.edit', encrypt($event->id))}}">Actividades</a>
+    <a href="{{route('activities-event.edit', encrypt($event->id))}}">Modificar actividades</a>
 @else
-    <a href="{{route('activities-event.create', encrypt($event->id))}}">Actividades</a>
+    <a href="{{route('activities-event.create', encrypt($event->id))}}">Agregar actividades</a>
 @endguest
 
 <br>
 
 @if ($eventPlace)
-    <a href="{{route('event.edit', encrypt($event->id))}}">Lugar</a>
-    hola
+    <a href="{{route('event-map.edit', encrypt($event->id))}}">Editar lugar</a>
 @else
-    <a href="">Lugar</a>
-    adios
+    <a href="{{route('event-map.create', encrypt($event->id))}}">Agregar lugar</a>
 @endguest
 <br>
 
 
 @if ($eventImages)
-    <a href="{{route('event.edit', encrypt($event->id))}}">Imagenes</a>
+    <a href="{{route('event.edit', encrypt($event->id))}}">Editar imagenes</a>
     hola
 @else
-    <a href="">Imagenes</a>
+    <a href="">Agregar imagenes</a>
     adios
 @endguest
 

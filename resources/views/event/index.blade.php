@@ -21,6 +21,17 @@
     </div>
     @endif
 
+    @if ($errors->any()){{-- errores de eventController cuando se crea evento --}}
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+    @endif
+
+
 
 
     {{-- <a href="{{ route('event.create') }}" class="btn btn-se rounded-circle position-fixed" style="bottom: 20px; left: 20px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-pencil-alt"></i></a> --}}
