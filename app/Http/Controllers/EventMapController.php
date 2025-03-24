@@ -9,65 +9,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EventMapController extends Controller
 {
     /**
      * Show the form for creating a new resource.
      */
-    public function create(string $id)
+    public function create(string $id)/* ya */
     {
-        /*validacion de que existe el evento, esta activo y no ha pasado ninguna fecha por alto*/
-        //try catch
-        try{
-            $event = Event::find(Crypt::decrypt($id));
-            if (!$event && !$event->status = "Activo" && $event->event_date < now()) {
-                return redirect()->back()->withErrors('El evento no existe o no está activo.')->withInput();
-            }
-            $places = Place::all();
-            return view('event-map.create',compact('id','places'));
-
-        }catch (DecryptException $e) {//si hay error entonces retornamos a la vista con los errores y revisar en este punto cual es el valor de option y id
-            return redirect()->back()->withErrors('ID inválido o corrupto.')->withInput();
+        $response = $this->validationView($id);
+        if($response != null){
+            return redirect()->back()->withErrors($response);
         }
-        
+
+        $places = Place::all();
+        return view('event-map.create', compact('id', 'places'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request)/* ya */
     {
-        $eventMap = Validator::make($request->all(), [/* validacion de ids (Id de evento y de lugar)*/
-            'id' => 'required|string|min:30|max:255',
-            'option' => 'required|not_in:notaviable|string|min:3|max:255', // El valor no puede ser "notaviable"
-        ]);
-
-        if ($eventMap->fails()) {//retornamos los errores de los datos del evento
-            return redirect()->back()->withErrors($eventMap)->withInput();
-        }
-
-        try {/* try catch de descencriptacion de id y de option*/
-            $decryptedEventId = Crypt::decrypt($request->id);
-            if($request->option != 'new'){//revisamos si el lugar es valido
-                $place = Place::find(Crypt::decrypt($request->option));
-            } 
-        } catch (DecryptException $e) {//si hay error entonces retornamos a la vista con los errores y revisar en este punto cual es el valor de option y id
-            return redirect()->back()->withErrors('ID inválido o corrupto.')->withInput();
-        }
-        
-        if ($request->option == 'new') {/* validacion de los valores del mapa si option tiene el valor de new */
-            $eventMap = Validator::make($request->all(), [
-                'name' => 'required_if:option,new|string|max:255', // Requerido si option es "new"
-                'address' => 'required_if:option,new|string|max:255', // Requerido si option es "new"
-                'lat' => 'required_if:option,new|numeric|between:-90,90', // Requerido si option es "new"
-                'lon' => 'required_if:option,new|numeric|between:-180,180', // Requerido si option es "new"
-            ]);
-            if ($eventMap->fails()) {//retornamos los errores de los datos del evento
-                return redirect()->back()->withErrors($eventMap)->withInput();
-            }
-        }
-
+        $this->validation($request);//llamamos al metodo de validacion
 
         try {//registra el evento en la base de datos
             $result = DB::transaction(function () use ($request) {
@@ -116,7 +81,13 @@ class EventMapController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $response = $this->validationView($id);
+        if($response != null){
+            return redirect()->back()->withErrors($response);
+        }
+
+        $places = Place::all();
+        return view('event-map.edit', compact('id', 'places'));
     }
 
     /**
@@ -166,6 +137,34 @@ class EventMapController extends Controller
             }
         }
     }
+
+    public function validationView(string $id)
+    {
+        
+        try {
+            // Buscar el evento por ID
+            $event = Event::find(Crypt::decrypt($id));
+    
+            if (!$event) {
+                return 'El evento no existe.';
+            }
+            // Verificar si el evento está activo
+            if ($event->status !== 'Activo') {
+                return 'El evento no está activo.';
+            }
+        
+            // Verificar si la fecha del evento ya ha pasado
+            if (Carbon::now()->gte(Carbon::parse($event->event_date))) {
+                return 'La fecha del evento ya ha pasado.';
+            }
+
+        } catch (DecryptException $e) {
+        // Manejar el error de desencriptación
+            return redirect()->back()->withErrors('ID inválido o corrupto.');
+        }
+    }
+
+
 
 
 }

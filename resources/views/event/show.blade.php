@@ -15,6 +15,12 @@
         {{ session('success') }}
     </div>
 @endif
+{{-- Verifica si hay errores en la sesión --}}
+@if(session('errors'))
+    <div class="alert alert-danger">
+        {{ session('errors')->first() }}
+    </div>
+@endif
 
 <a href="{{ route('event.edit',encrypt($event->id)) }}">Informacion del evento</a>
 
