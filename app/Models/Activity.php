@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     use HasFactory;
-    protected $fillable = [
-     'name',
-     'mix'
-    ];
+    protected $fillable = ['name', 'sport_id', 'mix'];
+
+    //relation with sport
+    public function sport()
+    {
+        return $this->belongsTo(Sport::class);
+    }
 
     //relation with event
     public function eventActivities()
