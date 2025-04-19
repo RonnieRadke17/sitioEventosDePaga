@@ -34,7 +34,6 @@
 <br>
 
 @if ($activitiesEvent)
-    hola
     <a href="{{route('activities-event.edit', encrypt($event->id))}}">Modificar actividades</a>
 @else
     <a href="{{route('activities-event.create', encrypt($event->id))}}">Agregar actividades</a>
@@ -51,11 +50,9 @@
 
 
 @if ($eventImages)
-    <a href="{{route('event.edit', encrypt($event->id))}}">Editar imagenes</a>
-    hola
+    <a href="{{route('images-event.edit', encrypt($event->id))}}">Editar imagenes</a>
 @else
-    <a href="">Agregar imagenes</a>
-    adios
+    <a href="{{route('images-event.create', encrypt($event->id))}}">Agregar imagenes</a>
 @endguest
 
 <br>

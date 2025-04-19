@@ -17,23 +17,23 @@ use App\Http\Controllers\AdminEventController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\EventMapController;
-
+use App\Http\Controllers\ImageEventController;
 
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
 // Ruta personalizada para create con parámetro id
 Route::get('/event-map/create/{id}', [EventMapController::class, 'create'])->name('event-map.create');
 
-
-
-/* Route::resource('activities-event', ActivityEventController::class);//no existe index de esta ventana 
-Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event */
 // Resource sin index
 Route::resource('activities-event', ActivityEventController::class)->except(['index', 'create']); // Excluye index y create
 // Ruta personalizada para create con parámetro id
 Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');
 
 
+// Resource sin index
+Route::resource('images-event', ImageEventController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/images-event/create/{id}', [ImageEventController::class, 'create'])->name('images-event.create');
 
 
 Route::get('/pago', function () {

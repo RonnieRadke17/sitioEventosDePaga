@@ -34,7 +34,6 @@ class ActivityEventController extends Controller
     
     public function store(Request $request)
     {
-        //dd($request);
         $id = $request->id_event;
         $encryptedId = $request->id_event;
         $value = $this->validateRegistrationDeadline($id);//validacion de fecha de inscripcion si todavia es valido el insertar acts
@@ -61,8 +60,8 @@ class ActivityEventController extends Controller
         if ($request->is_with_activities != "1") {//si no hay actividades solo redireccionas a el evento especifico
             return redirect()->route('event.show', $encryptedId);//redireccionar a ruta de show
         }
-    
-        /* try {
+
+        try {
             $result = DB::transaction(function () use ($request) {
                 $decryptedId = Crypt::decrypt($request->id_event);
     
@@ -70,33 +69,39 @@ class ActivityEventController extends Controller
                     if (!isset($request->genders[$activityId]) || empty($request->genders[$activityId])) {
                         continue;
                     }
-                    //falta encriptar los ids de las actividades en las vistas y descencriptar en el back
                     //como a su vez validar que la actividad tenga el genero mixto en dado caso de que llegue un registro con mix
-                    foreach ($request->genders[$activityId] as $gender => $subIds) {
-                        foreach ($subIds as $subId) {
-                            ActivityEvent::create([
-                                'event_id'   => $decryptedId,
-                                'activity_id' => $activityId,
-                                'gender'     => $gender,
-                                'sub_id'     => $subId,
-                            ]);
+                    foreach ($request->genders as $activityId => $genders) {
+                        // $activityId = ID de la actividad (ej: 1, 2)
+                        foreach ($genders as $gender => $subIds) {
+                            // $gender = 'M', 'F' o 'Mix'
+                            foreach ($subIds as $subId => $value) {
+                                $result = ActivityEvent::create([
+                                    'event_id' => $decryptedId,
+                                    'activity_id' => $activityId,
+                                    'gender' => $gender,
+                                    'sub_id' => $subId,
+                                ]);
+                                
+                            }
                         }
                     }
                 }
-    
-                Event::where('id', $decryptedId)->update(['activities' => '1']);
+                return true;
             });
 
-            if($result){
+            if($result == true){
+                dd("exito");
                 return redirect()->route('home')->with('success', 'Actividades registradas correctamente.');
             }else {
+                dd("error");
                 return redirect()->route('home')->with('success', 'Error.');
             }
     
             
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return redirect()->route('home')->withErrors(['error' => 'Error al registrar actividades: ' . $e->getMessage()]);
-        } */
+        }
     }
        
 

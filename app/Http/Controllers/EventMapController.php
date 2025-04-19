@@ -79,7 +79,7 @@ class EventMapController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id)/* ya */
     {
         $response = $this->validationView($id);
         if($response != null){
@@ -93,7 +93,7 @@ class EventMapController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id)/* falta poner todas las consideraciones */
     {
         //
     }
@@ -149,7 +149,7 @@ class EventMapController extends Controller
                 return 'El evento no existe.';
             }
             // Verificar si el evento está activo
-            if ($event->status !== 'Activo') {
+            if ($event->status !== 'Activo') {//revisar este apartado porque puede ser contraproducente
                 return 'El evento no está activo.';
             }
         
