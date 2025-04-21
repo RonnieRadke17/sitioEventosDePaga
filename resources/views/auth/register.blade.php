@@ -38,6 +38,7 @@
             <!-- Contenedor de campos en dos columnas -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
+                
                 <!-- Nombre -->
                 <div class="col-span-1 md:col-span-2">
                     <div class="relative">
@@ -141,11 +142,8 @@
                 @enderror
             </div>
             
-            
             <!-- Botón de Registro -->
-            <button type="submit" class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition duration-200">
-                Registrarte
-            </button>
+            <x-forms-components.submit-button value='Registrarme'></x-forms-components.submit-button>
         </form>
     
 </div>
