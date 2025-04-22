@@ -57,6 +57,7 @@
         </div>
     </div> --}}
 
+    {{-- calendars --}}
     <div class="flex mb-4">
         <div class="w-1/2 pr-2">
             
@@ -75,7 +76,7 @@
         </div>
     </div>
 
-
+    {{-- capacity --}}
     <div class="mb-4">
         <div class="relative">
             <input type="text"  name="capacity" id="capacity" autocomplete="off" value="{{ old('capacity', $event->capacity ?? '') }}"  class="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
