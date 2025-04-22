@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\View;
 class InputText extends Component
 {
     public $description;
+    public $oldvalue;
     /**
      * Create a new component instance.
      */
