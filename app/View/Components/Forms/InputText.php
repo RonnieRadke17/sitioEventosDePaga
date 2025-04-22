@@ -13,8 +13,9 @@ class InputText extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct($description = ''){
+    public function __construct($description = '', $oldvalue = ''){
         $this->description = $description;
+        $this->oldvalue = $oldvalue;
     }
 
     /**

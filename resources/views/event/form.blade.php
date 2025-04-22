@@ -2,7 +2,7 @@
 
     <h2 class="text-3xl font-bold text-center text-orange-600 mb-2">{{$mode}} evento</h2>
 
-    <x-forms.input-text name="name" id="name" description="Nombre del evento" ></x-forms.input-text>
+    <x-forms.input-text name="name" description="Nombre del evento" oldvalue="{{ $event->name ?? ''}}"></x-forms.input-text>
 
     {{-- <div class="mb-4">
         <div class="relative">
@@ -14,7 +14,7 @@
         @enderror
     </div> --}}
 
-    <x-forms.input-text name="description" id="description" description="Descripción del evento"></x-forms.input-text>
+    <x-forms.input-text name="description" id="description" description="Descripción del evento" oldvalue="{{ $event->description ?? ''}}"></x-forms.input-text>
     
     {{-- <div class="mb-4">
         <div class="relative">
