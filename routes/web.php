@@ -22,7 +22,10 @@ use App\Http\Controllers\ImageEventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
 
+
 Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
+
+Route::resource('sports', SportController::class)->except(['create', 'edit']);
 
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
