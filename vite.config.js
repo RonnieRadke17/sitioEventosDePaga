@@ -9,7 +9,8 @@ export default defineConfig({
         }),
     ],
     server: {
-        host: '127.0.0.1', //conexiones externas
+        //host: '127.0.0.1', //conexiones externas
+        host: '0.0.0.0', // <- importante
         //host: '192.168.1.72', // direccion en otro lado
         port: 5173,      // Cambia el puerto si es necesario
         hmr: {
