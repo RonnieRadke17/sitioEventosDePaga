@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sport;
 use App\Models\Category;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+
 
 class SportController extends Controller
 {
@@ -14,18 +18,9 @@ class SportController extends Controller
      */
     public function index()
     {
-        //
         $categories = Category::all(); // Obtener todas las categorías de la base de datos
-        $sports = Sport::all(); // Obtener todos los deportes de la base de datos
+        $sports = Sport::with('category')->paginate(5);
         return view('sports.index', compact('sports','categories')); // Pasar los deportes a la vista
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -33,60 +28,67 @@ class SportController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        // Validar los datos de entrada
         $request->validate([
-            'name' => 'required|string|max:255', // Validar que el nombre sea requerido, una cadena y tenga un máximo de 255 caracteres
+            'name' => 'required|string|max:60|unique:sports,name',
+           'category_id' => 'required|integer|exists:categories,id'
         ]);
+        /* try catch y transaccion para crear el nuevo deporte*/
+        try {//registra el sporto en la base de datos
+            $sport = DB::transaction(function () use ($request) {
+                return sport::create([
+                    'name' => $request->name,
+                    'category_id' => $request->category_id,
+                ]);
+            });
 
-        // Crear un nuevo deporte con los datos de entrada
-        $sport = new Sport([
-            'name' => $request->name,
-            'category_id' => $request->category_id,
-        ]);
+            if($sport){//verifica el valor de la variable $sport si tiene algo dentro lo redirecciona a la ruta de show
+                return redirect()->route('sports.index')->with('success', 'Deporte creado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
+            }else {//sino redirecciona a la ruta de sport con un mensaje de error
+                return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+            }
 
-        // Guardar el deporte en la base de datos
-        $sport->save();
-
-        // Redirigir al usuario a la página de deportes
-        return redirect()->route('sports.index')->with('success', 'Deporte creado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        } catch (\Exception $e) {
+            return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-        // Obtener el deporte por ID
-        $sportEdit = Sport::findOrFail($id); // Buscar el deporte por ID o lanzar un error 404 si no se encuentra
-        return redirect()->back()->with($sportEdit); // Redirigir a la vista anterior con el deporte editado
-    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
-        // Validar los datos de entrada
-
         $request->validate([
-            'name' => 'required|string|max:255', // Validar que el nombre sea requerido, una cadena y tenga un máximo de 255 caracteres
+            'name' => 'required|string|min5|max:60|unique:sports,name',
+           'category_id' => 'required|integer|exists:categories,id'
         ]);
+
+        /* try catch y transaccion para actualizar el deporte*/
+        try {//registra el sporto en la base de datos
+            $sport = DB::transaction(function () use ($request) {
+                return sport::create([
+                    'name' => $request->name,
+                    'category_id' => $request->category_id,
+                ]);
+            });
+
+            if($sport){//verifica el valor de la variable $sport si tiene algo dentro lo redirecciona a la ruta de show
+                return redirect()->route('sports.index')->with('success', 'Deporte creado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
+            }else {//sino redirecciona a la ruta de sport con un mensaje de error
+                return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        }
+
+
+
+
 
         // Actualizar el deporte en la base de datos
         $sport = Sport::findOrFail($id); // Buscar el deporte por ID o lanzar una excepción si no se encuentra
         $sport->update($request->all()); // Actualizar el deporte con los datos del formulario
-
         return redirect()->route('sports.index')->with('success', 'Deporte actualizado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
     }
 
@@ -95,10 +97,9 @@ class SportController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-        // Eliminar el deporte de la base de datos
-        $sport = Sport::findOrFail($id); // Buscar el deporte por ID o lanzar un error 404 si no se encuentra
-        $sport->delete(); // Eliminar el deporte
+        /* usar try catch */
+
+        $sport = Sport::findOrFail($id)->delete(); // Buscar el deporte por ID o lanzar un error 404 si no se encuentra
         return redirect()->route('sports.index')->with('success', 'Deporte eliminado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
     }
 }
