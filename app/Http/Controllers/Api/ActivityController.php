@@ -15,9 +15,9 @@ use Illuminate\Validation\ValidationException;
 class ActivityController extends Controller
 {
     //
-    public function index()//falta paginar
+    public function index()
     {
-        return new ActivityCollection(Activity::all());
+        return new ActivityCollection(Activity::paginate(10));//ya contiene la paginación y la colección de recursos
     }
 
     public function store(StoreActivityRequest  $request)//ya esta validado por ActivityRequest/StoreActivityRequest y ya está
