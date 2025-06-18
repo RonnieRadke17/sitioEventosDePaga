@@ -96,7 +96,7 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
     Route::resource('sub', SubController::class);
-    Route::resource('activity', ActivityController::class);
+    //Route::resource('activity', ActivityController::class);
     Route::resource('event', EventController::class);
 
  /* Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);

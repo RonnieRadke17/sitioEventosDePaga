@@ -16,7 +16,7 @@ class SportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index()//funciona
     {
         $categories = Category::all(); // Obtener todas las categorías de la base de datos
         $sports = Sport::with('category')->paginate(5);
@@ -26,7 +26,7 @@ class SportController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request)//ya esta
     {
         $request->validate([
             'name' => 'required|string|max:60|unique:sports,name',
@@ -56,11 +56,11 @@ class SportController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id)//revisar codigo de update
     {
         $request->validate([
-            'name' => 'required|string|min5|max:60|unique:sports,name',
-           'category_id' => 'required|integer|exists:categories,id'
+            'name' => 'required|string|min:5|max:60|unique:sports,name',
+            'category_id' => 'required|integer|exists:categories,id'
         ]);
 
         /* try catch y transaccion para actualizar el deporte*/
@@ -81,8 +81,6 @@ class SportController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
         }
-
-
 
 
 

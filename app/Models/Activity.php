@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\SoftDeletes;//hace un "borrado suave" de los registros eliminados
+
+
 class Activity extends Model
 {
+    use SoftDeletes;
     use HasFactory;
-    protected $fillable = ['name', 'sport_id', 'mix'];
+    protected $fillable = ['name','mix','sport_id'];
 
     //relation with sport
     public function sport()

@@ -7,6 +7,8 @@
             overflow-y: auto;
         }
     </style>
+@vite(['resources/js/forms/sportsForm/formValidationSports.js'])
+{{-- @vite(['resources/js/forms/sportsForm/showForm.js']) --}}
 @endsection
 
 @section('content')
@@ -85,11 +87,11 @@
                         </div>
                         <!-- Modal body -->
                         <div class="p-4 md:p-5">
-                            <form class="space-y-4" id="formSport" method="post">
+                            <form class="formSport space-y-4" id="formSport" method="post">
                             @csrf
-                            <x-forms.input-text name="name" description="Nombre del deporte" oldvalue="{{ $sport->name ?? ''}}" oninput="validateName()" onblur="validateName()" required></x-forms.input-text>
+                            <x-forms.input-text name="name" description="Nombre del deporte" oldvalue="{{ $sport->name ?? ''}}" required></x-forms.input-text>
                             
-                            <select name="category_id" id="category_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <select name="category_id" id="category_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                 <option value="" disabled {{ old('category_id') ? '' : 'selected' }}>Selecciona una categoría</option>
 
                                 @foreach ($categories as $category)
@@ -199,39 +201,6 @@
                 </div> --}}
         </div>
     </div>
-   
-<script>
-  function validateName() {
-    const nameInput = document.getElementById('name');
-    const errorDiv = document.getElementById('nameError');
-    const value = nameInput.value.trim();
-    
-    if (!value) {
-      errorDiv.textContent = 'El nombre es obligatorio.';
-      nameInput.classList.add('invalid');
-      nameInput.classList.remove('valid');
-    } else if (value.length < 5) {
-      errorDiv.textContent = 'El nombre debe tener al menos 5 caracteres.';
-      nameInput.classList.add('invalid');
-      nameInput.classList.remove('valid');
-    } else if (value.length > 60) {
-      errorDiv.textContent = 'El nombre no debe exceder los 60 caracteres.';
-      nameInput.classList.add('invalid');
-      nameInput.classList.remove('valid');
-    } else {
-      errorDiv.textContent = '';
-      nameInput.classList.remove('invalid');
-      nameInput.classList.add('valid');
-    }
-  }
-</script>
-
-
-
-
-
-
-
 
 
 <script>
@@ -262,15 +231,15 @@
                 console.log(form.action);
                 
                 // Limpiar los campos del formulario
-                /* document.getElementById('name').value = '';
+                document.getElementById('name').value = '';
                 document.getElementById('category_id').value = '';
                 document.getElementById('nameError').innerText = '';
-                document.getElementById('categoryError').innerText = ''; */
+                document.getElementById('categoryError').innerText = '';
 
                 form.reset();
             });
         }
-
+        /* codigo para  el btn de editar*/
         document.querySelectorAll('.edit-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const id = this.dataset.id;
@@ -290,11 +259,11 @@
                 form.querySelector('select[name="category_id"]').value = category;
 
                 form.action = "{{ url('sports') }}/" + id;
-                //falta abajo del token el csrf y el method
                 console.log(form.action);
             });
         });
     };
+    
 </script>
-
+   
 @endsection
