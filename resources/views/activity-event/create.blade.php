@@ -15,10 +15,10 @@
 
 @section('content')
 <!-- Formulario -->
-<form action="{{ route('event.store') }}" method="post" class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200 dark:text-white dark:bg-gray-600 dark:border-gray-600">
+<form action="{{ route('activities-event.store') }}" method="post" class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200 dark:text-white dark:bg-gray-600 dark:border-gray-600">
     @csrf
-    <input type="hidden" name="id_event" value="{{$encriptedId}}">
-    @include('event.form-activities', ['mode' => 'Registrar'])
+    <input type="hidden" name="id_event" value="{{$id}}">
+    @include('activity-event.form', ['mode' => 'Registrar'])
 </form>
 
 @endsection

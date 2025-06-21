@@ -105,7 +105,7 @@
         </div>
 
         <!-- Modal de Éxito -->
-        @if(session('success'))
+        {{-- @if(session('success'))
                 <div id="successModal" class="modal flex">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -117,7 +117,7 @@
                         </div>
                     </div>
                 </div>       
-        @endif
+        @endif --}}
 
         <!-- Contenido de la página -->
         <div class="flex-grow">

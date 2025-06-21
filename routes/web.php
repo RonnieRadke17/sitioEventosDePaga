@@ -16,6 +16,33 @@ use App\Http\Controllers\MercadoPagoController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\EventMapController;
+use App\Http\Controllers\ImageEventController;
+
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SportController;
+
+
+Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
+
+Route::resource('sports', SportController::class)->except(['create', 'edit']);
+
+//rutas del mapa de los eventos
+Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/event-map/create/{id}', [EventMapController::class, 'create'])->name('event-map.create');
+
+// Resource sin index
+Route::resource('activities-event', ActivityEventController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');
+
+
+// Resource sin index
+Route::resource('images-event', ImageEventController::class)->except(['index', 'create']); // Excluye index y create
+// Ruta personalizada para create con parámetro id
+Route::get('/images-event/create/{id}', [ImageEventController::class, 'create'])->name('images-event.create');
+
 
 Route::get('/pago', function () {
     return view('stripe');
@@ -68,13 +95,8 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-    Route::resource('activities-event', ActivityEventController::class); 
-
-    Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');//get id for event
-
-
     Route::resource('sub', SubController::class);
-    Route::resource('activity', ActivityController::class);
+    //Route::resource('activity', ActivityController::class);
     Route::resource('event', EventController::class);
 
  /* Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);

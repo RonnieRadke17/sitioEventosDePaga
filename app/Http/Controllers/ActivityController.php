@@ -13,10 +13,9 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        //
         $data['activities'] = Activity::paginate(10);
-        //$data['activities'] = Activity::all();
-        return view('activities.index', $data);
+        //return view('activities.index', $data); Vista
+        return $data;
     }
 
     /**
@@ -57,7 +56,7 @@ class ActivityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id)//no creo que se use
     {
         //
     }
@@ -76,7 +75,6 @@ class ActivityController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
         $activityData = $request->except(['_token', '_method']);
         // Update the database record with the new data
         Activity::where('id', '=', $id)->update($activityData);

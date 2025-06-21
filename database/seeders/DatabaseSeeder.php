@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Category;
+use App\Models\Sport;
 use App\Models\Activity;
 use App\Models\ActivityCategory;
 use App\Models\Sub;
@@ -41,40 +43,68 @@ class DatabaseSeeder extends Seeder
         );
 
 
-        $Activitydata = [
-            ['name' => '100 metros'],
-            ['name' => '200 metros'],
-            ['name' => '400 metros'],
-            ['name' => '800 metros'],
-            ['name' => '1500 metros'],
-            ['name' => '5000 metros'],
-            ['name' => '10000 metros'],
-            ['name' => 'Maratón (42.195 km)'],
-            ['name' => '110 metros con vallas'],
-            ['name' => '100 metros con vallas'],
-            ['name' => '400 metros con vallas'],
-            ['name' => '4x100 metros'],
-            ['name' => '4x400 metros'],
-            ['name' => '3000 metros con obstáculos'],
-            ['name' => 'Salto de longitud'],
-            ['name' => 'Salto triple'],
-            ['name' => 'Salto de altura'],
-            ['name' => 'Salto con pértiga'],
-            ['name' => 'Lanzamiento de peso'],
-            ['name' => 'Lanzamiento de disco'],
-            ['name' => 'Lanzamiento de martillo'],
-            ['name' => 'Lanzamiento de jabalina'],
-            ['name' => '20 km marcha'],
-            ['name' => '35 km marcha'],
-            ['name' => 'Cross Country (distancias variables)'],
-            ['name' => 'Media maratón (21.0975 km)']
-        ];
-        
+        // 1. Crear categorías
+    $categoryNames = ['Deportes individuales', 'Deportes de equipo'];
+    $categories = [];
 
-        // Insertar las actividades en la base de datos
-        foreach ($Activitydata as $data) {
-            Activity::create($data);
-        }
+    foreach ($categoryNames as $name) {
+        $categories[$name] = Category::create(['name' => $name]);
+    }
+
+    // 2. Crear deportes y vincular con categoría
+    $sportsData = [
+        'Atletismo' => 'Deportes individuales',
+        'Fútbol' => 'Deportes de equipo',
+        'Natación' => 'Deportes individuales',
+        'Básquetbol' => 'Deportes de equipo',
+    ];
+
+    $sports = [];
+
+    foreach ($sportsData as $sportName => $categoryName) {
+        $sports[$sportName] = Sport::create([
+            'name' => $sportName,
+            'category_id' => $categories[$categoryName]->id,
+        ]);
+    }
+
+    // 3. Actividades de atletismo
+    $Activitydata = [ 
+        ['name' => '100 metros'],
+        ['name' => '200 metros'],
+        ['name' => '400 metros'],
+        ['name' => '800 metros'],
+        ['name' => '1500 metros'],
+        ['name' => '5000 metros'],
+        ['name' => '10000 metros'],
+        ['name' => 'Maratón (42.195 km)'],
+        ['name' => '110 metros con vallas'],
+        ['name' => '100 metros con vallas'],
+        ['name' => '400 metros con vallas'],
+        ['name' => '4x100 metros'],
+        ['name' => '4x400 metros'],
+        ['name' => '3000 metros con obstáculos'],
+        ['name' => 'Salto de longitud'],
+        ['name' => 'Salto triple'],
+        ['name' => 'Salto de altura'],
+        ['name' => 'Salto con pértiga'],
+        ['name' => 'Lanzamiento de peso'],
+        ['name' => 'Lanzamiento de disco'],
+        ['name' => 'Lanzamiento de martillo'],
+        ['name' => 'Lanzamiento de jabalina'],
+        ['name' => '20 km marcha'],
+        ['name' => '35 km marcha'],
+        ['name' => 'Cross Country (distancias variables)'],
+        ['name' => 'Media maratón (21.0975 km)']
+    ];
+
+    foreach ($Activitydata as $data) {
+        Activity::create([
+            'name' => $data['name'],
+            'sport_id' => $sports['Atletismo']->id,
+            'mix' => false, // O true, según tu lógica
+        ]);
+    }
 
         // Definir un arreglo con las categorías de edad
         $SubData = [

@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Image;
-//use App\Models\Activity;
-//use App\Models\Sub;
-//use App\Models\Place;
 use App\Models\ActivityEvent;
-//use App\Models\ActivityCategory;
 use App\Models\EventPlace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 
 
@@ -31,68 +30,48 @@ class EventController extends Controller
 
     public function create()
     {         
-        return view('event.create-data');         
+        return view('event.create');         
     }
 
-    public function store(Request $request)
+    public function store(Request $request)//ya
     {
-        //dd($request);
-        //validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
-        $eventData = Validator::make($request->all(), [
-            'name' => 'required|string|max:60',
+        
+        $eventData = Validator::make($request->all(), [//validamos la informacion del evento y si esta mal retornamos el error especifico por cada campo
+            'name' => 'required|string|max:60|unique:events,name',
             'description' => 'required|string|max:200',
             'event_date' => 'required|date|after:today',
-            'kit_delivery' => 'nullable|date|after:today|before:event_date',//kit_delivery puede ser nulo pero sino es nulo se valida//la entrega de kits y restration sea after:today es decir se entregan despues de hoy
             'registration_deadline' => 'required|date|after:today|before:event_date',
-            'is_limited_capacity' => 'required|boolean',
-            'capacity' => [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_limited_capacity') == 1) { // = true
-                        if (is_null($request->input('capacity'))) {
-                            $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
-                        }
-                        if (!is_numeric($request->input('capacity')) || intval($request->input('capacity')) != $request->input('capacity')) {
-                            $fail('The capacity must be an integer.');
-                        }
-                        if ($request->input('capacity') < 5 || $request->input('capacity') > 15000) {
-                            $fail('The capacity is not valid.');
-                        }
-                    } else { // = false
-                        if (!is_null($request->input('capacity'))) {
-                            $fail('The capacity must be null when limited capacity is disabled.');
-                        }
-                    }
-                },
-            ],
-            'price' => 'nullable|numeric|min:10|max:10000',
-            
+            'capacity' => 'nullable|numeric|min:5|max:900000',
+            'price' => 'nullable|numeric|min:10|max:10000', 
         ]);
 
         if ($eventData->fails()) {//retornamos los errores de los datos del evento
-            return redirect()->back()
-                ->withErrors($eventData)
-                ->withInput();
-        }else{
-        
-            //aqui falta un boolean de si es con actividades o no
-            $event = Event::create([//registra primero el evento
-                'name' => $request->name,
-                'description'=> $request->description,
-                'event_date' => $request->event_date,
-                'kit_delivery' => $request->kit_delivery,
-                'registration_deadline' => $request->registration_deadline, 
-                'is_limited_capacity'=> $request->is_limited_capacity,
-                'capacity' => $request->is_limited_capacity ? $request->capacity : null,
-                'activities' => 0,//este campo es de si es con actividades el evento o no
-                'price'=> $request->price
-            ]);
-            
-            //$event->save();
-            $encryptedId = encrypt($event->id);
-            
-            return redirect()->route('event.show', $encryptedId);//redireccionar a ruta de show
+            return redirect()->back()->withErrors($eventData)->withInput();
         }
         
+        try {//registra el evento en la base de datos
+            $event = DB::transaction(function () use ($request) {
+                return Event::create([
+                    'name' => $request->name,
+                    'description'=> $request->description,
+                    'event_date' => $request->event_date,
+                    'registration_deadline' => $request->registration_deadline, 
+                    'capacity' => $request->capacity ? $request->capacity : null,
+                    'price'=> $request->price ? $request->price : null,
+                ]);
+            });
+
+            if($event){//verifica el valor de la variable $event si tiene algo dentro lo redirecciona a la ruta de show
+                $encryptedId = encrypt($event->id);
+                return redirect()->route('event.show', $encryptedId)->with('success', 'Evento creado correctamente.');//redireccionar a ruta de show
+            }else {//sino redirecciona a la ruta de event con un mensaje de error
+                return redirect()->route('event')->withErrors(['error' => 'Ha ocurrido un error al crear el evento.']);
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->route('event')->withErrors(['error' => 'Ha ocurrido un error al crear el evento.']);
+        }
+
     }
 
 
@@ -100,7 +79,7 @@ class EventController extends Controller
     {
         $decryptedId = decrypt($id);
         $event = Event::findOrFail($decryptedId);
-        return view('event.edit-data', compact('event'));
+        return view('event.edit', compact('event'));
     }
     
     public function update(Request $request, $id)
@@ -115,34 +94,24 @@ class EventController extends Controller
             'name' => 'required|string|max:60',
             'description' => 'required|string|max:200',
             'event_date' => 'required|date|after:today',
-            'kit_delivery' => 'nullable|date|after:today|before:event_date',
             'registration_deadline' => 'required|date|after:today|before:event_date',
-            'is_limited_capacity' => 'required|boolean',
-            'capacity' => [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_limited_capacity') == 1) {
-                        if (is_null($request->input('capacity'))) {
-                            $fail('The capacity field is required when limited capacity is enabled and must be greater than 0.');
-                        }
-                        if (!is_numeric($request->input('capacity')) || intval($request->input('capacity')) != $request->input('capacity')) {
-                            $fail('The capacity must be an integer.');
-                        }
-                        if ($request->input('capacity') < 5 || $request->input('capacity') > 15000) {
-                            $fail('The capacity is not valid.');
-                        }
-                    } else {
-                        if (!is_null($request->input('capacity'))) {
-                            $fail('The capacity must be null when limited capacity is disabled.');
-                        }
-                    }
-                },
-            ],
+            'capacity' => 'nullable|numeric|min:5|max:900000',
             'price' => 'nullable|numeric|min:10|max:10000',
+            'status' => 'required|in:Activo,Inactivo,Cancelado',
         ]);
 
         if ($eventData->fails()) {
             return redirect()->back()->withErrors($eventData)->withInput();
         }
+
+
+        //verificar aqui, si el evento esta cancelado, no se puede actualizar
+        //verificar aqui, si el evento esta inactivo, no se puede actualizar
+        //verificar el aspecto de la capacidad, revisar la cantidad de usuarios ingresados es decir que no sea menor a los que estan ingresados
+        //revisar las fechas, si ya hay registros replantear el mandar correo de reagendacion del evento oy/o fechas de registro
+        
+
+
         
         //actualizacion de campos de eventData
         $updates = [];
@@ -155,25 +124,24 @@ class EventController extends Controller
         if ($event->event_date !== $request->event_date) {
             $updates['event_date'] = $request->event_date;
         }
-        if ($event->kit_delivery !== $request->kit_delivery) {
-            $updates['kit_delivery'] = $request->kit_delivery;
-        }
         if ($event->registration_deadline !== $request->registration_deadline) {
             $updates['registration_deadline'] = $request->registration_deadline;
         }
-        if ($event->is_limited_capacity !== $request->is_limited_capacity) {
-            $updates['is_limited_capacity'] = $request->is_limited_capacity;
-            // Si cambia la capacidad, actualizamos también
-            if ($request->is_limited_capacity == 1 && $event->capacity !== $request->capacity) {
-                $updates['capacity'] = $request->capacity;
-            } else {
-                $updates['capacity'] = null;
-            }
+        
+        if ($event->capacity !== $request->capacity) {
+            $updates['capacity'] = $request->capacity;
+        } else {
+            $updates['capacity'] = null;
         }
 
         if ($event->price !== $request->price) {
             $updates['price'] = $request->price;
         }
+
+        if ($event->status !== $request->status) {
+            $updates['status'] = $request->status;
+        }
+
 
         // Si hay cambios, actualizamos
         if (!empty($updates)) {
@@ -190,10 +158,9 @@ class EventController extends Controller
         // Buscar el evento con sus actividades y sus relaciones en activity_events
         $event = Event::findOrFail($decryptedId);
         //hacer consulta de si encuentra registros ligados al evento
-        $activitiesEvent = ActivityEvent::where('event_id', $event)->exists();
-        $eventPlace = EventPlace::where('event_id', $event)->exists();
-        $eventImages = Image::where('event_id', $event)->exists();
-
+        $activitiesEvent = ActivityEvent::where('event_id', $event->id)->exists();
+        $eventPlace = EventPlace::where('event_id', $event->id)->exists();
+        $eventImages = Image::where('event_id', $event->id)->exists();
         return view('event.show', compact('event','activitiesEvent',"eventPlace","eventImages"));
     }
 

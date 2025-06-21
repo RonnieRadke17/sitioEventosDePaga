@@ -19,7 +19,7 @@ class UserEventController extends Controller
     public function index()//show all events
     {
          
-        if (auth()->check()) {
+        /* if (auth()->check()) {
             // Obtener datos del usuario autenticado
             $subName = $this->getUserData('sub'); 
             $userId = auth()->id(); // Obtener el ID del usuario autenticado
@@ -92,7 +92,7 @@ class UserEventController extends Controller
 
             return view('user-event/home', compact('events'));
 
-        }
+        } */
     }
     
     public function userRegisteredEvents()

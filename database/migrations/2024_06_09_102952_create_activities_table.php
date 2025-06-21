@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->boolean('mix')->default(false);
+            $table->foreignId('sport_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes(); // agrega 'deleted_at' como campo nullable
         });
     }
 

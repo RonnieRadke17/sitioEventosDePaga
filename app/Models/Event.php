@@ -13,11 +13,8 @@ class Event extends Model
         'name',
         'description',
         'event_date',
-        'kit_delivery',
         'registration_deadline', 
-        'is_limited_capacity',
         'capacity',
-        'activities',
         'status',
         'price'
     ];
