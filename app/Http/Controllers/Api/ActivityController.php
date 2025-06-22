@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Activity;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ActivityCollection;
 
 use App\Http\Requests\ActivityRequest\StoreActivityRequest; // Importa la clase ActivityRequest
@@ -14,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class ActivityController extends Controller
 {
+
     //
     public function index()
     {
@@ -38,7 +38,7 @@ class ActivityController extends Controller
         }
     }
 
-    public function show($id)//ya está
+    public function show($id)//sirve para mostrar una actividad específica y también para el update cuando se pasa el ID y se quiera actualizar los valores anteriores
     {
         // Validación rápida del ID antes de buscar
         if (!is_numeric($id) || (int)$id <= 0) {
@@ -95,7 +95,6 @@ class ActivityController extends Controller
             ], 500);
         }
     }
-
 
     // Eliminación lógica (inhabilitar actividad)
     public function destroy($id)
