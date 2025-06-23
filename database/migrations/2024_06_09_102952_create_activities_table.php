@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean('mix')->default(false);
             $table->foreignId('sport_id')->constrained()->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes(); // agrega 'deleted_at' como campo nullable
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
     }
 

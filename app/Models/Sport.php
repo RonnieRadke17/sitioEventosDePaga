@@ -9,12 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;//hace un "borrado suave" de los re
 class Sport extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['name', 'category_id'];
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+    protected $fillable = ['name'];
 
     public function activities()
     {

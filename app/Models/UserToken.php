@@ -6,17 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes; // hace un "borrado suave" de los registros eliminados
 
-class Permission extends Model
+class UserToken extends Model
 {
     use HasFactory;
-    use SoftDeletes;
-    
+    use SoftDeletes; // hace un "borrado suave" de los registros eliminados
     protected $fillable = [
-        'name',
-    ];
-
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+        'email',
+        'token',
+        'ip_address',
+        'expiration',
+        'type',
+       ];
 }

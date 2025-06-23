@@ -11,8 +11,9 @@ class Category extends Model
     use SoftDeletes;
     protected $fillable = ['name'];
 
-    public function sports()
+    //relation with activities m-m table category_event
+    public function events()
     {
-        return $this->hasMany(Sport::class);
+        return $this->belongsToMany(Event::class, 'category_event');
     }
 }

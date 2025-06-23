@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->enum('type',['cover','kit','content']);
             $table->timestamps();
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
     }
 

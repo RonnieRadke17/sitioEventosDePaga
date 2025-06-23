@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->foreignId('place_id')->constrained()->onDelete('cascade');
+            $table->unique(['event_id', 'place_id']);//evita registros duplicados de eventos y lugares
+            //es decir un evento no puede tener el mismo lugar más de una vez
             $table->timestamps();
         });
     }

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // hace un "borrado suave" de los registros eliminados
 
 class EventUser extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     // Definir el nombre de la tabla si no sigue la convención de Laravel
     protected $table = 'event_user';
     protected $fillable = [

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('gender',['M','F','Mix']);
             $table->foreignId('sub_id')->constrained()->onUpdate('cascade')->onDelete('cascade');//falta relacion con el modelo 
             $table->timestamps();
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
     }
 

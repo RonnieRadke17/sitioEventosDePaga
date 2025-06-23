@@ -6,21 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;//hace un "borrado suave" de los registros eliminados
 
-class Sub extends Model
+class Type extends Model
 {
     use HasFactory;
     use SoftDeletes;
     protected $fillable = ['name'];
-
-    public function subs()
+    //relation with activities m-m table activity_type
+     public function activities()
     {
-        return $this->hasMany(ActivityEvent::class);
+        return $this->belongsToMany(Activity::class, 'activity_type');
     }
-
-    // Definir la relación de uno a muchos
-    public function activityEventUsers()
-    {
-        return $this->hasMany(ActivityEventUser::class, 'sub_id', 'id');
-    }
-
 }

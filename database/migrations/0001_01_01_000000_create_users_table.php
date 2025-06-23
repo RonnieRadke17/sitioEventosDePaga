@@ -21,10 +21,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('is_suspended')->default(false);
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
+            //aqui usamos softdeletes para que no se elimine el usuario, sino que se marque como eliminado
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
 
         Schema::create('sessions', function (Blueprint $table) {

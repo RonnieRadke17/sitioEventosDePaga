@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('places', function (Blueprint $table) {
+        Schema::create('user_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('address');//direccion
-            $table->decimal('lat', 10, 8); // Latitud con 10 dígitos en total y 8 decimales
-            $table->decimal('lon', 11, 8); // Longitud con 11 dígitos en total y 8 decimales
+            $table->string('email')->index();//indice para revisar el correo de manera más sencilla
+            $table->string('token')->unique();//cada token debe ser único 
+            $table->string('ip_address')->nullable();//dirección IP del usuario
+            $table->datetime('expiration');
+            $table->enum('type', ['password_reset', 'email_verification']);
             $table->timestamps();
             $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('places');
+        Schema::dropIfExists('user_tokens');
     }
 };
