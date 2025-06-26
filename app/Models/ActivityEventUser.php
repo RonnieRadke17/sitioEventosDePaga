@@ -22,7 +22,7 @@ class ActivityEventUser extends Model
      /**
      * Relación con el modelo EventUser (Muchos a Uno)
      */
-    public function eventUser()
+    public function eventUser()//verificada correctamente
     {
         return $this->belongsTo(EventUser::class);
     }

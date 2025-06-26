@@ -25,8 +25,7 @@ class Event extends Model
 
     public function users()//relation many to many with events table EventUser
     {
-        return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')->withTimestamps(); 
-        // Agrega withTimestamps si quieres que los timestamps de la tabla pivote estén disponibles
+        return $this->belongsToMany(User::class); 
     }
 
     public function categories()//relation with categories m-m está bien
@@ -46,32 +45,20 @@ class Event extends Model
         return $this->hasMany(Image::class);
     }
 
-
-    public function user()//ya
-    {
-        return $this->belongsToMany(User::class)->withTimestamps();
-    }
-
     public function payments()//está bien
     {
         return $this->belongsToMany(User::class, 'payments')->withTimestamps();
     }
 
-
-    //relation with activity 
-    public function eventActivities()
+    //no sirve esta relación
+    public function eventUsers()//relacion que permite mostrar solo los eventos que tienen capacidad
     {
-        return $this->belongsToMany(Activity::class)->withTimestamps();
+        return $this->hasMany(EventUser::class, 'event_id');
     }
-
+    
+    //relation with activity_events table
     public function activityEvents()
     {
         return $this->hasMany(ActivityEvent::class, 'event_id');
     }
-
-    public function eventUser()//relacion que permite mostrar solo los eventos que tienen capacidad
-    {
-        return $this->hasMany(EventUser::class, 'event_id');
-    }
-
 }

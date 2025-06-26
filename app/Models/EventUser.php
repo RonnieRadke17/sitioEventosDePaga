@@ -20,7 +20,7 @@ class EventUser extends Model
     /**
      * Relación con el modelo ActivityEventUser (Uno a Muchos)
      */
-    public function activityEventUsers()
+    public function activityEventUsers()//table activity_event_user
     {
         return $this->hasMany(ActivityEventUser::class);
     }

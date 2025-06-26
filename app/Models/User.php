@@ -62,14 +62,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
+
     public function events()//relation many to many with events table EventUser
     {
-        return $this->belongsToMany(Event::class, 'event_user', 'user_id', 'event_id')->withTimestamps();;
+        return $this->belongsToMany(User::class,);
     }
-
-
-
-
-    
-
 }

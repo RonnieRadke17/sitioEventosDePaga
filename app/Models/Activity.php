@@ -25,11 +25,14 @@ class Activity extends Model
         return $this->belongsToMany(Type::class, 'activity_type');
     }
 
-    //relation with event
-    public function eventActivities()
+    /////////////////////////////////////////////////////////////
+
+    //relation with ActivityEvent 1-m table activity_event
+    public function activityEvents()
     {
-        return $this->belongsToMany(Event::class)->withTimestamps();
+        return $this->hasMany(ActivityEvent::class, 'activity_id');
     }
+
 
     /**
      * Relación con el modelo ActivityEventUser (Uno a Muchos)
