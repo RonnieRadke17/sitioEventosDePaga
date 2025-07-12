@@ -1,29 +1,47 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sport;
-use App\Http\Resources\SportCollection;
 use App\Http\Requests\SportRequest\StoreSportRequest;
 use App\Http\Requests\SportRequest\UpdateSportRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+use App\Services\EncryptService\EncryptService;
+
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
-
-   use Illuminate\Support\Facades\Log;
-
 
 class SportController extends Controller
 {
+    protected $encryptService;
+
+    public function __construct(EncryptService $encryptService)
+    {
+        $this->encryptService = $encryptService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new SportCollection(Sport::paginate(10));//ya contiene la paginación y la colección de recursos
+        $sports = Sport::paginate(10);
+        $sports->getCollection()->transform(function ($item) {
+                $item->id = Crypt::encrypt($item->id);
+                return $item;
+        });
+        dd($sports);
+        return view('sports.index', compact('sports'));
     }
+
+
+    public function create(){
+        return view('sports.create');
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -49,32 +67,17 @@ class SportController extends Controller
     /**
      * Display the specified resource.
      */
- 
+    public function show(String $id)
+    {
+        try {
+            $decriptedId = Crypt::decryptString($id);
+            $sport = Sport::findOrFail($decriptedId);
+            return response()->json(['data' => $sport], 200);
 
-public function show(String $id)
-{
-    Log::info('[SPORT SHOW] Encrypted ID recibido:', ['id' => $id]);
-
-    try {
-        $decryptedId = Crypt::decryptString($id);
-        Log::info('[SPORT SHOW] Decrypted ID:', ['id' => $decryptedId]);
-
-        $sport = Sport::findOrFail($decryptedId);
-        Log::info('[SPORT SHOW] Sport encontrado:', $sport->toArray());
-
-        return response()->json(['data' => $sport], 200);
-
-    } catch (DecryptException $e) {
-        Log::error('[SPORT SHOW] ERROR DecryptException: ' . $e->getMessage());
-        return response()->json(['error' => 'ID inválido o corrupto.'], 400);
-    } catch (ModelNotFoundException $e) {
-        Log::error('[SPORT SHOW] ERROR ModelNotFoundException: ' . $e->getMessage());
-        return response()->json(['error' => 'Deporte no encontrado.'], 404);
-    } catch (\Throwable $e) {
-        Log::error('[SPORT SHOW] ERROR General: ' . $e->getMessage());
-        return response()->json(['error' => 'Error inesperado.', 'message' => $e->getMessage()], 500);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Deporte no encontrada.'], 404);
+        }
     }
-}
 
     /**
      * Update the specified resource in storage.

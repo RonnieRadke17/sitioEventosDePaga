@@ -16,7 +16,7 @@ Route::resource('activity', ActivityController::class);
 Route::post('activity/{id}/restore', [ActivityController::class, 'restore'])->name('activity.restore');
 Route::delete('activity/{id}/force', [ActivityController::class, 'forceDestroy'])->name('activity.force');
 
-Route::resource('sport', SportController::class);
+Route::resource('sports', SportController::class);
 
-Route::post('sport/{id}/restore', [SportController::class, 'restore'])->name('sport.restore');
-Route::delete('sport/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');
+Route::post('sports/{id}/restore', [SportController::class, 'restore'])->name('sport.restore');
+Route::delete('sports/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');

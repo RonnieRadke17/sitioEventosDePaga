@@ -22,10 +22,21 @@ use App\Http\Controllers\ImageEventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
 
+/* Route::resource('sports', SportController::class);
+Route::post('sport/{id}/restore', [SportController::class, 'restore'])->name('sport.restore');
+Route::delete('sport/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');
+ */
+
+Route::get('/sports', function () {
+    return view('sports.index');
+})->name('sports.index');
+
+Route::get('/sports/{id}', fn($id) => view('sports.show', ['sportId' => $id]))->name('sports.show');
+
 
 Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
 
-Route::resource('sports', SportController::class)->except(['create', 'edit']);
+;
 
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
@@ -48,7 +59,7 @@ Route::get('/pago', function () {
     return view('stripe');
 })->name('stripe.form');
 
-Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');
+Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment'); 
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
@@ -63,7 +74,7 @@ Route::post('/inscription-free/{id}', [UserEventController::class, 'inscriptionF
 Route::post('/confirmPayment/{id}', [UserEventController::class, 'confirmPayment'])->name('events.confirmPayment');
 
 //restablecimiento de contrasena
-Route::controller(ResetPasswordController::class)->group(function () {
+ Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/password', 'showFormSendCode')->name('forgot-password');//form para envio de correo
     Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');//formulario para restablecer la contrasena
     Route::post('/password/send-passwod-code', 'sendPasswordCode')->name('password.send-password-code');//manda el correo
@@ -97,11 +108,11 @@ Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta
 
     Route::resource('sub', SubController::class);
     //Route::resource('activity', ActivityController::class);
-    Route::resource('event', EventController::class);
+    Route::resource('event', EventController::class); 
 
- /* Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
+ Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
 Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
-Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class); */
+Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class);
 
 //mercadopago
 Route::get('/mp', [MercadoPagoController::class, 'index']);
@@ -114,7 +125,7 @@ Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
 
 
 
-
+/* 
 //User Event
 // Ruta para ver los eventos en los que el usuario está registrado
 Route::get('/UserEvent', [UserEventController::class, 'userRegisteredEvents'])->name('user.events');
@@ -134,4 +145,4 @@ Route::get('/users/{user}/edit', [AdminEventController::class, 'editUser'])->nam
 // Actualizar un usuario (ruta corregida para usar PATCH en lugar de POST)
 Route::patch('/users/{user}', [AdminEventController::class, 'updateUser'])->name('admin.users.update');
 // Eliminar un usuario
-Route::delete('/users/{user}', [AdminEventController::class, 'destroyUser'])->name('admin.users.destroy');
+Route::delete('/users/{user}', [AdminEventController::class, 'destroyUser'])->name('admin.users.destroy'); */

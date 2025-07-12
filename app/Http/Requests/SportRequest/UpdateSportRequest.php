@@ -22,7 +22,7 @@ class UpdateSportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|min:3|max:100',
+            'name' => 'sometimes|string|min:3|max:100|unique:sports,name',
         ];
     }
 
@@ -32,6 +32,7 @@ class UpdateSportRequest extends FormRequest
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.min' => 'El nombre debe tener al menos 3 caracteres.',
             'name.max' => 'El nombre no puede superar los 100 caracteres.',
+            'name.unique' => 'El nombre ya está en uso. Debe ser único.',
         ];
     }
 }
