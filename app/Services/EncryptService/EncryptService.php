@@ -7,7 +7,7 @@ class EncryptService{
     public function encryptAll($data)
     {
         $data->getCollection()->transform(function ($item) {
-                $item->id = Crypt::encrypt($item->id);
+                $item->encrypted_id = Crypt::encrypt($item->id);
                 return $item;
             });
     }

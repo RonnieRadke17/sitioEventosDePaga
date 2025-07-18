@@ -27,11 +27,13 @@ Route::post('sport/{id}/restore', [SportController::class, 'restore'])->name('sp
 Route::delete('sport/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');
  */
 
-Route::get('/sports', function () {
+/* Route::get('/sports', function () {
     return view('sports.index');
-})->name('sports.index');
+})->name('sports.index'); */
 
-Route::get('/sports/{id}', fn($id) => view('sports.show', ['sportId' => $id]))->name('sports.show');
+Route::resource('sports', SportController::class);
+
+//Route::get('/sports/{id}', fn($id) => view('sports.show', ['sportId' => $id]))->name('sports.show');
 
 
 Route::resource('categories', CategoryController::class)->except(['create', 'edit']);

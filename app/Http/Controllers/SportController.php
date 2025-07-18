@@ -28,13 +28,21 @@ class SportController extends Controller
      */
     public function index()
     {
-        $sports = Sport::paginate(10);
-        $sports->getCollection()->transform(function ($item) {
-                $item->id = Crypt::encrypt($item->id);
+        try {
+            $sports = Sport::latest()->paginate(10);
+            // Encriptar IDs para la vista
+            $sports->getCollection()->transform(function ($item) {
+                $item->encrypted_id = Crypt::encrypt($item->id);
                 return $item;
-        });
-        dd($sports);
-        return view('sports.index', compact('sports'));
+            });
+              $type = 'active';
+
+            return view('sports.index', compact('sports', 'type'));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return view('sports.index')->with('error', 'Error al cargar las dependencias.');
+        }
+
     }
 
 
