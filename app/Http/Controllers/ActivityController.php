@@ -11,11 +11,11 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index()/* falta mandar los deportes en un selector */
     {
-        $data['activities'] = Activity::paginate(10);
-        //return view('activities.index', $data); Vista
-        return $data;
+        $activities = Activity::paginate(10);
+        $type = 'active';
+        return view('activities.index',compact('activities','type')); 
     }
 
     /**
@@ -24,7 +24,7 @@ class ActivityController extends Controller
     public function create()
     {
         //show the activities registered
-        return view('activities.create');
+        return view('activities.form');
     }
 
     /**

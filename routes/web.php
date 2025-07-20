@@ -22,21 +22,41 @@ use App\Http\Controllers\ImageEventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
 
-/* Route::resource('sports', SportController::class);
-Route::post('sport/{id}/restore', [SportController::class, 'restore'])->name('sport.restore');
-Route::delete('sport/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');
- */
+Route::resource('sports', SportController::class)->except('show');
+Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
+Route::post('/sports/{id}/restore', [SportController::class, 'restore'])->name('sports.restore');
+Route::delete('/sports/{id}/force-delete', [SportController::class, 'forceDelete'])->name('sports.forceDelete');
 
-Route::get('/sports', function () {
-    return view('sports.index');
-})->name('sports.index');
+Route::resource('categories', CategoryController::class)->except('show');
+Route::get('/categories/content/{type}', [CategoryController::class, 'content'])->name('categories.content');
+Route::post('/categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
+Route::delete('/categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
 
-Route::get('/sports/{id}', fn($id) => view('sports.show', ['sportId' => $id]))->name('sports.show');
+/* falta reviar estas rutas */
+Route::resource('types', TypeController::class)->except('show');
+Route::get('/types/content/{type}', [TypeController::class, 'content'])->name('types.content');
+Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('types.restore');
+Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
+
+Route::resource('activities', ActivityController::class)->except('show');
+Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
+Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');
+Route::delete('/activities/{id}/force-delete', [ActivityController::class, 'forceDelete'])->name('activities.forceDelete');
+
+Route::resource('subs', SubController::class);
+Route::get('/subs/content/{type}', [SubController::class, 'content'])->name('subs.content');
+Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs.restore');
+Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
 
 
-Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
 
-;
+
+
+
+
+
+
+
 
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
@@ -106,13 +126,13 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-    Route::resource('sub', SubController::class);
-    //Route::resource('activity', ActivityController::class);
+   
+   
     Route::resource('event', EventController::class); 
 
- Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
+/*  Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
 Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
-Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class);
+Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class); */
 
 //mercadopago
 Route::get('/mp', [MercadoPagoController::class, 'index']);
