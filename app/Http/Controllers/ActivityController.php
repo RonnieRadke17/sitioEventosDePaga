@@ -4,91 +4,71 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Activity;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Sport;
+use App\Http\Requests\ActivityRequest\StoreActivityRequest;
+use App\Http\Requests\ActivityRequest\UpdateActivityRequest;
+use App\Services\EncryptService\EncryptService;
+
+
 
 class ActivityController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()/* falta mandar los deportes en un selector */
+    protected $encryptService;
+
+    public function __construct(EncryptService $encryptService)
+    {
+        $this->encryptService = $encryptService;
+    }
+
+    public function index()
     {
         $activities = Activity::paginate(10);
+        $activities = $this->encryptService->encrypt($activities);
         $type = 'active';
-        return view('activities.index',compact('activities','type')); 
+
+        return view('activities.index', compact('activities', 'type'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //show the activities registered
-        return view('activities.form');
+    public function create(){
+        $activity = new Activity;
+        $sports = Sport::all();
+        //$sports = $this->encryptService->EncryptSelectors($sports);
+        return view('activities.form',compact('activity','sports'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:5|max:255',
-            'mix' => 'required|in:0,1',
-        ]);
-    
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+    public function store(StoreActivityRequest $request){
+        try {
+            Activity::create($request->validated());
+            return redirect()->route('activities.index')->with('message', 'Tipo creado correctamente.');
+        } catch (\Throwable $e) {
+            return redirect()->route('activities.index')->withErrors('Error al crear el tipo.');
         }
-    
-        // Insertar la actividad
-        Activity::create([
-            'name' => $request->input('name'),
-            'mix' => $request->input('mix'),
-        ]);
-    
-        return redirect('activity')->with('mensaje', 'Evento agregado con éxito');
     }
 
+    public function edit(string $id){
+        $decrypted_id = $this->encryptService->decrypt($id);
+        if (!$decrypted_id) return redirect()->route('activities.index')->withErrors('ID inválido.');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)//no creo que se use
-    {
-        //
+        $activity = Activity::find($decrypted_id);
+        if (!$activity) return redirect()->route('activities.index')->withErrors('Tipo no encontrado.');
+
+        $sports = Sport::all();
+        return view('activities.form', compact('activity', 'id','sports'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $activity = Activity::findOrFail($id);
-        return view('activities.edit', compact('activity'));
-    }
+    public function update(UpdateActivityRequest $request, string $id){
+        $decrypted_id = $this->encryptService->decrypt($id);
+        if (!$decrypted_id) return redirect()->route('activities.index')->withErrors('ID inválido.');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $activityData = $request->except(['_token', '_method']);
-        // Update the database record with the new data
-        Activity::where('id', '=', $id)->update($activityData);
-        return redirect('activity')->with('mensaje', 'Evento Modificado');
-    }
+        $activity = Activity::find($decrypted_id);
+        if (!$activity) return redirect()->route('activities.index')->withErrors('Tipo no encontrado.');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-        Activity::destroy($id);
+        $activity->update($request->validated());
 
-        return redirect('activity')->with('mensaje', 'Evento borrado');
+        return redirect()->route('activities.index')->with('message', 'Actividad actualizada correctamente.');
     }
+   
 }

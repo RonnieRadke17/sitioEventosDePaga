@@ -21,6 +21,7 @@ use App\Http\Controllers\ImageEventController;
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
+use App\Http\Controllers\TypeController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
@@ -32,12 +33,12 @@ Route::get('/categories/content/{type}', [CategoryController::class, 'content'])
 Route::post('/categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
 Route::delete('/categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
 
-/* falta reviar estas rutas */
 Route::resource('types', TypeController::class)->except('show');
 Route::get('/types/content/{type}', [TypeController::class, 'content'])->name('types.content');
 Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('types.restore');
 Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
 
+/* falta reviar estas rutas */
 Route::resource('activities', ActivityController::class)->except('show');
 Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
 Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');

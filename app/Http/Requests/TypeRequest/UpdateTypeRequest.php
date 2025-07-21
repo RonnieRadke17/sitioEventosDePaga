@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ActivityRequest;
+namespace App\Http\Requests\TypeRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateActivityRequest extends FormRequest
+class UpdateTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,21 +22,17 @@ class UpdateActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|min:3|max:100|unique:activities,name',
-            'sport_id' => 'sometimes|exists:sports,id',
+            'name' => 'sometimes|string|min:3|max:100|unique:types,name',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.string' => 'El nombre debe ser texto.',
-            'name.min' => 'Debe tener al menos 5 caracteres.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.min' => 'El nombre debe tener al menos 3 caracteres.',
+            'name.max' => 'El nombre no puede superar los 100 caracteres.',
             'name.unique' => 'El nombre ya está en uso. Debe ser único.',
-
-
-            'sport_id.exists' => 'El deporte seleccionado no es válido.',
         ];
     }
-
 }
