@@ -22,9 +22,8 @@ class StoreActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:5|max:255',
-            'mix'  => 'required|in:0,1',
-            'sport_id'  => 'required|exists:sports,id',//faltan los comentarios de la validación
+            'name' => 'required|string|min:3|max:100|unique:acivities,name',
+            'sport_id'  => 'required|exists:sports,id',
         ];
     }
 
@@ -35,11 +34,9 @@ class StoreActivityRequest extends FormRequest
             'name.string'       => 'El nombre debe ser una cadena de texto.',
             'name.min'          => 'El nombre debe tener al menos 5 caracteres.',
             'name.max'          => 'El nombre no puede exceder los 255 caracteres.',
+            'name.unique'       => 'El nombre ya esta en uso',
 
-            'mix.required'      => 'El campo mix es obligatorio.',
-            'mix.in'            => 'El campo mix debe ser 0 o 1.',
-
-            'sport_id.required' => 'El campo sport_id es obligatorio.',
+            'sport_id.required' => 'El campo deporte es obligatorio.',
             'sport_id.exists'   => 'El deporte seleccionado no es válido o no existe en la base de datos.',
         ];
     }

@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('subs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            /* falta poner la edad en la cual abarca la sub */
             $table->timestamps();
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
     }
 

@@ -21,11 +21,43 @@ use App\Http\Controllers\ImageEventController;
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
+use App\Http\Controllers\TypeController;
+
+Route::resource('sports', SportController::class)->except('show');
+Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
+Route::post('/sports/{id}/restore', [SportController::class, 'restore'])->name('sports.restore');
+Route::delete('/sports/{id}/force-delete', [SportController::class, 'forceDelete'])->name('sports.forceDelete');
+
+Route::resource('categories', CategoryController::class)->except('show');
+Route::get('/categories/content/{type}', [CategoryController::class, 'content'])->name('categories.content');
+Route::post('/categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
+Route::delete('/categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
+
+Route::resource('types', TypeController::class)->except('show');
+Route::get('/types/content/{type}', [TypeController::class, 'content'])->name('types.content');
+Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('types.restore');
+Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
+
+/* falta reviar estas rutas */
+Route::resource('activities', ActivityController::class)->except('show');
+Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
+Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');
+Route::delete('/activities/{id}/force-delete', [ActivityController::class, 'forceDelete'])->name('activities.forceDelete');
+
+Route::resource('subs', SubController::class);
+Route::get('/subs/content/{type}', [SubController::class, 'content'])->name('subs.content');
+Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs.restore');
+Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
 
 
-Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
 
-Route::resource('sports', SportController::class)->except(['create', 'edit']);
+
+
+
+
+
+
+
 
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
@@ -48,7 +80,7 @@ Route::get('/pago', function () {
     return view('stripe');
 })->name('stripe.form');
 
-Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');
+Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment'); 
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
@@ -63,7 +95,7 @@ Route::post('/inscription-free/{id}', [UserEventController::class, 'inscriptionF
 Route::post('/confirmPayment/{id}', [UserEventController::class, 'confirmPayment'])->name('events.confirmPayment');
 
 //restablecimiento de contrasena
-Route::controller(ResetPasswordController::class)->group(function () {
+ Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/password', 'showFormSendCode')->name('forgot-password');//form para envio de correo
     Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');//formulario para restablecer la contrasena
     Route::post('/password/send-passwod-code', 'sendPasswordCode')->name('password.send-password-code');//manda el correo
@@ -95,11 +127,11 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-    Route::resource('sub', SubController::class);
-    //Route::resource('activity', ActivityController::class);
-    Route::resource('event', EventController::class);
+   
+   
+    Route::resource('event', EventController::class); 
 
- /* Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
+/*  Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
 Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
 Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class); */
 
@@ -114,7 +146,7 @@ Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
 
 
 
-
+/* 
 //User Event
 // Ruta para ver los eventos en los que el usuario está registrado
 Route::get('/UserEvent', [UserEventController::class, 'userRegisteredEvents'])->name('user.events');
@@ -134,4 +166,4 @@ Route::get('/users/{user}/edit', [AdminEventController::class, 'editUser'])->nam
 // Actualizar un usuario (ruta corregida para usar PATCH en lugar de POST)
 Route::patch('/users/{user}', [AdminEventController::class, 'updateUser'])->name('admin.users.update');
 // Eliminar un usuario
-Route::delete('/users/{user}', [AdminEventController::class, 'destroyUser'])->name('admin.users.destroy');
+Route::delete('/users/{user}', [AdminEventController::class, 'destroyUser'])->name('admin.users.destroy'); */

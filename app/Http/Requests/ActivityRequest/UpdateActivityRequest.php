@@ -22,8 +22,7 @@ class UpdateActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|min:5|max:255',
-            'mix'  => 'sometimes|in:0,1',
+            'name' => 'sometimes|string|min:3|max:100|unique:activities,name',
             'sport_id' => 'sometimes|exists:sports,id',
         ];
     }
@@ -33,7 +32,9 @@ class UpdateActivityRequest extends FormRequest
         return [
             'name.string' => 'El nombre debe ser texto.',
             'name.min' => 'Debe tener al menos 5 caracteres.',
-            'mix.in' => 'El campo mix debe ser 0 o 1.',
+            'name.unique' => 'El nombre ya está en uso. Debe ser único.',
+
+
             'sport_id.exists' => 'El deporte seleccionado no es válido.',
         ];
     }

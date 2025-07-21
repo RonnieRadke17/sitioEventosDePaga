@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('lat', 10, 8); // Latitud con 10 dígitos en total y 8 decimales
             $table->decimal('lon', 11, 8); // Longitud con 11 dígitos en total y 8 decimales
             $table->timestamps();
+            $table->softDeletes(); // Permite eliminar lógicamente el registro "inhabilitarlo" sin borrarlo de la base de datos
         });
     }
 

@@ -4,21 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // hace un "borrado suave" de los registros eliminados
 
 class ActivityEvent extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'event_id','activity_id','gender','sub_id'
-       ];
-    //faltan las relaciones con los otros modelos   
-    //solo es con sub porque es tabla intermedia
-    #entre event y activity y gender es un enum
-    /* public function sub()
+    ];
+    
+    //creo falta la relacion con la tabla 'events' ya esta agregada un protopype de la relación
+    public function event()
     {
-        return $this->belongsTo(Sub::class);
-    } */
+        return $this->belongsTo(Event::class, 'event_id');
+    }
 
     // Relación con la tabla 'activities'
     public function activity()
@@ -31,7 +32,4 @@ class ActivityEvent extends Model
     {
         return $this->belongsTo(Sub::class, 'sub_id');
     }
-
-
-
 }

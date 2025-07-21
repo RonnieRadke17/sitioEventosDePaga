@@ -5,99 +5,198 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sport;
-use App\Models\Category;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use App\Http\Requests\SportRequest\StoreSportRequest;
+use App\Http\Requests\SportRequest\UpdateSportRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+use App\Services\EncryptService\EncryptService;
 
 
 class SportController extends Controller
 {
+    protected $encryptService;
+
+    public function __construct(EncryptService $encryptService)
+    {
+        $this->encryptService = $encryptService;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()//funciona
+    public function index()
     {
-        $categories = Category::all(); // Obtener todas las categorías de la base de datos
-        $sports = Sport::with('category')->paginate(5);
-        return view('sports.index', compact('sports','categories')); // Pasar los deportes a la vista
+        $sports = Sport::paginate(10);
+        $sports = $this->encryptService->encrypt($sports);
+        $type = 'active';
+
+        return view('sports.index', compact('sports', 'type'));
+    }
+
+    public function create()
+    {
+        $sport = new Sport();
+        return view('sports.form', compact('sport'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)//ya esta
+    public function store(StoreSportRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:60|unique:sports,name',
-           'category_id' => 'required|integer|exists:categories,id'
-        ]);
-        /* try catch y transaccion para crear el nuevo deporte*/
-        try {//registra el sporto en la base de datos
-            $sport = DB::transaction(function () use ($request) {
-                return sport::create([
-                    'name' => $request->name,
-                    'category_id' => $request->category_id,
-                ]);
-            });
+        try {
+            Sport::create($request->validated());
 
-            if($sport){//verifica el valor de la variable $sport si tiene algo dentro lo redirecciona a la ruta de show
-                return redirect()->route('sports.index')->with('success', 'Deporte creado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
-            }else {//sino redirecciona a la ruta de sport con un mensaje de error
-                return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+            return redirect()->route('sports.index')->with('message', 'Deporte creado correctamente.');
+        } catch (\Throwable $e) {
+            return redirect()->route('sports.index')->withErrors('Error al crear el deporte: ');
         }
     }
 
+    public function edit(string $id)
+    {
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
+        }
+
+        $sport = Sport::find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        return view('sports.form', compact('sport', 'id'));
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)//revisar codigo de update
+    public function update(UpdateSportRequest $request, string $id)
     {
-        $request->validate([
-            'name' => 'required|string|min:5|max:60|unique:sports,name',
-            'category_id' => 'required|integer|exists:categories,id'
-        ]);
+        $decrypted_id = $this->encryptService->decrypt($id);
 
-        /* try catch y transaccion para actualizar el deporte*/
-        try {//registra el sporto en la base de datos
-            $sport = DB::transaction(function () use ($request) {
-                return sport::create([
-                    'name' => $request->name,
-                    'category_id' => $request->category_id,
-                ]);
-            });
-
-            if($sport){//verifica el valor de la variable $sport si tiene algo dentro lo redirecciona a la ruta de show
-                return redirect()->route('sports.index')->with('success', 'Deporte creado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
-            }else {//sino redirecciona a la ruta de sport con un mensaje de error
-                return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->route('sports.index')->with('error', 'Ha ocurrido un error.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
         }
 
+        $sport = Sport::find($decrypted_id);
 
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
 
-        // Actualizar el deporte en la base de datos
-        $sport = Sport::findOrFail($id); // Buscar el deporte por ID o lanzar una excepción si no se encuentra
-        $sport->update($request->all()); // Actualizar el deporte con los datos del formulario
-        return redirect()->route('sports.index')->with('success', 'Deporte actualizado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        $sport->update($request->validated());
+
+        return redirect()->route('sports.index')->with('message', 'Deporte actualizado correctamente.');
+    }
+
+    public function content($type)
+    {
+        
+        try {
+            // Elegir la consulta base según el filtro recibido
+            if ($type === 'active') {
+                $query = Sport::query();
+            }
+            else if ($type === 'trashed') {
+                $query = Sport::onlyTrashed();
+            } elseif ($type === 'all') {
+                $query = Sport::withTrashed();
+            } else {
+                // Si el tipo no es válido, redirigir o manejar el error
+                return redirect()->route('sports.index')->withErrors('Tipo de contenido no válido.');
+            }
+
+            // Obtener resultados paginados
+            $sports = $query->paginate(10);
+
+            $sports = $this->encryptService->Encrypt($sports);
+
+            // Pasar el tipo actual para marcar la selección en el frontend
+            return view('sports.index', compact('sports', 'type'));
+
+        } catch (\Throwable $th) {
+            return back()->withErrors('Ocurrió un error al cargar los registros.');
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft-delete the specified resource.
      */
     public function destroy(string $id)
     {
-        /* usar try catch */
+        $decrypted_id = $this->encryptService->decrypt($id);
 
-        $sport = Sport::findOrFail($id)->delete(); // Buscar el deporte por ID o lanzar un error 404 si no se encuentra
-        return redirect()->route('sports.index')->with('success', 'Deporte eliminado correctamente.'); // Redirigir a la lista de deportes con un mensaje de éxito
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
+        }
+
+        $sport = Sport::find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        $sport->delete();
+
+        return redirect()->route('sports.index')->with('message', 'Deporte inhabilitado correctamente.');
+    }
+
+    /**
+     * Restore the specified soft-deleted resource.
+     */
+    public function restore(string $id)
+    {
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
+        }
+
+        $sport = Sport::withTrashed()->find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        if (!$sport->trashed()) {
+            return redirect()->route('sports.index')->withErrors('El deporte no está inhabilitado.');
+        }
+
+        $sport->restore();
+
+        return redirect()->route('sports.index')->with('message', 'Deporte restaurado correctamente.');
+    }
+
+    /**
+     * Permanently delete the specified resource.
+     */
+    public function forceDelete(string $id)
+    {
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
+        }
+
+        $sport = Sport::withTrashed()->find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        if (!$sport->trashed()) {
+            return redirect()->route('sports.index')->withErrors('El deporte no está inhabilitado, no se puede eliminar permanentemente.');
+        }
+
+        try {
+            $sport->forceDelete();
+            return redirect()->route('sports.index')->with('message', 'Deporte eliminado permanentemente.');
+        } catch (\Throwable $e) {
+            return redirect()->route('sports.index')->withErrors('Error al eliminar permanentemente: ');
+        }
     }
 }
+
