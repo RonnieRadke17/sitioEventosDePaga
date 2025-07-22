@@ -75,6 +75,9 @@
                 </td>
                 
                 <td class="px-6 py-4 text-right">
+                    <a href="{{ route('activities.show', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-primary">
+                        Ver
+                        </a>
                     @if($activity->trashed())
                         <form 
                             action="{{ route('activities.restore', $activity->encrypted_id) }}" 
@@ -101,9 +104,9 @@
                         <a href="{{ route('activities.edit', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-secondary">
                         Editar
                         </a>
-                        <a href="{{ route('activities.show', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-primary">
+                        {{-- <a href="{{ route('activities.show', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-primary">
                         Ver
-                        </a>
+                        </a> --}}
                         <form 
                         action="{{route('activities.destroy', $activity->encrypted_id)}}" 
                         method="POST" 

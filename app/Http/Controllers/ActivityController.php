@@ -53,7 +53,8 @@ class ActivityController extends Controller
         if (!$decrypted_id) return redirect()->route('activities.index')->withErrors('ID inválido.');
 
         /* buscar hasta en trasehd */
-        $activity = Activity::find($decrypted_id);
+        /* $activity = Activity::find($decrypted_id); */
+        $activity = Activity::withTrashed()->find($decrypted_id);
         if (!$activity) return redirect()->route('activities.index')->withErrors('Tipo no encontrado.');
 
         $sports = Sport::all();
@@ -65,7 +66,9 @@ class ActivityController extends Controller
         if (!$decrypted_id) return redirect()->route('activities.index')->withErrors('ID inválido.');
 
         $activity = Activity::find($decrypted_id);
-        if (!$activity) return redirect()->route('activities.index')->withErrors('Tipo no encontrado.');
+        
+
+        if (!$activity) return redirect()->route('activities.index')->withErrors('Actividad no encontrada.');
 
         $sports = Sport::all();
         return view('activities.form', compact('activity', 'id','sports'));
