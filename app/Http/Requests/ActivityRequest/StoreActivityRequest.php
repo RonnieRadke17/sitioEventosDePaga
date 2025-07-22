@@ -22,7 +22,7 @@ class StoreActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:100|unique:acivities,name',
+            'name' => 'required|string|min:3|max:100|unique:activities,name',
             'sport_id'  => 'required|exists:sports,id',
         ];
     }

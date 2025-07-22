@@ -39,7 +39,7 @@ Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('ty
 Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
 
 /* falta reviar estas rutas */
-Route::resource('activities', ActivityController::class)->except('show');
+Route::resource('activities', ActivityController::class);
 Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
 Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');
 Route::delete('/activities/{id}/force-delete', [ActivityController::class, 'forceDelete'])->name('activities.forceDelete');
