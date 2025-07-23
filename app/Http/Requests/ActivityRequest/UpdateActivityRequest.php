@@ -4,6 +4,9 @@ namespace App\Http\Requests\ActivityRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
+
 class UpdateActivityRequest extends FormRequest
 {
     /**
@@ -18,14 +21,16 @@ class UpdateActivityRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+     */  
+
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|min:3|max:100|unique:activities,name',
+            'name' => 'sometimes|string|min:3|max:100|unique:activities,name,',
             'sport_id' => 'sometimes|exists:sports,id',
         ];
     }
+
 
     public function messages(): array
     {
