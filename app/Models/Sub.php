@@ -10,7 +10,10 @@ class Sub extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name'
+        ,'min'
+        ,'max'];
 
     //retation with ActivityEvent m-m-
     public function activityEvents()

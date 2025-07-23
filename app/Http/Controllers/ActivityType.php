@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Sub;
 
-class SubController extends Controller
+class ActivityType extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,9 +12,6 @@ class SubController extends Controller
     public function index()
     {
         //
-
-        $data['subs'] = Sub::paginate(10);
-        return view('sub.index',$data);
     }
 
     /**
@@ -24,7 +20,6 @@ class SubController extends Controller
     public function create()
     {
         //
-        return view('sub.create');
     }
 
     /**
