@@ -117,7 +117,7 @@ class ActivityController extends Controller
                 $query = Activity::withTrashed();
             } else {
                 // Si el tipo no es válido, redirigir o manejar el error
-                return redirect()->route('sports.index')->withErrors('Tipo de contenido no válido.');
+                return redirect()->route('activities.index')->withErrors('Tipo de contenido no válido.');
             }
 
             // Obtener resultados paginados
