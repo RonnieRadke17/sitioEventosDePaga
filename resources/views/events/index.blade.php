@@ -5,7 +5,7 @@
 @section('content')
     {{-- faltan mensajes de error y exito --}}
     
-    
+    {{-- falta el selector para mostrar los eventos o chance un floatingActionButton --}}
 
     <div data-dial-init class="fixed right-6 bottom-6">
         <a href="{{ route('events.create') }}" data-dial-toggle="speed-dial-menu-dropdown-alternative" aria-controls="speed-dial-menu-dropdown-alternative" aria-expanded="false" class="flex items-center justify-center ml-auto text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
@@ -17,11 +17,11 @@
 
 
 
-    {{-- <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         @foreach($events as $event)
             
             <div class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                <a href="#">
+                <a href="{{ route('events.show', $event->encrypted_id) }}">
                     <img class="w-full h-48 object-cover" src="{{ asset('storage/'.$event->first_image) }}" alt="Event Image">
                 </a>
                 <div class="p-5">
@@ -30,13 +30,12 @@
                     </a>
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ $event->event_date }}</p>
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ Str::limit($event->description, 100) }}</p>
-                    
                 </div>
             </div>
 
         @endforeach
 
-    </div> --}}
+    </div>
     
 
 

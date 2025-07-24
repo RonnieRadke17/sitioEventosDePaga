@@ -5,8 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
-use App\Http\Requests\SportRequest\StoreEventRequest;
-use App\Http\Requests\SportRequest\UpdateEventRequest;
+use App\Http\Requests\EventRequest\StoreEventRequest;
+use App\Http\Requests\EventRequest\UpdateEventRequest;
 use App\Services\EncryptService\EncryptService;
 
 class EventController extends Controller
@@ -21,7 +21,8 @@ class EventController extends Controller
     public function index()
     {
         /* falta poner el evento con la primera imagen relacionada de tipo cover */
-        $events = Event::paginate(10);
+        //$events = Event::paginate(10);
+        $events = Event::latest()->paginate(10);
         $events = $this->encryptService->encrypt($events);
         $type = 'active';
 
@@ -56,9 +57,10 @@ class EventController extends Controller
         return view('events.form', compact('event', 'id'));
     }
 
-    
     public function update(UpdateEventRequest $request, string $id){
+    //public function update(Request $request, string $id){
 
+        //dd($request->all());
         if (empty($request->except('_token', '_method'))) {
             return redirect()->route('events.index')->withErrors('No se han realizado cambios.');
         }
@@ -87,10 +89,18 @@ class EventController extends Controller
     }
 
     /* mandar la información del evento junto con los demás elementos que tiene seleccionados */
-    public function show($id)
+    public function show(string $id)
     {
-    }
+        //
+        $decrypted_id = $this->encryptService->decrypt($id);
+        if (!$decrypted_id) return redirect()->route('events.index')->withErrors('ID inválido.');
 
+        /* buscar hasta en trasehd */
+        $event = Event::withTrashed()->find($decrypted_id);
+        if (!$event) return redirect()->route('events.index')->withErrors('Tipo no encontrado.');
+
+        return view('events.show', compact('event','id'));
+    }
     
     public function content($type)
     {
@@ -110,7 +120,9 @@ class EventController extends Controller
             }
 
             // Obtener resultados paginados
-            $events = $query->paginate(10);
+            //$events = $query->paginate(10);
+            $events = $query->latest()->paginate(10);
+
 
             $events = $this->encryptService->Encrypt($events);
 

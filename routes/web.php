@@ -5,9 +5,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\UserEventController;
-use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ActivityEventController;
-use App\Http\Controllers\SubController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
@@ -18,11 +16,17 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\EventMapController;
 use App\Http\Controllers\ImageEventController;
 
+
+
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SubController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ActivityTypeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\CategoryEventController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
@@ -62,7 +66,20 @@ Route::get('/events/content/{type}', [EventController::class, 'content'])->name(
 Route::post('/events/{id}/restore', [EventController::class, 'restore'])->name('event.restore');
 Route::delete('/events/{id}/force-delete', [EventController::class, 'forceDelete'])->name('event.forceDelete');
 
+Route::get('category-events/form/{event}', [ActivityTypeController::class, 'form'])->name('category-events.form');
+Route::post('category-events/store', [ActivityTypeController::class, 'store'])->name('category-events.store');
+Route::patch('category-events/update{id}', [ActivityTypeController::class, 'update'])->name('category-events.update');
 
+
+/* por hacer aun*/
+Route::resource('places', PlaceController::class);
+Route::get('/places/content/{type}', [PlaceController::class, 'content'])->name('places.content');
+Route::post('/places/{id}/restore', [PlaceController::class, 'restore'])->name('places.restore');
+Route::delete('/places/{id}/force-delete', [PlaceController::class, 'forceDelete'])->name('places.forceDelete');
+
+
+/* ya después de hacer lo del mapa se tiene que agregar una ruta para que se pueda agregar el lugar a un evento +
+    podrian ser la ruta del form y la del store y update en dado caso de que tenga una  */
 
 
 

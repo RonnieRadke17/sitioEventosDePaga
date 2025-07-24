@@ -10,15 +10,46 @@
                 @csrf
                 @if($event->exists) 
                     @method('PATCH') 
-                    {{-- <input type="hidden" name="id" value="{{ $event->exists ? $id : '' }}"> --}}
                 @endif
-                {{-- <div class="form-group">
+                <div class="form-group">
                     <label>Name</label>
                     <input name="name" class="form-control" value="{{ old('name', $event->name) }}" data-original="{{ $event->name }}" required>
                     @error('name') <div>{{ $message }}</div> @enderror
-                </div> --}}
+                </div>
 
-                <x-forms.input-text name="name" description="Nombre del evento" oldvalue="{{ $event->name ?? ''}}" data-original="{{ $event->name }}" required></x-forms.input-text>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input name="description" class="form-control" value="{{ old('description', $event->description) }}" data-original="{{ $event->description }}" required>
+                    @error('description') <div>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label>event_date</label>
+                    <input name="event_date" class="form-control" value="{{ old('event_date', $event->event_date) }}" data-original="{{ $event->event_date }}" required>
+                    @error('event_date') <div>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label>registration_deadline</label>
+                    <input name="registration_deadline" class="form-control" value="{{ old('registration_deadline', $event->registration_deadline) }}" data-original="{{ $event->registration_deadline }}" required>
+                    @error('registration_deadline') <div>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label>capacity</label>
+                    <input name="capacity" class="form-control" value="{{ old('capacity', $event->capacity) }}" data-original="{{ $event->capacity }}" required>
+                    @error('capacity') <div>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label>price</label>
+                    <input name="price" class="form-control" value="{{ old('price', $event->price) }}" data-original="{{ $event->price }}" required>
+                    @error('price') <div>{{ $message }}</div> @enderror
+                </div>
+
+
+
+                {{-- <x-forms.input-text name="name" description="Nombre del evento" oldvalue="{{ $event->name ?? ''}}" data-original="{{ $event->name }}" required></x-forms.input-text> --}}
 
                 
 
