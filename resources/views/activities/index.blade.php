@@ -78,6 +78,11 @@
                     <a href="{{ route('activities.show', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-primary">
                         Ver
                         </a>
+                    {{-- ruta de las etiquetas de cada actividad --}}
+                    <a href="{{ route('activity-types.form', $activity->encrypted_id) }}" class="btn btn-sm btn-outline-primary">
+                        etiquetas
+                        </a>
+
                     @if($activity->trashed())
                         <form 
                             action="{{ route('activities.restore', $activity->encrypted_id) }}" 

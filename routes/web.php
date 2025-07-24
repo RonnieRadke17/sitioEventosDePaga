@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ActivityEventController;
@@ -22,6 +21,8 @@ use App\Http\Controllers\ImageEventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
 use App\Http\Controllers\TypeController;
+use App\Http\Controllers\ActivityTypeController;
+use App\Http\Controllers\EventController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
@@ -38,7 +39,7 @@ Route::get('/types/content/{type}', [TypeController::class, 'content'])->name('t
 Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('types.restore');
 Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
 
-/* falta reviar estas rutas */
+
 Route::resource('activities', ActivityController::class);
 Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
 Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');
@@ -48,6 +49,27 @@ Route::resource('subs', SubController::class);
 Route::get('/subs/content/{type}', [SubController::class, 'content'])->name('subs.content');
 Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs.restore');
 Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
+
+
+Route::get('activity-types/form/{activity}', [ActivityTypeController::class, 'form'])->name('activity-types.form');
+Route::post('activity-types/store', [ActivityTypeController::class, 'store'])->name('activity-types.store');
+Route::patch('activity-types/update{id}', [ActivityTypeController::class, 'update'])->name('activity-types.update');
+
+/* falta reviar estas rutas */
+
+Route::resource('events', EventController::class); 
+Route::get('/events/content/{type}', [EventController::class, 'content'])->name('event.content');
+Route::post('/events/{id}/restore', [EventController::class, 'restore'])->name('event.restore');
+Route::delete('/events/{id}/force-delete', [EventController::class, 'forceDelete'])->name('event.forceDelete');
+
+
+
+
+
+
+
+
+
 
 
 
@@ -129,7 +151,7 @@ Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta
 
    
    
-    Route::resource('event', EventController::class); 
+    
 
 /*  Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
 Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
