@@ -99,6 +99,7 @@ class EventController extends Controller
         $event = Event::withTrashed()->find($decrypted_id);
         if (!$event) return redirect()->route('events.index')->withErrors('Tipo no encontrado.');
 
+        /* aqui se podrian revisar si hay registros en las tablas intermedias para el evento y mandar las variables */
         return view('events.show', compact('event','id'));
     }
     

@@ -17,8 +17,6 @@ use App\Http\Controllers\EventMapController;
 use App\Http\Controllers\ImageEventController;
 
 
-
-
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
 use App\Http\Controllers\ActivityController;
