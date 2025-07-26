@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\Services\EncryptService\EncryptService;
 
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Contracts\Encryption\DecryptException;
 
 class SportController extends Controller
 {
@@ -28,6 +26,7 @@ class SportController extends Controller
      */
     public function index()
     {
+<<<<<<< HEAD
         try {
             $sports = Sport::latest()->paginate(10);
             // Encriptar IDs para la vista
@@ -43,13 +42,20 @@ class SportController extends Controller
             return view('sports.index')->with('error', 'Error al cargar las dependencias.');
         }
 
+=======
+        $sports = Sport::paginate(10);
+        $sports = $this->encryptService->encrypt($sports);
+        $type = 'active';
+
+        return view('sports.index', compact('sports', 'type'));
+>>>>>>> a0a7cf16af904fe9b799689a3381af0f7a230214
     }
 
-
-    public function create(){
-        return view('sports.create');
+    public function create()
+    {
+        $sport = new Sport();
+        return view('sports.form', compact('sport'));
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -57,135 +63,157 @@ class SportController extends Controller
     public function store(StoreSportRequest $request)
     {
         try {
-            $sport = Sport::create($request->validated());
+            Sport::create($request->validated());
 
-            return response()->json([
-                'success' => 'Deporte creado correctamente.',
-                'data' => $sport
-            ], 201);
-
+            return redirect()->route('sports.index')->with('message', 'Deporte creado correctamente.');
         } catch (\Throwable $e) {
-            return response()->json([
-                'error' => 'Error al crear el deporte.',
-                'message' => $e->getMessage()
-            ], 500);
+            return redirect()->route('sports.index')->withErrors('Error al crear el deporte: ');
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(String $id)
+    public function edit(string $id)
     {
-        try {
-            $decriptedId = Crypt::decryptString($id);
-            $sport = Sport::findOrFail($decriptedId);
-            return response()->json(['data' => $sport], 200);
+        $decrypted_id = $this->encryptService->decrypt($id);
 
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Deporte no encontrada.'], 404);
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
         }
+
+        $sport = Sport::find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        return view('sports.form', compact('sport', 'id'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSportRequest $request, $id)
+    public function update(UpdateSportRequest $request, string $id)
     {
-        if (!is_numeric($id) || (int)$id <= 0) {
-            return response()->json(['error' => 'El ID proporcionado no es válido.'], 422);
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
         }
 
+        $sport = Sport::find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        $sport->update($request->validated());
+
+        return redirect()->route('sports.index')->with('message', 'Deporte actualizado correctamente.');
+    }
+
+    public function content($type)
+    {
+        
         try {
-            $sport = Sport::findOrFail($id);
-            $sport->update($request->validated());
+            // Elegir la consulta base según el filtro recibido
+            if ($type === 'active') {
+                $query = Sport::query();
+            }
+            else if ($type === 'trashed') {
+                $query = Sport::onlyTrashed();
+            } elseif ($type === 'all') {
+                $query = Sport::withTrashed();
+            } else {
+                // Si el tipo no es válido, redirigir o manejar el error
+                return redirect()->route('sports.index')->withErrors('Tipo de contenido no válido.');
+            }
 
-            return response()->json([
-                'success' => 'Deporte actualizada correctamente.',
-                'data' => $sport
-            ], 200);
+            // Obtener resultados paginados
+            $sports = $query->paginate(10);
 
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Deporte no encontrada.'], 404);
+            $sports = $this->encryptService->Encrypt($sports);
+
+            // Pasar el tipo actual para marcar la selección en el frontend
+            return view('sports.index', compact('sports', 'type'));
+
+        } catch (\Throwable $th) {
+            return back()->withErrors('Ocurrió un error al cargar los registros.');
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft-delete the specified resource.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $id = (int) $id;
-        if ($id <= 0) {
-            return response()->json(['error' => 'El ID proporcionado no es válido.'], 422);
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
         }
 
-        try {
-            $Sport = Sport::findOrFail($id);
-            $Sport->delete();
+        $sport = Sport::find($decrypted_id);
 
-            return response()->json(['success' => 'Deporte inhabilitado correctamente.'], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Deporte no encontrado.'], 404);
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
         }
+
+        $sport->delete();
+
+        return redirect()->route('sports.index')->with('message', 'Deporte inhabilitado correctamente.');
     }
 
-    public function restore($id)
+    /**
+     * Restore the specified soft-deleted resource.
+     */
+    public function restore(string $id)
     {
-        $id = (int) $id;
-        if ($id <= 0) {
-            return response()->json(['error' => 'El ID proporcionado no es válido.'], 422);
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
         }
 
-        try {
-            $sport = Sport::withTrashed()->findOrFail($id);
+        $sport = Sport::withTrashed()->find($decrypted_id);
 
-            if (!$Sport->trashed()) {
-                return response()->json(['error' => 'El deporte no está inhabilitado.'], 409);
-            }
-
-            $Sport->restore();
-
-            return response()->json([
-                'success' => 'Deporte restaurado correctamente.',
-                'data' => $Sport
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Deporte no encontrada.'], 404);
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
         }
+
+        if (!$sport->trashed()) {
+            return redirect()->route('sports.index')->withErrors('El deporte no está inhabilitado.');
+        }
+
+        $sport->restore();
+
+        return redirect()->route('sports.index')->with('message', 'Deporte restaurado correctamente.');
     }
 
-    public function forceDestroy($id)
+    /**
+     * Permanently delete the specified resource.
+     */
+    public function forceDelete(string $id)
     {
-        $id = (int) $id;
-        if ($id <= 0) {
-            return response()->json(['error' => 'El ID proporcionado no es válido.'], 422);
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('sports.index')->withErrors('ID inválido.');
+        }
+
+        $sport = Sport::withTrashed()->find($decrypted_id);
+
+        if (!$sport) {
+            return redirect()->route('sports.index')->withErrors('Deporte no encontrado.');
+        }
+
+        if (!$sport->trashed()) {
+            return redirect()->route('sports.index')->withErrors('El deporte no está inhabilitado, no se puede eliminar permanentemente.');
         }
 
         try {
-            $Sport = Sport::withTrashed()->findOrFail($id);
-
-            if (!$Sport->trashed()) {
-                return response()->json([
-                    'error' => 'El deporte no está inhabilitado, no se puede eliminar permanentemente.'
-                ], 409);
-            }
-
-            $Sport->forceDelete();
-
-            return response()->json([
-                'success' => 'Deporte eliminada permanentemente.'
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Deporte no encontrada.'], 404);
+            $sport->forceDelete();
+            return redirect()->route('sports.index')->with('message', 'Deporte eliminado permanentemente.');
         } catch (\Throwable $e) {
-            return response()->json([
-                'error' => 'Error al eliminar permanentemente.',
-                'message' => $e->getMessage()
-            ], 500);
+            return redirect()->route('sports.index')->withErrors('Error al eliminar permanentemente: ');
         }
     }
 }

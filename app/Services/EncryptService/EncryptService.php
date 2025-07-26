@@ -4,19 +4,41 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 class EncryptService{
-    public function encryptAll($data)
+
+    public function Encrypt($data)
     {
+<<<<<<< HEAD
         $data->getCollection()->transform(function ($item) {
+=======
+        try {
+            $data->setCollection(
+                $data->getCollection()->transform(function ($item) {
+>>>>>>> a0a7cf16af904fe9b799689a3381af0f7a230214
                 $item->encrypted_id = Crypt::encrypt($item->id);
                 return $item;
-            });
+                })
+            );
+        } catch (\Throwable $th) {
+            return null;
+        }
+        return $data;
     }
 
-    public function find(string $id){
+
+    /* ecriptación de los selectores */
+    public function Encryptselectors($data)
+    {
+        return $data->transform(function ($item) {
+            $item->encrypted_id = Crypt::encrypt($item->id);
+            return $item;
+        });
+    }
+
+
+    public function decrypt(string $id){
         try {
-            return Crypt::decryptString($id);
+            return Crypt::decrypt($id);
         } catch (DecryptException $e) {
-            // Manejo de errores si es necesario
             return null;
         }
     }

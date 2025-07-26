@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SportController;
 
-Route::resource('category', CategoryController::class);
+/* Route::resource('category', CategoryController::class);
 
 Route::post('category/{id}/restore', [CategoryController::class, 'restore'])->name('category.restore');
 Route::delete('category/{id}/force', [CategoryController::class, 'forceDestroy'])->name('category.force');
@@ -19,4 +19,4 @@ Route::delete('activity/{id}/force', [ActivityController::class, 'forceDestroy']
 Route::resource('sports', SportController::class);
 
 Route::post('sports/{id}/restore', [SportController::class, 'restore'])->name('sport.restore');
-Route::delete('sports/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force');
+Route::delete('sports/{id}/force', [SportController::class, 'forceDestroy'])->name('sport.force'); */

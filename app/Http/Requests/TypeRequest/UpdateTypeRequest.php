@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\CategoryRequest;
+namespace App\Http\Requests\TypeRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCategoryRequest extends FormRequest
+class UpdateTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,17 +22,17 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:100|unique:categories,name',
+            'name' => 'sometimes|string|min:3|max:100|unique:types,name',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'El nombre es obligatorio.',
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.min' => 'El nombre debe tener al menos 3 caracteres.',
             'name.max' => 'El nombre no puede superar los 100 caracteres.',
+            'name.unique' => 'El nombre ya está en uso. Debe ser único.',
         ];
     }
 }
