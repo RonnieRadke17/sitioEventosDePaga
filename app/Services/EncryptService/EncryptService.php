@@ -7,13 +7,9 @@ class EncryptService{
 
     public function Encrypt($data)
     {
-<<<<<<< HEAD
-        $data->getCollection()->transform(function ($item) {
-=======
         try {
             $data->setCollection(
                 $data->getCollection()->transform(function ($item) {
->>>>>>> a0a7cf16af904fe9b799689a3381af0f7a230214
                 $item->encrypted_id = Crypt::encrypt($item->id);
                 return $item;
                 })

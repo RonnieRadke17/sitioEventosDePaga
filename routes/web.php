@@ -84,28 +84,6 @@ Route::delete('/places/{id}/force-delete', [PlaceController::class, 'forceDelete
 
 
 
-
-
-
-
-
-
-
-<<<<<<< HEAD
-/* Route::get('/sports', function () {
-    return view('sports.index');
-})->name('sports.index'); */
-
-Route::resource('sports', SportController::class);
-
-//Route::get('/sports/{id}', fn($id) => view('sports.show', ['sportId' => $id]))->name('sports.show');
-=======
-
->>>>>>> a0a7cf16af904fe9b799689a3381af0f7a230214
-
-
-
-
 //rutas del mapa de los eventos
 Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
 // Ruta personalizada para create con parámetro id
