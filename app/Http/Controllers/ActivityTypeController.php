@@ -8,8 +8,8 @@ use App\Services\EncryptService\EncryptService;
 use App\Models\Activity;
 use App\Models\type;
 
-use App\Http\Requests\SportRequest\StoreSportRequest;
-use App\Http\Requests\SportRequest\UpdateSportRequest;
+use App\Http\Requests\ActivityTypeRequest\StoreActivityTypeRequest;
+use App\Http\Requests\ActivityTypeRequest\UpdateActivityTypeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
@@ -55,7 +55,7 @@ class ActivityTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)/* falta implementar el request */
+    public function store(StoreActivityTypeRequest $request)
     {
         $decrypted_id = $this->encryptService->decrypt($request->input('activity_id'));
 
@@ -83,8 +83,11 @@ class ActivityTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)/* falta el request */
+    public function update(UpdateActivityTypeRequest $request, string $id)
     {
+        if (empty($request->except('_token', '_method'))) {
+            return redirect()->route('activities.index')->withErrors('No se han realizado cambios.');
+        }
         $decrypted_id = $this->encryptService->decrypt($id);
 
         if (!$decrypted_id) {

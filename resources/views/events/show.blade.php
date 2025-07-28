@@ -46,7 +46,48 @@
 {{-- link del mapa --}}
 
 {{-- link categorias del evento --}}
-
+@if ($categories)
+    <a href="{{ route('category-events.form',$id) }}">categorias</a>
+@else
+    <a href="{{ route('category-events.form',$id) }}">categorias</a>
+@endif
 {{-- link actividades del evento --}}
+
+
+{{-- link para desactivar el evento --}}
+@if($event->trashed())
+                        <form 
+                            action="{{ route('events.restore',$id) }}" 
+                            method="POST" 
+                            style="display:inline;"
+                            >
+                            @csrf
+                            <button class="btn btn-sm btn-outline-success">
+                                Activar
+                            </button>
+                        </form>
+
+                        <form 
+                            action="{{ route('events.forceDelete', $id) }}" 
+                            method="POST" 
+                            class="d-inline"
+                            onsubmit="return confirm('¿Seguro de eliminar?')"
+                            >
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                    @else
+                        <form 
+                        action="{{route('events.destroy',$id)}}" 
+                        method="POST" 
+                        class="d-inline"
+                        onsubmit="return confirm('¿Seguro de desactivar?')"
+                        >
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-sm btn-outline-danger">Desactivar</button>
+                        </form>
+                    @endif
 
 @endsection

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ActivityTypeRequest;
+namespace App\Http\Requests\CategoryEventRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreActivitytypeRequest extends FormRequest
+class UpdateCategoryEventRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,18 +22,16 @@ class StoreActivitytypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'selectedTypes' => 'required|array',
-        'selectedTypes.*' => 'exists:types,id',
+        'selectedCategories' => 'sometimes|array',
+        'selectedCategories.*' => 'exists:categories,id',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'selectedTypes.required' => 'Debe seleccionar al menos un tipo de actividad.',
-            'selectedTypes.array' => 'El formato de los tipos seleccionados no es válido.',
-            'selectedTypes.*.exists' => 'Uno o más tipos seleccionados no existen en la base de datos.',
+            'selectedCategories.array' => 'El formato de las categorias seleccionadas no es válido.',
+            'selectedCategories.*.exists' => 'Uno o más categorias seleccionadas no existen en la base de datos.',
         ];
     }
-
 }

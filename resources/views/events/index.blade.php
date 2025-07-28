@@ -4,8 +4,32 @@
 @endsection
 @section('content')
     {{-- faltan mensajes de error y exito --}}
-    
-    {{-- falta el selector para mostrar los eventos o chance un floatingActionButton --}}
+    @if ($errors->any())
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+        @foreach ($errors->all() as $error)
+            <span class="block font-medium">{{ $error }}</span>
+        @endforeach
+    </div>
+@endif
+
+    <form class="max-w-sm mx-auto">
+        <label for="typeSelector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seleccionar opción</label>
+        <select id="typeSelector" onchange="window.location.href = this.value"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            
+            <option value="{{ route('events.content', 'active') }}" {{ ($type ?? 'active') == 'active' ? 'selected' : '' }}>
+            Registros Activos
+            </option>
+
+            <option value="{{ route('events.content', 'trashed') }}" {{ ($type ?? '') == 'trashed' ? 'selected' : '' }}>
+            Registros Inactivos
+            </option>
+
+            <option value="{{ route('events.content', 'all') }}" {{ ($type ?? '') == 'all' ? 'selected' : '' }}>
+            Todos
+            </option>
+        </select>
+    </form>
 
     <div data-dial-init class="fixed right-6 bottom-6">
         <a href="{{ route('events.create') }}" data-dial-toggle="speed-dial-menu-dropdown-alternative" aria-controls="speed-dial-menu-dropdown-alternative" aria-expanded="false" class="flex items-center justify-center ml-auto text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
@@ -14,7 +38,6 @@
             </svg>
         </a>
     </div>
-
 
 
     <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -37,7 +60,4 @@
 
     </div>
     
-
-
-
 @endSection

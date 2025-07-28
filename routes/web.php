@@ -53,20 +53,20 @@ Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs
 Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
 
 
+/* falta revisar estas rutas */
 Route::get('activity-types/form/{activity}', [ActivityTypeController::class, 'form'])->name('activity-types.form');
 Route::post('activity-types/store', [ActivityTypeController::class, 'store'])->name('activity-types.store');
 Route::patch('activity-types/update{id}', [ActivityTypeController::class, 'update'])->name('activity-types.update');
 
-/* falta reviar estas rutas */
 
 Route::resource('events', EventController::class); 
-Route::get('/events/content/{type}', [EventController::class, 'content'])->name('event.content');
-Route::post('/events/{id}/restore', [EventController::class, 'restore'])->name('event.restore');
-Route::delete('/events/{id}/force-delete', [EventController::class, 'forceDelete'])->name('event.forceDelete');
+Route::get('/events/content/{type}', [EventController::class, 'content'])->name('events.content');
+Route::post('/events/{id}/restore', [EventController::class, 'restore'])->name('events.restore');
+Route::delete('/events/{id}/force-delete', [EventController::class, 'forceDelete'])->name('events.forceDelete');
 
-Route::get('category-events/form/{event}', [ActivityTypeController::class, 'form'])->name('category-events.form');
-Route::post('category-events/store', [ActivityTypeController::class, 'store'])->name('category-events.store');
-Route::patch('category-events/update{id}', [ActivityTypeController::class, 'update'])->name('category-events.update');
+Route::get('category-events/form/{event}', [CategoryEventController::class, 'form'])->name('category-events.form');
+Route::post('category-events/store', [CategoryEventController::class, 'store'])->name('category-events.store');
+Route::patch('category-events/update{id}', [CategoryEventController::class, 'update'])->name('category-events.update');
 
 
 /* por hacer aun*/
@@ -81,6 +81,21 @@ Route::delete('/places/{id}/force-delete', [PlaceController::class, 'forceDelete
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 

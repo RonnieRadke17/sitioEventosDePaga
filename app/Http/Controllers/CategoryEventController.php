@@ -8,8 +8,8 @@ use App\Services\EncryptService\EncryptService;
 use App\Models\Category;
 use App\Models\Event;
 
-use App\Http\Requests\SportRequest\StoreSportRequest;
-use App\Http\Requests\SportRequest\UpdateSportRequest;
+use App\Http\Requests\CategoryEventRequest\StoreCategoryEventRequest;
+use App\Http\Requests\CategoryEventRequest\UpdateCategoryEventRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
@@ -40,23 +40,23 @@ class CategoryEventController extends Controller
 
         $selectedCategories = null;
         // Verificamos si la actividad tiene tipos asociados
-        $event->load('types');
+        $event->load('categories');
 
         //aqui verificamos si la actividad tiene tipos asociados
 
         $selectedCategories = !$event->categories->isEmpty() ? $event->categories->pluck('id')->toArray() : null;
 
-        $types = Type::all(); //obtener todos los tipos disponibles
-
-        return view('activity-types.form',compact('activity', 'types','selectedCategories','id'));
+        $categories = Category::all(); //obtener todos los tipos disponibles
+    
+        return view('category-events.form',compact('event', 'categories','selectedCategories','id'));
     }
    
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)/* falta implementar el request */
+    public function store(StoreCategoryEventRequest $request)
     {
-        $decrypted_id = $this->encryptService->decrypt($request->input('activity_id'));
+        $decrypted_id = $this->encryptService->decrypt($request->input('event_id'));
 
         if (!$decrypted_id) {
             return redirect()->route('events.index')->withErrors('ID inválido.');
@@ -66,7 +66,7 @@ class CategoryEventController extends Controller
             return redirect()->route('events.index')->withErrors('Actividad no encontrada.');
         }
 
-        // Asociar los tipos enviados desde el formulario
+        // Asociar las categorias enviadas desde el formulario
         $selectedCategories = $request->input('selectedCategories', []);
 
         // Si vienen IDs válidos, los asociamos
@@ -82,8 +82,9 @@ class CategoryEventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)/* falta el request */
+    public function update(UpdateCategoryEventRequest $request, string $id)
     {
+    
         $decrypted_id = $this->encryptService->decrypt($id);
 
         if (!$decrypted_id) {

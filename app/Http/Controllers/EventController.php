@@ -21,7 +21,6 @@ class EventController extends Controller
     public function index()
     {
         /* falta poner el evento con la primera imagen relacionada de tipo cover */
-        //$events = Event::paginate(10);
         $events = Event::latest()->paginate(10);
         $events = $this->encryptService->encrypt($events);
         $type = 'active';
@@ -58,9 +57,7 @@ class EventController extends Controller
     }
 
     public function update(UpdateEventRequest $request, string $id){
-    //public function update(Request $request, string $id){
-
-        //dd($request->all());
+        
         if (empty($request->except('_token', '_method'))) {
             return redirect()->route('events.index')->withErrors('No se han realizado cambios.');
         }
@@ -100,7 +97,14 @@ class EventController extends Controller
         if (!$event) return redirect()->route('events.index')->withErrors('Tipo no encontrado.');
 
         /* aqui se podrian revisar si hay registros en las tablas intermedias para el evento y mandar las variables */
-        return view('events.show', compact('event','id'));
+
+        $activities = $event->activityEvents()->exists() ?: null;
+        $categories = $event->categories()->exists() ?: null;
+        $map = $event->places()->exists() ?: null;
+        /* aqui falta de multimedia, ya no imagenes debido a que se pueden agregar links de videos de redes sociales */
+
+
+        return view('events.show', compact('event','id','activities','categories','map'));
     }
     
     public function content($type)

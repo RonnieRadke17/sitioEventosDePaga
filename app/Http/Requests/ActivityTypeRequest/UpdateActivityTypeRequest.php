@@ -4,7 +4,7 @@ namespace App\Http\Requests\ActivityTypeRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreActivitytypeRequest extends FormRequest
+class UpdateActivityTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class StoreActivitytypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'selectedTypes' => 'required|array',
+        'selectedTypes' => 'sometimes|array',
         'selectedTypes.*' => 'exists:types,id',
         ];
     }
@@ -30,10 +30,8 @@ class StoreActivitytypeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'selectedTypes.required' => 'Debe seleccionar al menos un tipo de actividad.',
             'selectedTypes.array' => 'El formato de los tipos seleccionados no es válido.',
             'selectedTypes.*.exists' => 'Uno o más tipos seleccionados no existen en la base de datos.',
         ];
     }
-
 }
