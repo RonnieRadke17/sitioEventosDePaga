@@ -53,7 +53,7 @@ Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs
 Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
 
 
-/* falta revisar estas rutas */
+
 Route::get('activity-types/form/{activity}', [ActivityTypeController::class, 'form'])->name('activity-types.form');
 Route::post('activity-types/store', [ActivityTypeController::class, 'store'])->name('activity-types.store');
 Route::patch('activity-types/update{id}', [ActivityTypeController::class, 'update'])->name('activity-types.update');
@@ -69,11 +69,36 @@ Route::post('category-events/store', [CategoryEventController::class, 'store'])-
 Route::patch('category-events/update{id}', [CategoryEventController::class, 'update'])->name('category-events.update');
 
 
-/* por hacer aun*/
+/* falta revisar estas rutas */
+
+Route::get('activity-events/form/{event}', [ActivityEventController::class, 'form'])->name('activity-events.form');
+Route::post('activity-events/store', [ActivityEventController::class, 'store'])->name('activity-events.store');
+Route::patch('activity-events/update{id}', [ActivityEventController::class, 'update'])->name('activity-events.update');
+
+Route::get('event-map/form/{event}', [EventMapController::class, 'form'])->name('event-map.form');
+Route::post('event-map/store', [EventMapController::class, 'store'])->name('event-map.store');
+Route::patch('event-map/update{id}', [EventMapController::class, 'update'])->name('event-map.update');
+
+
+/* por hacer aun aqui se puede poner que estan vinculados a tantos eventos y un crud como tal de los lugares*/
 Route::resource('places', PlaceController::class);
 Route::get('/places/content/{type}', [PlaceController::class, 'content'])->name('places.content');
 Route::post('/places/{id}/restore', [PlaceController::class, 'restore'])->name('places.restore');
 Route::delete('/places/{id}/force-delete', [PlaceController::class, 'forceDelete'])->name('places.forceDelete');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* ya después de hacer lo del mapa se tiene que agregar una ruta para que se pueda agregar el lugar a un evento +

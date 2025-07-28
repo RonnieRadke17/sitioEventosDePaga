@@ -11,6 +11,7 @@ use App\Models\Activity;
 use App\Models\ActivityCategory;
 use App\Models\Sub;
 use App\Models\Role;
+use App\Models\Place;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        $RoleData = [
+        /* $RoleData = [
             ['name' => 'client'],
             ['name' => 'admin'],
         ];
@@ -122,7 +123,20 @@ class DatabaseSeeder extends Seeder
         // Insertar los registros en la base de datos
         foreach ($SubData as $data) {
             Sub::factory()->create($data);
-        }
+        } */
         
+
+        
+        for ($i = 1; $i <= 10; $i++) {
+            Place::create([
+                'name' => 'Lugar ' . $i,
+                'address' => 'Calle Falsa #' . rand(100, 999) . ', Ciudad Ejemplo',
+                'lat' => 19.0 + ($i * 0.01), // coordenadas simuladas
+                'lon' => -99.0 + ($i * 0.01),
+            ]);
+        }
+    
+
+
     }
 }

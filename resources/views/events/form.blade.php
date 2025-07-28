@@ -36,6 +36,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label>kit_delivery</label>
+                    <input name="kit_delivery" class="form-control" value="{{ old('kit_delivery', $event->kit_delivery) }}" data-original="{{ $event->kit_delivery }}" >
+                    @error('kit_delivery') <div>{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
                     <label>capacity</label>
                     <input name="capacity" class="form-control" value="{{ old('capacity', $event->capacity) }}" data-original="{{ $event->capacity }}" required>
                     @error('capacity') <div>{{ $message }}</div> @enderror

@@ -15,10 +15,12 @@ class Event extends Model
         'name',
         'description',
         'event_date',
-        'registration_deadline', 
+        'registration_deadline',
+        'kit_delivery', //kit de eventos kitdeliveri 
         'capacity',
         'status',
-        'price'
+        'price',
+        'place_id', //llave foranea de la tabla places
     ];
 
     //relations with users,place,payments
@@ -33,10 +35,10 @@ class Event extends Model
         return $this->belongsToMany(Category::class, 'category_event');
     }
 
-    //relation with place m-m
-    public function places()//está bien
+    //relation with place 1-m
+    public function place()//está bien
     {
-        return $this->belongsToMany(Place::class);
+        return $this->belongsTo(Place::class);
     }
 
     //relation with images 1-m está bien

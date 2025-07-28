@@ -41,7 +41,7 @@ class EventController extends Controller
             Event::create($request->validated());
             return redirect()->route('events.index')->with('message', 'Evento creado correctamente.');
         } catch (\Throwable $e) {
-            return redirect()->route('events.index')->withErrors('Error al crear el evento.');
+            return redirect()->route('events.index')->withErrors('Error al crear el evento.'. ' ' . $e->getMessage());
         }
     }
 
@@ -96,14 +96,11 @@ class EventController extends Controller
         $event = Event::withTrashed()->find($decrypted_id);
         if (!$event) return redirect()->route('events.index')->withErrors('Tipo no encontrado.');
 
-        /* aqui se podrian revisar si hay registros en las tablas intermedias para el evento y mandar las variables */
-
+        /* se manda información donde se muestra si hay contenido relacionado al evento en estas relaciones */
         $activities = $event->activityEvents()->exists() ?: null;
         $categories = $event->categories()->exists() ?: null;
-        $map = $event->places()->exists() ?: null;
-        /* aqui falta de multimedia, ya no imagenes debido a que se pueden agregar links de videos de redes sociales */
-
-
+        $map = $event->place()->exists() ?: null;
+        //$multimedia = $event->multimedia()->exists() ?: null;
         return view('events.show', compact('event','id','activities','categories','map'));
     }
     

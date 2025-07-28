@@ -11,8 +11,75 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+
+use App\Services\EncryptService\EncryptService;
+
 class EventMapController extends Controller
 {
+    protected $encryptService;
+
+    public function __construct(EncryptService $encryptService)
+    {
+        $this->encryptService = $encryptService;
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function form(string $id)
+    {
+        $decrypted_id = $this->encryptService->decrypt($id);
+
+        if (!$decrypted_id) {
+            return redirect()->route('events.index')->withErrors('ID inválido.');
+        }
+
+        $event = Event::withTrashed()->with('place')->find($decrypted_id);
+
+        if (!$event) {
+            return redirect()->route('events.index')->withErrors('Evento no encontrado.');
+        }
+
+        // Como la relación es belongsTo, no es colección
+        $selectedPlace = $event->place ? $event->place->id : null;
+
+        $places = Place::all();
+
+        return view('event-map.form', compact('event', 'places', 'selectedPlace', 'id'));
+    }
+
+
+    /* falta el método de store y update */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -138,7 +205,7 @@ class EventMapController extends Controller
         }
     }
 
-    public function validationView(string $id)
+    /* public function validationView(string $id)
     {
         
         try {
@@ -162,7 +229,7 @@ class EventMapController extends Controller
         // Manejar el error de desencriptación
             return redirect()->back()->withErrors('ID inválido o corrupto.');
         }
-    }
+    } */
 
 
 

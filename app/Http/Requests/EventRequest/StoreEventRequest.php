@@ -26,6 +26,7 @@ class StoreEventRequest extends FormRequest
             'description' => 'required|string|min:10|max:200',
             'event_date' => 'required|date|after:today',
             'registration_deadline' => 'required|date|after:today|before:event_date',
+            'kit_delivery' => 'nullable|date|after:today|before:event_date',
             'capacity' => 'nullable|numeric|min:5|max:900000',
             'price' => 'nullable|numeric|min:10|max:10000', 
         ];
@@ -55,6 +56,10 @@ class StoreEventRequest extends FormRequest
             'registration_deadline.after' => 'La fecha límite de inscripción debe ser posterior a hoy.',
             'registration_deadline.before' => 'La fecha límite de inscripción debe ser anterior a la fecha del evento.',
 
+            'kit_delivery.date' => 'La fecha de entrega del kit debe ser una fecha válida.',
+            'kit_delivery.after' => 'La fecha de entrega del kit debe ser posterior a hoy.',
+            'kit_delivery.before' => 'La fecha de entrega del kit debe ser anterior a la fecha del evento.',
+            
             'capacity.numeric' => 'La capacidad debe ser un número.',
             'capacity.min' => 'La capacidad mínima es de 5 personas.',
             'capacity.max' => 'La capacidad máxima es de 900000 personas.',
