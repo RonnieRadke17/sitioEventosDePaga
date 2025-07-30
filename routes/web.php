@@ -90,7 +90,7 @@ Route::patch('event-map/update{id}', [EventMapController::class, 'update'])->nam
 
 Route::get('event-multimedia/form/{event}', [EventMultimediaController::class, 'form'])->name('event-multimedia.form');
 Route::post('event-multimedia/store', [EventMultimediaController::class, 'store'])->name('event-multimedia.store');
-Route::patch('event-multimedia/update{id}', [EventMultimediaController::class, 'update'])->name('event-multimedia.update');
+Route::put('event-multimedia/update{id}', [EventMultimediaController::class, 'update'])->name('event-multimedia.update');
 
 
 
