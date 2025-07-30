@@ -25,6 +25,8 @@ use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ActivityTypeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryEventController;
+use App\Http\Controllers\EventMultimediaController;
+use App\Http\Controllers\RoleController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
@@ -71,6 +73,13 @@ Route::patch('category-events/update{id}', [CategoryEventController::class, 'upd
 
 /* falta revisar estas rutas */
 
+Route::resource('roles', RoleController::class)->except('show');
+Route::get('/roles/content/{type}', [RoleController::class, 'content'])->name('roles.content');
+Route::post('/roles/{id}/restore', [RoleController::class, 'restore'])->name('roles.restore');
+Route::delete('/roles/{id}/force-delete', [RoleController::class, 'forceDelete'])->name('roles.forceDelete');
+
+
+/* falta revisar estas rutas */
 Route::get('activity-events/form/{event}', [ActivityEventController::class, 'form'])->name('activity-events.form');
 Route::post('activity-events/store', [ActivityEventController::class, 'store'])->name('activity-events.store');
 Route::patch('activity-events/update{id}', [ActivityEventController::class, 'update'])->name('activity-events.update');
@@ -78,6 +87,15 @@ Route::patch('activity-events/update{id}', [ActivityEventController::class, 'upd
 Route::get('event-map/form/{event}', [EventMapController::class, 'form'])->name('event-map.form');
 Route::post('event-map/store', [EventMapController::class, 'store'])->name('event-map.store');
 Route::patch('event-map/update{id}', [EventMapController::class, 'update'])->name('event-map.update');
+
+Route::get('event-multimedia/form/{event}', [EventMultimediaController::class, 'form'])->name('event-multimedia.form');
+Route::post('event-multimedia/store', [EventMultimediaController::class, 'store'])->name('event-multimedia.store');
+Route::patch('event-multimedia/update{id}', [EventMultimediaController::class, 'update'])->name('event-multimedia.update');
+
+
+
+
+
 
 
 /* por hacer aun aqui se puede poner que estan vinculados a tantos eventos y un crud como tal de los lugares*/

@@ -47,6 +47,12 @@ class Event extends Model
         return $this->hasMany(Image::class);
     }
 
+    //relación con multimedia event m-1 multimedia
+    public function multimedias()
+    {
+        return $this->hasMany(Multimedia::class);
+    }
+
     public function payments()//está bien
     {
         return $this->belongsToMany(User::class, 'payments')->withTimestamps();

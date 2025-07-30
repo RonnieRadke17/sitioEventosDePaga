@@ -59,9 +59,9 @@
 
 {{-- link del form de multimedia del evento --}}
 {{-- aqui igual se define si se pone el apartado de la imagen del kit --}}
-{{-- <a href="{{ route('event-multimedia.form', $id) }}">
+<a href="{{ route('event-multimedia.form', $id) }}">
     {{ $multimedia == null ? 'agregar multimedia' : 'modificar multimedia' }}
-</a> --}}
+</a>
 
 {{-- link para desactivar el evento --}}
 @if($event->trashed())

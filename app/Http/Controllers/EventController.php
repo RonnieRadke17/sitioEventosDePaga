@@ -100,8 +100,8 @@ class EventController extends Controller
         $activities = $event->activityEvents()->exists() ?: null;
         $categories = $event->categories()->exists() ?: null;
         $map = $event->place()->exists() ?: null;
-        //$multimedia = $event->multimedia()->exists() ?: null;
-        return view('events.show', compact('event','id','activities','categories','map'));
+        $multimedia = $event->multimedias()->exists() ?: null;
+        return view('events.show', compact('event','id','activities','categories','map','multimedia'));
     }
     
     public function content($type)
