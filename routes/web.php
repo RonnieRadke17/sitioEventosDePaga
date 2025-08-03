@@ -5,7 +5,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\UserEventController;
-use App\Http\Controllers\ActivityEventController;
+
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
@@ -27,6 +27,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryEventController;
 use App\Http\Controllers\EventMultimediaController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ActivityEventController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');

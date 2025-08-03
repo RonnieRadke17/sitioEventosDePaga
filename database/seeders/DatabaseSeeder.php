@@ -41,19 +41,19 @@ class DatabaseSeeder extends Seeder
                 'password' => base64_encode('Knives1.'),
                 'role_id' => 2//revisar este apartado
             ],
-        );
+        ); */
 
 
         // 1. Crear categorías
-    $categoryNames = ['Deportes individuales', 'Deportes de equipo'];
+    /* $categoryNames = ['Deportes individuales', 'Deportes de equipo'];
     $categories = [];
 
     foreach ($categoryNames as $name) {
         $categories[$name] = Category::create(['name' => $name]);
-    }
+    } */
 
     // 2. Crear deportes y vincular con categoría
-    $sportsData = [
+    /* $sportsData = [
         'Atletismo' => 'Deportes individuales',
         'Fútbol' => 'Deportes de equipo',
         'Natación' => 'Deportes individuales',
@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $categories[$categoryName]->id,
         ]);
     }
-
+ */
     // 3. Actividades de atletismo
     $Activitydata = [ 
         ['name' => '100 metros'],
@@ -123,7 +123,7 @@ class DatabaseSeeder extends Seeder
         // Insertar los registros en la base de datos
         foreach ($SubData as $data) {
             Sub::factory()->create($data);
-        } */
+        }
         
 
         

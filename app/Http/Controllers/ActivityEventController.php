@@ -35,7 +35,6 @@ class ActivityEventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    /* falta encriptar el contenido de los types */
     public function form(string $id)
     {
         $decrypted_id = $this->encryptService->decrypt($id);
@@ -45,29 +44,88 @@ class ActivityEventController extends Controller
         }
         $event = Event::withTrashed()->find($decrypted_id);
         if (!$event) {
-            return redirect()->route('event.index')->withErrors('Actividad no encontrada.');
+            return redirect()->route('events.index')->withErrors('Event no encontrado.');
         }
 
-        $selectedActivities = null;
-        // Verificamos si el evento tiene actividades asociadas
-        /* hasta aqui vamos bien ya lo demás es más delicado revisarlo */
-        
-        
-        
-        $event->load('activities');
-        //aqui verificamos si la actividad tiene tipos asociados
+        $activities = Activity::all();
+        $subs = Sub::all();
+        /* relación con actividades del evento */
+        $activitiesEvent = $event->activityEvents()->exists() ?: null;
 
-        $selectedActivities = !$event->types->isEmpty() ? $event->types->pluck('id')->toArray() : null;
 
-        $types = Type::all(); //obtener todos los tipos disponibles
+        $selectedActivities = $event->activityEvents()->pluck('activity_id')->unique()->toArray();
 
-        return view('activity-types.form',compact('activity', 'types','selectedActivities','id'));
+        $selectedGenders = $event->activityEvents()
+            ->get()
+            ->groupBy('activity_id');
+
+        return view('activity-events.form', compact('activities','subs','event','id','activitiesEvent','selectedActivities','selectedGenders'));
+        
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreActivityEventRequest $request)//ya
+    {
+        $decrypted_id = $this->encryptService->decrypt($request->input('event_id'));
 
+        if (!$decrypted_id) {
+            return redirect()->route('events.index')->withErrors('ID inválido.');
+        }
+        $event = Event::withTrashed()->find($decrypted_id);
+        if (!$event) {
+            return redirect()->route('events.index')->withErrors('Evento no encontrada.');
+        }
 
+        $genders = $request->input('genders', []);
 
+        // Eliminar registros anteriores si aplica (opcional)
+        ActivityEvent::where('event_id', $decrypted_id)->delete();
 
+        foreach ($genders as $activityId => $genderGroups) {
+            foreach ($genderGroups as $gender => $subs) {
+                foreach ($subs as $subId => $value) {
+                    ActivityEvent::create([
+                        'event_id'     => $decrypted_id,
+                        'activity_id'  => $activityId,
+                        'sub_id'       => $subId,
+                        'gender'       => $gender,
+                    ]);
+                }
+            }
+        }
 
-    
+        return redirect()->route('events.index')->with('success', 'Actividades registradas correctamente');
+
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(StoreActivityEventRequest $request, string $id)
+    {
+        $eventId = $request->getDecryptedEventId();
+        $genders = $request->input('genders', []);
+        $selectedActivities = $request->input('selected_activities', []);
+
+        // 🗑️ 1. Borrar todos los registros actuales del evento
+        ActivityEvent::where('event_id', $eventId)->delete();
+
+        // ✅ 2. Insertar los nuevos (solo si hay seleccionados)
+        foreach ($genders as $activityId => $genderGroups) {
+            foreach ($genderGroups as $gender => $subs) {
+                foreach ($subs as $subId => $value) {
+                    ActivityEvent::create([
+                        'event_id'    => $eventId,
+                        'activity_id' => $activityId,
+                        'sub_id'      => $subId,
+                        'gender'      => $gender,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Actividades actualizadas correctamente.');
+    }    
 }
