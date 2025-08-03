@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // hace un "borrado suave" de los registros eliminados
+//suse Illuminate\Database\Eloquent\SoftDeletes; // hace un "borrado suave" de los registros eliminados
 
 class ActivityEvent extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+    //use SoftDeletes;
 
     protected $fillable = [
         'event_id','activity_id','gender','sub_id'

@@ -104,8 +104,24 @@ class ActivityEventController extends Controller
      * Update the specified resource in storage.
      */
     public function update(StoreActivityEventRequest $request, string $id)
+    //public function update(Request $request, string $id)
     {
-        $eventId = $request->getDecryptedEventId();
+        //dd($request->all(),$id);
+        $eventId = $this->encryptService->decrypt($id);
+        //dd($request->all(),$id,$eventId);
+        //$eventId = $this->encryptService->decrypt($id);
+
+        if (!$eventId) {
+            return redirect()->route('events.index')->withErrors('ID inválido.');
+        }
+        $event = Event::withTrashed()->find($eventId);
+        if (!$event) {
+            return redirect()->route('events.index')->withErrors('Event no encontrado.');
+        }
+
+
+        
+
         $genders = $request->input('genders', []);
         $selectedActivities = $request->input('selected_activities', []);
 
@@ -125,7 +141,7 @@ class ActivityEventController extends Controller
                 }
             }
         }
-
-        return redirect()->back()->with('success', 'Actividades actualizadas correctamente.');
+        return redirect()->route('events.index')->with('success', 'Actividades actualizadas correctamente.');
+        //return redirect()->back()->with('success', 'Actividades actualizadas correctamente.');
     }    
 }
