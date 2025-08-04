@@ -5,16 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\http\Requests\AuthRequest\RegisterRequest;
 use App\Services\EmailService\EmailService;
-/* use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Models\UserToken;
+use Carbon\Carbon;
+
+
+
+use Illuminate\Support\Facades\Hash;
+
 use App\Models\User; // Importa tu modelo User
 use Illuminate\Support\Facades\Auth; // Importa Auth para el login
 use Illuminate\Support\Facades\Crypt; // Se usa para la encriptación
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
-use App\Http\Controllers\EmailController;
+
+/* use App\Http\Controllers\EmailController;
 use App\Models\EmailVerification; */
-use App\Models\UserToken;
+
 
 class RegisterController extends Controller
 {
@@ -36,19 +41,13 @@ class RegisterController extends Controller
     // Código de verificación de 6 dígitos
     public function processRegister(RegisterRequest $request)
     {
-        
-        $sendVerificationCode = $this->email->sendCode($request->email,'verification');
         /* manda a llamar el service de email para mandar el correo de verificación */
-        
-        // Llamada al controlador de correo para enviar el código de verificación
-        /* $controladoremail = app(EmailController::class);
-        $emailResponse = $controladoremail->sendCodeViaEmail($request->email, "verification");
+        $sendVerificationCode = $this->email->sendCode($request->email,"email_verification");
 
         // Verificar si la respuesta es válida y manejar errores
-        if (!$emailResponse || $emailResponse['status'] == false) {
-            return redirect()->back()->with('error', $emailResponse['message']);
-        } */
-
+        if (!$sendVerificationCode || $sendVerificationCode['status'] == false) {
+            return redirect()->back()->withErrors($sendVerificationCode['message']);
+        }
 
         $user = $request->validated();
         // Almacenar los datos del usuario en la sesión
@@ -71,15 +70,16 @@ class RegisterController extends Controller
         $user = session('user');
         
         if (!$user) {
-            return redirect()->route('register')->withErrors(['error' => 'Datos de usuario no encontrados.']);
+            return redirect()->route('register')->withErrors(['error' => 'Datos del usuario no encontrados.']);
         }
 
         $existingVerification = UserToken::where('email', $user['email'])
+            ->where('type', "email_verification") // parámetro adicional
             ->orderBy('created_at', 'desc')
             ->first();
 
-        $expirationTime = Carbon::parse($existingVerification->expiration)->setTimezone('America/Mexico_City');
-        $now = Carbon::now('America/Mexico_City');
+        $expirationTime = Carbon::parse($existingVerification->expiration)->setTimezone('UTC');
+        $now = Carbon::now('UTC');
 
         // Calcular el tiempo restante en segundos y formatearlo
         $remainingSeconds = max($now->diffInSeconds($expirationTime), 0);
@@ -89,7 +89,7 @@ class RegisterController extends Controller
         return view('auth.email-verification', compact('user', 'remainingTimeFormatted', 'remainingSeconds'));
     }
 
-    public function checkEmailVerification(Request $request)
+    public function checkEmailVerification(Request $request)//falta este método
     {
         $user = session('user');
         $emailController = app(EmailController::class);

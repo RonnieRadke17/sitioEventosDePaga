@@ -10,7 +10,7 @@
 
 <div class="min-h-screen flex items-center justify-center ">
         <!-- Mostrar errores de validación -->
-        {{-- @if ($errors->any())
+        @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
@@ -18,14 +18,8 @@
                     @endforeach
                 </ul>
             </div>
-        @endif --}}
+        @endif
 
-        <!-- Mostrar mensaje de error de sesión -->
-       {{--  @if (session()->get('error'))
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-                {{ session()->get('error') }}
-            </div>
-        @endif --}}
 
         <!-- Formulario -->
         <form method="POST" action="{{ route('process-register') }}" class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200 dark:text-white dark:bg-gray-600 dark:border-gray-600">
