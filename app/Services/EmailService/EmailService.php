@@ -15,8 +15,68 @@ use Illuminate\Support\Str;//se usa para generar texto aleatorio
 
 class EmailService{
 
+    public function SendCode($email,$type){
+        $code = random_int(100000, 999999);
+        $data = ['mailSubject', 'mailMessage', 'code'];
+        $subject = null;
 
-   public function sendCode($email, $affair)
+            /* buscamos en los registros incluso usando el withtrash y e incluso usamos el type*/
+            $register = UserToken::where('email', $email)
+                ->where('type', $type) // parámetro adicional
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+                /* revisar condicional de si es valido todavia */
+                if ($register && $register->created_at && $register->created_at->gt(now()->subMinutes(5))) {
+                    // código si aún es válido
+                } else {
+                    // código si ya expiró o no existe
+                }
+
+                if ($reqister) {
+                    // Verificar si el código anterior ha expirado
+                    if (1 == 1) {
+                        // Si el código no ha expirado, retornar un error
+                        return [
+                            'status' => false,
+                            'message' => 'Aún no se puede enviar un nuevo código. El código anterior no ha expirado.'
+                        ];
+                    }
+                }
+            
+            // Crear nuevo código de verificación
+                $subject = 'Código de Verificación';
+                UserToken::create([
+                    'email' => $email,
+                    'token' => base64_encode($code),
+                    'type' => 'email_verification',
+                    'expiration' => Carbon::now()->addMinutes(5)
+                ]);
+
+                /* mandar el correo */
+                Mail::send('emails.verification', [
+                    'mailSubject' => 'Código de Verificación',
+                    'mailMessage' => 'Tu código de verificación es:',
+                    'code' => $code
+                    ], function ($message) use ($email, $subject) {
+                        $message->to($email)->subject($subject);
+                });
+
+                return [
+                    'status' => true,
+                    'message' => 'Código enviado correctamente.'
+                ];
+
+
+    }
+
+
+
+
+
+
+    /* refactorización para  poner verificación y reset*/
+   public function send∫($email, $affair)
     {
         $code = random_int(100000, 999999);
         $data = ['mailSubject', 'mailMessage', 'code'];
