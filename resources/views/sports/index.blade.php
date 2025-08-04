@@ -11,8 +11,6 @@
     </div>
 @endif
 
-
-
 <h1>Listado de Deportes</h1>
 
 <div data-dial-init class="fixed right-6 bottom-6">
@@ -22,8 +20,6 @@
         </svg>
     </a>
 </div>
-
-
 
 
 <form class="max-w-sm mx-auto">
@@ -44,11 +40,6 @@
     </option>
   </select>
 </form>
-
-
-
-
-
 
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

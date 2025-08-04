@@ -4,11 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserEventController;
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\ActivityEventController;
-use App\Http\Controllers\SubController;
+
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ErrorsController;
 use App\Http\Controllers\PaypalController;
@@ -17,11 +14,18 @@ use App\Http\Controllers\AdminEventController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\EventMapController;
-use App\Http\Controllers\ImageEventController;
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SportController;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SubController;
 use App\Http\Controllers\TypeController;
+use App\Http\Controllers\ActivityTypeController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\CategoryEventController;
+use App\Http\Controllers\EventMultimediaController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ActivityEventController;
 
 Route::resource('sports', SportController::class)->except('show');
 Route::get('/sports/content/{type}', [SportController::class, 'content'])->name('sports.content');
@@ -38,7 +42,6 @@ Route::get('/types/content/{type}', [TypeController::class, 'content'])->name('t
 Route::post('/types/{id}/restore', [TypeController::class, 'restore'])->name('types.restore');
 Route::delete('/types/{id}/force-delete', [TypeController::class, 'forceDelete'])->name('types.forceDelete');
 
-/* falta reviar estas rutas */
 Route::resource('activities', ActivityController::class);
 Route::get('/activities/content/{type}', [ActivityController::class, 'content'])->name('activities.content');
 Route::post('/activities/{id}/restore', [ActivityController::class, 'restore'])->name('activities.restore');
@@ -49,38 +52,70 @@ Route::get('/subs/content/{type}', [SubController::class, 'content'])->name('sub
 Route::post('/subs/{id}/restore', [SubController::class, 'restore'])->name('subs.restore');
 Route::delete('/subs/{id}/force-delete', [SubController::class, 'forceDelete'])->name('subs.forceDelete');
 
+Route::get('activity-types/form/{activity}', [ActivityTypeController::class, 'form'])->name('activity-types.form');
+Route::post('activity-types/store', [ActivityTypeController::class, 'store'])->name('activity-types.store');
+Route::patch('activity-types/update{id}', [ActivityTypeController::class, 'update'])->name('activity-types.update');
+
+Route::resource('events', EventController::class); 
+Route::get('/events/content/{type}', [EventController::class, 'content'])->name('events.content');
+Route::post('/events/{id}/restore', [EventController::class, 'restore'])->name('events.restore');
+Route::delete('/events/{id}/force-delete', [EventController::class, 'forceDelete'])->name('events.forceDelete');
+
+Route::get('category-events/form/{event}', [CategoryEventController::class, 'form'])->name('category-events.form');
+Route::post('category-events/store', [CategoryEventController::class, 'store'])->name('category-events.store');
+Route::patch('category-events/update{id}', [CategoryEventController::class, 'update'])->name('category-events.update');
+
+Route::resource('roles', RoleController::class)->except('show');
+Route::get('/roles/content/{type}', [RoleController::class, 'content'])->name('roles.content');
+Route::post('/roles/{id}/restore', [RoleController::class, 'restore'])->name('roles.restore');
+Route::delete('/roles/{id}/force-delete', [RoleController::class, 'forceDelete'])->name('roles.forceDelete');
+
+Route::get('activity-events/form/{event}', [ActivityEventController::class, 'form'])->name('activity-events.form');
+Route::post('activity-events/store', [ActivityEventController::class, 'store'])->name('activity-events.store');
+Route::patch('activity-events/update{id}', [ActivityEventController::class, 'update'])->name('activity-events.update');
+
+Route::get('event-multimedia/form/{event}', [EventMultimediaController::class, 'form'])->name('event-multimedia.form');
+Route::post('event-multimedia/store', [EventMultimediaController::class, 'store'])->name('event-multimedia.store');
+Route::put('event-multimedia/update{id}', [EventMultimediaController::class, 'update'])->name('event-multimedia.update');
+
+/* falta revisar estas rutas */
+Route::get('event-map/form/{event}', [EventMapController::class, 'form'])->name('event-map.form');
+Route::post('event-map/store', [EventMapController::class, 'store'])->name('event-map.store');
+Route::patch('event-map/update{id}', [EventMapController::class, 'update'])->name('event-map.update');
+
+/* por hacer aun aqui se puede poner que estan vinculados a tantos eventos y un crud como tal de los lugares*/
+/* Route::resource('places', PlaceController::class);
+Route::get('/places/content/{type}', [PlaceController::class, 'content'])->name('places.content');
+Route::post('/places/{id}/restore', [PlaceController::class, 'restore'])->name('places.restore');
+Route::delete('/places/{id}/force-delete', [PlaceController::class, 'forceDelete'])->name('places.forceDelete'); */
+
+
+/* rutas de autentificación */
+//falta grupo de rutas de registro y login
+//Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');
+//Route::post('/process-register', [RegisterController::class, 'processRegister'])->name('process-register');
+Route::get('/email-verification',[RegisterController::class,'emailVerification'])->name('email-verification');
+Route::post('/check-email-verification',[RegisterController::class,'checkEmailVerification'])->name('check-email-verification');
+Route::post('/send-verification-code',[RegisterController::class,'sendVerificationCode'])->name('send-verification-code');
+Route::post('/signup',[RegisterController::class,'register'] )->name('signup');//ruta que registra al usr
+
+
+Route::controller(RegisterController::class)->group(function(){
+    /* rutas de la autentificacion */
+    Route::get('/register','form')->name('register');
+    Route::post('/process-register','processRegister')->name('process-register');
+});
 
 
 
 
 
 
-
-
-
-
-//rutas del mapa de los eventos
-Route::resource('event-map', EventMapController::class)->except(['index', 'create']); // Excluye index y create
-// Ruta personalizada para create con parámetro id
-Route::get('/event-map/create/{id}', [EventMapController::class, 'create'])->name('event-map.create');
-
-// Resource sin index
-Route::resource('activities-event', ActivityEventController::class)->except(['index', 'create']); // Excluye index y create
-// Ruta personalizada para create con parámetro id
-Route::get('/activities-event/create/{id}', [ActivityEventController::class, 'create'])->name('activities-event.create');
-
-
-// Resource sin index
-Route::resource('images-event', ImageEventController::class)->except(['index', 'create']); // Excluye index y create
-// Ruta personalizada para create con parámetro id
-Route::get('/images-event/create/{id}', [ImageEventController::class, 'create'])->name('images-event.create');
-
-
-Route::get('/pago', function () {
+/* Route::get('/pago', function () {
     return view('stripe');
 })->name('stripe.form');
 
-Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment'); 
+Route::post('/pago', [StripeController::class, 'processPayment'])->name('stripe.payment');  */
 
 //use App\Http\Controllers\ProfileController;Revisar si es necesario
 
@@ -112,13 +147,7 @@ Route::get('/error',[ErrorsController::class,'showWindowError'])->name('window.e
 
 //rutas del perfil
 
-//falta grupo de rutas de registro y login
-Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');
-Route::post('/process-register', [RegisterController::class, 'processRegister'])->name('process-register');
-Route::get('/email-verification',[RegisterController::class,'emailVerification'])->name('email-verification');
-Route::post('/check-email-verification',[RegisterController::class,'checkEmailVerification'])->name('check-email-verification');
-Route::post('/send-verification-code',[RegisterController::class,'sendVerificationCode'])->name('send-verification-code');
-Route::post('/signup',[RegisterController::class,'register'] )->name('signup');//ruta que registra al usr
+
 
 //Route::view('/login', 'auth/login')->name('login');//ruta que muestra la vista del login ya no se ocupa
 Route::get('/login',[LoginController::class,'showLoginForm'])->name('login');//ruta que muestra la vista del login
@@ -127,23 +156,15 @@ Route::post('/signin',[LoginController::class,'login'] )->name('signin');//ruta 
 
 Route::get('/logout',[LogoutController::class,'logout'] )->name('logout');//ruta que cierra sesion al usr
 
-   
-   
-    Route::resource('event', EventController::class); 
-
-/*  Route::resource('event', EventController::class)->middleware(RoleMiddleware::class);
-Route::resource('sub', SubController::class)->middleware(RoleMiddleware::class);
-Route::resource('activity', ActivityController::class)->middleware(RoleMiddleware::class); */
-
 //mercadopago
-Route::get('/mp', [MercadoPagoController::class, 'index']);
+/* Route::get('/mp', [MercadoPagoController::class, 'index']);
 Route::get('/create-preference', [MercadoPagoController::class, 'generatePreferenceId']);
 
 //paypal
 Route::post('paypal', [PaypalController::class, 'paypal'])->name('paypal');
 Route::get('success', [PaypalController::class, 'success'])->name('success');
 Route::get('cancel', [PaypalController::class, 'cancel'])->name('cancel');
-
+ */
 
 
 /* 

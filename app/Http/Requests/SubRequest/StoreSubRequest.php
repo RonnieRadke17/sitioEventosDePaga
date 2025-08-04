@@ -22,9 +22,9 @@ class StoreSubRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:100|unique:subs,name',
-            'min' => 'required|integer|min:1|max:100',
-            'max' => 'required|integer|min:1|max:100|gt:min',
+            'name' => 'required|string|min:3|max:30|unique:subs,name',
+            'min' => 'required|integer|min:6|max:100',
+            'max' => 'required|integer|min:6|max:100|gt:min',
         ];
     }
 

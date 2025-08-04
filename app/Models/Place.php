@@ -17,9 +17,9 @@ class Place extends Model
         'lon'
     ];
 
-    //relationship with event m-m    
+    //relationship with event m-1    
     public function events()
     {
-        return $this->belongsToMany(Event::class);
+        return $this->hasMany(Event::class);
     }
 }

@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Requests\ActivityTypeRequest;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreActivitytypeRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+        'selectedTypes' => 'required|array',
+        'selectedTypes.*' => 'exists:types,id',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'selectedTypes.required' => 'Debe seleccionar al menos un tipo de actividad.',
+            'selectedTypes.array' => 'El formato de los tipos seleccionados no es válido.',
+            'selectedTypes.*.exists' => 'Uno o más tipos seleccionados no existen en la base de datos.',
+        ];
+    }
+
+}
